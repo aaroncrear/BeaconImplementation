@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Accounting_Date__c</fullName>
+    <description>Date of Invoice</description>
     <inlineHelpText>If paid set it to Close Date. For unpaid opps, leave it blank</inlineHelpText>
     <label>Accounting Date</label>
     <required>false</required>

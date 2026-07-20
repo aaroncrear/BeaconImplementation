@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Referred_By__c</fullName>
+    <description>Person or source that referred the opportunity.</description>
     <deleteConstraint>SetNull</deleteConstraint>
     <inlineHelpText>Where applicable, look-up and enter the name of the referring Contact.</inlineHelpText>
     <label>Referred By</label>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Invoice_Terms__c</fullName>
+    <description>Terms agreed for the invoice which comes into the invoicing body to buiild customer invoice</description>
     <inlineHelpText>Select a payment term for single payment, otherwise select the "Split" value and fill in the Terms 1 and 2 on the right column</inlineHelpText>
     <label>Invoice Terms</label>
     <required>false</required>

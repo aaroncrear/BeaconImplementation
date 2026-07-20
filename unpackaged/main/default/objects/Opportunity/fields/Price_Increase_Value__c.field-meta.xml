@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Price_Increase_Value__c</fullName>
-    <description>Calculates Yield. Renewal Opportunity Amount minus Previous Yield.</description>
+    <description>Value of the price increase for the renewal.</description>
     <formula>Amount - Previous_Yield__c</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <inlineHelpText>Calculates Yield. Renewal Opportunity Amount minus Previous Yield.</inlineHelpText>
