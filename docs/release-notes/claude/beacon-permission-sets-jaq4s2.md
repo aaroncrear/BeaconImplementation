@@ -94,6 +94,12 @@ fully satisfied alongside the license restriction.
 8. For each of the eight permission sets, confirm the "License" field on the permission set
    detail page reads "Salesforce," and confirm the permission set can only be assigned to users
    with a Salesforce (full CRM) user license.
+9. Confirm all eight permission sets deploy cleanly to a sandbox with no `PermissionSetTabVisibility`
+   errors, and that none of the eight grant field access to `Account.Beacon_Account_Segment__c`,
+   `Account.Beacon_Account_Type__c`, `Account.Seat_Utilisation_Rate_Last_30_Days__c`,
+   `Account.Seat_Utilisation_Rate_YTD__c`, `Contact.Email_Communication__c`,
+   `Contact.Phone_Communication__c`, or `CampaignMember.Account_Status__c` (temporarily removed —
+   see Post Deployment Items).
 
 ## Post Deployment Items
 
@@ -111,6 +117,31 @@ fully satisfied alongside the license restriction.
 - The Campaign sheet's "Module" row (API name entered as `Beacon_Module_Family__c`) looks like a
   data-entry error in the source workbook — confirm with the workbook owner whether it should
   instead point at the existing `Module__c` field, which has no description of its own yet.
+- **Fixed a deploy blocker**: all 8 permission sets used `<visibility>DefaultOn</visibility>` in
+  `tabSettings`, but `PermissionSet.tabSettings` uses the `PermissionSetTabVisibility` enum
+  (`Visible`/`None`), not the Profile `TabVisibility` enum (`DefaultOn`/`DefaultOff`/`Hidden`).
+  Corrected to `Visible` in all 40 `tabSettings` entries (5 tabs × 8 permission sets).
+- **Temporarily removed field access** to 7 fields from all 8 permission sets, because those
+  fields fail to deploy on their own: their formulas reference other custom fields that don't
+  exist anywhere in this repo or (per the sandbox validation) in the target org either.
+  | Field | References that don't exist |
+  |---|---|
+  | `Account.Beacon_Account_Segment__c` | `LS_Company_Type__c` |
+  | `Account.Beacon_Account_Type__c` | `Total_Beacon_Revenue_Last_365_Days__c` |
+  | `Account.Seat_Utilisation_Rate_Last_30_Days__c` | `Pendo_Visitors_Last_30_Days__c` |
+  | `Account.Seat_Utilisation_Rate_YTD__c` | `Pendo_Visitors_Year_To_Date__c` |
+  | `Contact.Email_Communication__c` | `Blacklisted__c`, `Account.Blacklisted__c`, `Is_Email_Valid__c`, `pi__pardot_hard_bounced__c`, `Email_Bounced_Back__c` |
+  | `Contact.Phone_Communication__c` | `Blacklisted__c`, `Account.Blacklisted__c`, `Contact_Suspended__c`, `is_Phone_Valid__c` |
+  | `CampaignMember.Account_Status__c` | `Contact.Account.Account_Status__c`, `Contact.Account.Account_History__c` |
+
+  This only removes the permission sets' field access to these 7 fields — it does **not** fix
+  the fields themselves, which are still present in this repo
+  (`unpackaged/main/default/objects/**/fields/`) with the same broken formulas. If a deploy
+  includes the `CustomObject` metadata for Account, Contact, or CampaignMember (not just the
+  permission sets), these 7 fields will still fail to deploy as `CustomField` components until
+  their missing dependency fields are added to the org/repo or their formulas are corrected.
+  Follow-up needed: retrieve or define the missing fields listed above, then restore field access
+  on these 7 fields to all 8 permission sets.
 
 ## Component Manifest
 
