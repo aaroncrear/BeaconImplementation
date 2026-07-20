@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Channels__c</fullName>
+    <description>Beacon Attribution</description>
+    <label>Channels</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Email, Events</fullName>
+                <default>false</default>
+                <label>Email, Events</label>
+            </value>
+            <value>
+                <fullName>Email - Pardot</fullName>
+                <default>false</default>
+                <label>Email - Pardot</label>
+            </value>
+            <value>
+                <fullName>Email - SendGrid</fullName>
+                <default>false</default>
+                <label>Email - SendGrid</label>
+            </value>
+            <value>
+                <fullName>ABM - Email</fullName>
+                <default>false</default>
+                <label>ABM - Email</label>
+            </value>
+            <value>
+                <fullName>Direct Marketing</fullName>
+                <default>false</default>
+                <label>Direct Marketing</label>
+            </value>
+            <value>
+                <fullName>Social Media (Organic)</fullName>
+                <default>false</default>
+                <label>Social Media (Organic)</label>
+            </value>
+            <value>
+                <fullName>Social Media (Paid)</fullName>
+                <default>false</default>
+                <label>Social Media (Paid)</label>
+            </value>
+            <value>
+                <fullName>HW Event Onsite</fullName>
+                <default>false</default>
+                <label>HW Event Onsite</label>
+            </value>
+            <value>
+                <fullName>HW Event Collab</fullName>
+                <default>false</default>
+                <label>HW Event Collab</label>
+            </value>
+            <value>
+                <fullName>LinkedIn (Paid)</fullName>
+                <default>false</default>
+                <label>LinkedIn (Paid)</label>
+            </value>
+            <value>
+                <fullName>Landing Page (Organic)</fullName>
+                <default>false</default>
+                <label>Landing Page (Organic)</label>
+            </value>
+            <value>
+                <fullName>PPC</fullName>
+                <default>false</default>
+                <label>PPC</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

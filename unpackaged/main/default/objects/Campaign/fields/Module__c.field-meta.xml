@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Module__c</fullName>
+    <description>Beacon Modules</description>
+    <label>Module</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>ADC</fullName>
+                <default>false</default>
+                <label>ADC</label>
+            </value>
+            <value>
+                <fullName>Bispecific</fullName>
+                <default>false</default>
+                <label>Bispecific</label>
+            </value>
+            <value>
+                <fullName>Cancer Vaccines</fullName>
+                <default>false</default>
+                <label>Cancer Vaccines</label>
+            </value>
+            <value>
+                <fullName>Cell Therapy</fullName>
+                <default>false</default>
+                <label>Cell Therapy</label>
+            </value>
+            <value>
+                <fullName>Checkpoint</fullName>
+                <default>false</default>
+                <label>Checkpoint</label>
+            </value>
+            <value>
+                <fullName>CVRM</fullName>
+                <default>false</default>
+                <label>CVRM</label>
+            </value>
+            <value>
+                <fullName>Cytokine</fullName>
+                <default>false</default>
+                <label>Cytokine</label>
+            </value>
+            <value>
+                <fullName>DDR</fullName>
+                <default>false</default>
+                <label>DDR</label>
+            </value>
+            <value>
+                <fullName>General</fullName>
+                <default>false</default>
+                <label>General</label>
+            </value>
+            <value>
+                <fullName>Gene Therapy</fullName>
+                <default>false</default>
+                <label>Gene Therapy</label>
+            </value>
+            <value>
+                <fullName>Immune Tolerance</fullName>
+                <default>false</default>
+                <label>Immune Tolerance</label>
+            </value>
+            <value>
+                <fullName>Lung Cancer</fullName>
+                <default>false</default>
+                <label>Lung Cancer</label>
+            </value>
+            <value>
+                <fullName>Microbiome</fullName>
+                <default>false</default>
+                <label>Microbiome</label>
+            </value>
+            <value>
+                <fullName>Neuro-Degenerative</fullName>
+                <default>false</default>
+                <label>Neuro-Degenerative</label>
+            </value>
+            <value>
+                <fullName>Neurology</fullName>
+                <default>false</default>
+                <label>Neurology</label>
+            </value>
+            <value>
+                <fullName>Neuroscience</fullName>
+                <default>false</default>
+                <label>Neuroscience</label>
+            </value>
+            <value>
+                <fullName>Oncology</fullName>
+                <default>false</default>
+                <label>Oncology</label>
+            </value>
+            <value>
+                <fullName>Oncolytic Viruses</fullName>
+                <default>false</default>
+                <label>Oncolytic Viruses</label>
+            </value>
+            <value>
+                <fullName>Psychiatric</fullName>
+                <default>false</default>
+                <label>Psychiatric</label>
+            </value>
+            <value>
+                <fullName>RAS</fullName>
+                <default>false</default>
+                <label>RAS</label>
+            </value>
+            <value>
+                <fullName>RNA</fullName>
+                <default>false</default>
+                <label>RNA</label>
+            </value>
+            <value>
+                <fullName>Targeted Radiopharmaceuticals</fullName>
+                <default>false</default>
+                <label>Targeted Radiopharmaceuticals</label>
+            </value>
+            <value>
+                <fullName>TPD</fullName>
+                <default>false</default>
+                <label>TPD</label>
+            </value>
+            <value>
+                <fullName>Adoptive Cell</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Adoptive Cell</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

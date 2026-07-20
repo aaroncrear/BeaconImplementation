@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Phone_Communication__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(OR(NOT(ISBLANK(TEXT(Account.Blacklisted__c))),Blacklisted__c = True,  Contact_Suspended__c = true),
+IMAGE("https://hansonwade--c.eu31.content.force.com/servlet/servlet.FileDownload?file=0155I000000LrFr", "Blacklisted"),
+IF(is_Phone_Valid__c =0,IMAGE("/img/samples/color_red.gif","red",15,200), IMAGE("/img/samples/color_green.gif","green",15,200))
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Blacklisted or Red flag, Do Not Call.</inlineHelpText>
+    <label>Phone Communication</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

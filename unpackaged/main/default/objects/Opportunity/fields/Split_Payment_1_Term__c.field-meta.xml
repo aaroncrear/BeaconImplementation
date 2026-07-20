@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Split_Payment_1_Term__c</fullName>
+    <label>Split Payment 1 Term</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Split_Payment__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>10</fullName>
+                <default>false</default>
+                <label>10</label>
+            </value>
+            <value>
+                <fullName>30</fullName>
+                <default>false</default>
+                <label>30</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>10% / 90%</controllingFieldValue>
+            <controllingFieldValue>20% / 80%</controllingFieldValue>
+            <controllingFieldValue>50% / 50%</controllingFieldValue>
+            <valueName>10</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>10% / 90%</controllingFieldValue>
+            <controllingFieldValue>20% / 80%</controllingFieldValue>
+            <controllingFieldValue>25% / 75%</controllingFieldValue>
+            <controllingFieldValue>50% / 50%</controllingFieldValue>
+            <valueName>30</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>
