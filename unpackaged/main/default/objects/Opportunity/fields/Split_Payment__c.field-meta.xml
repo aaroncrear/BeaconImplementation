@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Split_Payment__c</fullName>
+    <label>Split Payment</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Invoice_Terms__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>10% / 90%</fullName>
+                <default>false</default>
+                <label>10% / 90%</label>
+            </value>
+            <value>
+                <fullName>20% / 80%</fullName>
+                <default>false</default>
+                <label>20% / 80%</label>
+            </value>
+            <value>
+                <fullName>25% / 75%</fullName>
+                <default>false</default>
+                <label>25% / 75%</label>
+            </value>
+            <value>
+                <fullName>50% / 50%</fullName>
+                <default>false</default>
+                <label>50% / 50%</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Split</controllingFieldValue>
+            <valueName>10% / 90%</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Split</controllingFieldValue>
+            <valueName>20% / 80%</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Split</controllingFieldValue>
+            <valueName>25% / 75%</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Split</controllingFieldValue>
+            <valueName>50% / 50%</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Content_Family__c</fullName>
+    <inlineHelpText>For repeat events please use the SAME content family as the previous edition. For launch events, please use the content family that most matches a beacon module as a priority. If you are unsure, please ask Hannah.</inlineHelpText>
+    <label>Content Family</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>ADC</fullName>
+                <default>false</default>
+                <label>ADC</label>
+            </value>
+            <value>
+                <fullName>Biomarkers - Diagnostics</fullName>
+                <default>false</default>
+                <label>Biomarkers - Diagnostics</label>
+            </value>
+            <value>
+                <fullName>Bispecifics</fullName>
+                <default>false</default>
+                <label>Bispecifics</label>
+            </value>
+            <value>
+                <fullName>Cancer Vaccine</fullName>
+                <default>false</default>
+                <label>Cancer Vaccine</label>
+            </value>
+            <value>
+                <fullName>Cell Therapy</fullName>
+                <default>false</default>
+                <label>Cell Therapy</label>
+            </value>
+            <value>
+                <fullName>Checkpoint</fullName>
+                <default>false</default>
+                <label>Checkpoint</label>
+            </value>
+            <value>
+                <fullName>CNS</fullName>
+                <default>false</default>
+                <label>CNS</label>
+            </value>
+            <value>
+                <fullName>Construction - AEC Functions</fullName>
+                <default>false</default>
+                <label>Construction - AEC Functions</label>
+            </value>
+            <value>
+                <fullName>Construction - Digital Infrastructure</fullName>
+                <default>false</default>
+                <label>Construction - Digital Infrastructure</label>
+            </value>
+            <value>
+                <fullName>Construction - HR</fullName>
+                <default>false</default>
+                <label>Construction - HR</label>
+            </value>
+            <value>
+                <fullName>Construction - Industrialized</fullName>
+                <default>false</default>
+                <label>Construction - Industrialized</label>
+            </value>
+            <value>
+                <fullName>Construction - Market Type</fullName>
+                <default>false</default>
+                <label>Construction - Market Type</label>
+            </value>
+            <value>
+                <fullName>CVRM</fullName>
+                <default>false</default>
+                <label>CVRM</label>
+            </value>
+            <value>
+                <fullName>Cytokine</fullName>
+                <default>false</default>
+                <label>Cytokine</label>
+            </value>
+            <value>
+                <fullName>DDR</fullName>
+                <default>false</default>
+                <label>DDR</label>
+            </value>
+            <value>
+                <fullName>ESG</fullName>
+                <default>false</default>
+                <label>ESG</label>
+            </value>
+            <value>
+                <fullName>Fibrosis</fullName>
+                <default>false</default>
+                <label>Fibrosis</label>
+            </value>
+            <value>
+                <fullName>Food Science</fullName>
+                <default>false</default>
+                <label>Food Science</label>
+            </value>
+            <value>
+                <fullName>Gene Therapy</fullName>
+                <default>false</default>
+                <label>Gene Therapy</label>
+            </value>
+            <value>
+                <fullName>HR</fullName>
+                <default>false</default>
+                <label>HR</label>
+            </value>
+            <value>
+                <fullName>Immunology and Autoimmune</fullName>
+                <default>false</default>
+                <label>Immunology and Autoimmune</label>
+            </value>
+            <value>
+                <fullName>Internal</fullName>
+                <default>false</default>
+                <label>Internal</label>
+            </value>
+            <value>
+                <fullName>Life Science Technologies</fullName>
+                <default>false</default>
+                <label>Life Science Technologies</label>
+            </value>
+            <value>
+                <fullName>Microbiome</fullName>
+                <default>false</default>
+                <label>Microbiome</label>
+            </value>
+            <value>
+                <fullName>Neuroscience</fullName>
+                <default>false</default>
+                <label>Neuroscience</label>
+            </value>
+            <value>
+                <fullName>Oncology</fullName>
+                <default>false</default>
+                <label>Oncology</label>
+            </value>
+            <value>
+                <fullName>Oncolytic Viruses</fullName>
+                <default>false</default>
+                <label>Oncolytic Viruses</label>
+            </value>
+            <value>
+                <fullName>Ophthalmology</fullName>
+                <default>false</default>
+                <label>Ophthalmology</label>
+            </value>
+            <value>
+                <fullName>Peptide</fullName>
+                <default>false</default>
+                <label>Peptide</label>
+            </value>
+            <value>
+                <fullName>Process Development and Manufacturing</fullName>
+                <default>false</default>
+                <label>Process Development and Manufacturing</label>
+            </value>
+            <value>
+                <fullName>RNA</fullName>
+                <default>false</default>
+                <label>RNA</label>
+            </value>
+            <value>
+                <fullName>Small Molecules</fullName>
+                <default>false</default>
+                <label>Small Molecules</label>
+            </value>
+            <value>
+                <fullName>TPD</fullName>
+                <default>false</default>
+                <label>TPD</label>
+            </value>
+            <value>
+                <fullName>Uncategorised</fullName>
+                <default>true</default>
+                <label>Uncategorised</label>
+            </value>
+            <value>
+                <fullName>Adoptive Cell</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Adoptive Cell</label>
+            </value>
+            <value>
+                <fullName>Construction</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Construction</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

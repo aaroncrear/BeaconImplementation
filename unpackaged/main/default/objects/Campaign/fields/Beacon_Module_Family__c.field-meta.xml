@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Beacon_Module_Family__c</fullName>
+    <label>Beacon Module Family</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Biologics</fullName>
+                <default>false</default>
+                <label>Biologics</label>
+            </value>
+            <value>
+                <fullName>Advanced Therapies</fullName>
+                <default>false</default>
+                <label>Advanced Therapies</label>
+            </value>
+            <value>
+                <fullName>Small Molecules</fullName>
+                <default>false</default>
+                <label>Small Molecules</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
