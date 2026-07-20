@@ -44,6 +44,13 @@ was derived directly from each persona's object-level access on the parent objec
   on Opportunity) are always system read-only in Salesforce, so `editable` is `false` for these
   regardless of the persona's object access.
 
+Additionally, `CampaignMember.Account_Status__c` (the remaining custom field from the
+Custom-Fields branch, on the CampaignMember object) was added to every permission set using each
+persona's **Campaign** object access level to decide field access, since these permission sets
+don't grant CampaignMember object access directly. It is also a formula field, so `editable` is
+`false` for every persona, including Beacon Marketing (which has Create/Read/Edit/Delete on
+Campaign); `readable` is `true` for all eight.
+
 ## Acceptance Criteria
 
 1. In Setup > Permission Sets, confirm the following eight permission sets exist:
@@ -68,10 +75,11 @@ was derived directly from each persona's object-level access on the parent objec
 ## Post Deployment Items
 
 - Assign each permission set to the appropriate users/groups per persona.
-- The `CampaignMember.Account_Status__c` custom field (also added by the Custom-Fields branch)
-  was intentionally left out of these permission sets, since none of the eight personas were
-  granted CampaignMember object access in the original object-access matrix. Revisit if
-  CampaignMember access is later required.
+- The `CampaignMember.Account_Status__c` field was granted using each persona's **Campaign**
+  object access level as a stand-in, since none of the eight personas were granted a
+  CampaignMember object-access entry in the original object-access matrix. If CampaignMember
+  object access is formally required later, add `objectPermissions` for CampaignMember to each
+  permission set.
 
 ## Component Manifest
 
