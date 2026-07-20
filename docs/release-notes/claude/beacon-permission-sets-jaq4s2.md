@@ -30,10 +30,19 @@ For each object where a persona was granted at least Read access, the correspond
 object tab was set to `DefaultOn` visibility so the persona can navigate to the object in the
 Salesforce UI, satisfying the "Tab" portion of each permission set's description.
 
-Field Level Security (FLS) was **not** configured in this build — the source file provided only
-object-level (CRUD) access requirements, with no field-by-field breakdown. The permission sets
-are structured to hold field permissions once that requirement is provided (see Post Deployment
-Items below).
+Field Level Security (FLS) was added for all 39 custom fields introduced on Account, Campaign,
+Contact, Lead, and Opportunity by the `Custom-Fields` branch (merged to master in PR #2). Access
+was derived directly from each persona's object-level access on the parent object:
+
+- Object access is Read only → field access is Read only (`readable=true`, `editable=false`).
+- Object access is more than Read (Create/Edit/Delete) → field access is Read/Edit
+  (`readable=true`, `editable=true`).
+- Exception: formula fields (`Beacon_Account_Segment__c`, `Beacon_Account_Type__c`,
+  `Seat_Utilisation_Rate_Last_30_Days__c`, `Seat_Utilisation_Rate_YTD__c` on Account;
+  `Email_Communication__c`, `NAICS_Code__c`, `NAICS_Description__c`, `Phone_Communication__c` on
+  Contact; `Email_Communication__c`, `Phone_Communication__c` on Lead; `Price_Increase_Value__c`
+  on Opportunity) are always system read-only in Salesforce, so `editable` is `false` for these
+  regardless of the persona's object access.
 
 ## Acceptance Criteria
 
@@ -47,16 +56,22 @@ Items below).
    Release Notes section above.
 4. For each permission set, confirm the Lead, Account, Contact, Opportunity, and Campaign tabs
    are set to visible (Default On) in the permission set's assigned apps/tab settings.
-5. Assign each permission set to a test user for the corresponding persona and confirm the user
+5. For each permission set, open Object Settings for each of the 5 objects and confirm every
+   custom field (`__c`) added by the Custom-Fields branch shows Read (and Edit, where the
+   object has more than Read access) checked, and that the formula fields listed in the
+   Release Notes section remain Read-only even when the object has Edit access.
+6. Assign each permission set to a test user for the corresponding persona and confirm the user
    can access each object per the CRUD matrix (e.g., a Sales-assigned user can create/edit
-   Leads, Accounts, Contacts, and Opportunities but only view Campaigns).
+   Leads, Accounts, Contacts, and Opportunities but only view Campaigns), and that the custom
+   fields on each object are editable or read-only consistent with the object access level.
 
 ## Post Deployment Items
 
-- Field Level Security (FLS) values were not provided in the source file and are not yet
-  configured on these permission sets. Obtain the field-level access matrix per persona and
-  update each permission set's `fieldPermissions` accordingly.
 - Assign each permission set to the appropriate users/groups per persona.
+- The `CampaignMember.Account_Status__c` custom field (also added by the Custom-Fields branch)
+  was intentionally left out of these permission sets, since none of the eight personas were
+  granted CampaignMember object access in the original object-access matrix. Revisit if
+  CampaignMember access is later required.
 
 ## Component Manifest
 
@@ -64,11 +79,11 @@ Github Branch: https://github.com/aaroncrear/beaconimplementation/tree/claude/be
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Permission Set | N/A | Beacon_Executive | Beacon Executive | Created | Object/Tab access for the Executive persona: Read on Lead, Account, Contact, Opportunity, Campaign. |
-| 2 | Permission Set | N/A | Beacon_Sales | Beacon Sales | Created | Object/Tab access for the Sales persona: Create/Read/Edit on Lead, Account, Contact, Opportunity; Read on Campaign. |
-| 3 | Permission Set | N/A | Beacon_Marketing | Beacon Marketing | Created | Object/Tab access for the Marketing persona: Create/Read/Edit on Lead; Read on Account, Contact; Read/Edit on Opportunity; Create/Read/Edit/Delete on Campaign. |
-| 4 | Permission Set | N/A | Beacon_Customer_Success | Beacon Customer Success | Created | Object/Tab access for the Customer Success persona: Create/Read/Edit on Lead, Contact; Read on Account, Opportunity, Campaign. |
-| 5 | Permission Set | N/A | Beacon_ResOps | Beacon ResOps | Created | Object/Tab access for the ResOps persona: Create/Read/Edit on Lead, Account, Contact; Read on Opportunity, Campaign. |
-| 6 | Permission Set | N/A | Beacon_Consulting | Beacon Consulting | Created | Object/Tab access for the Consulting persona: Create/Read/Edit on Lead, Account, Contact, Opportunity; Read on Campaign. |
-| 7 | Permission Set | N/A | Beacon_Product | Beacon Product | Created | Object/Tab access for the Product persona: Create/Read/Edit on Lead, Account, Contact; Read on Opportunity, Campaign. |
-| 8 | Permission Set | N/A | Beacon_Tech | Beacon Tech | Created | Object/Tab access for the Tech persona: Read on Lead, Account, Contact, Opportunity, Campaign. |
+| 1 | Permission Set | N/A | Beacon_Executive | Beacon Executive | Created | Object/Tab/Field access for the Executive persona: Read only on Lead, Account, Contact, Opportunity, Campaign objects and their custom fields. |
+| 2 | Permission Set | N/A | Beacon_Sales | Beacon Sales | Created | Object/Tab/Field access for the Sales persona: Create/Read/Edit on Lead, Account, Contact, Opportunity (and their custom fields); Read on Campaign (and its custom fields). |
+| 3 | Permission Set | N/A | Beacon_Marketing | Beacon Marketing | Created | Object/Tab/Field access for the Marketing persona: Create/Read/Edit on Lead; Read on Account, Contact; Read/Edit on Opportunity; Create/Read/Edit/Delete on Campaign (custom fields follow the same Read vs Read/Edit split per object, formula fields excepted). |
+| 4 | Permission Set | N/A | Beacon_Customer_Success | Beacon Customer Success | Created | Object/Tab/Field access for the Customer Success persona: Create/Read/Edit on Lead, Contact; Read on Account, Opportunity, Campaign (custom fields follow the same split). |
+| 5 | Permission Set | N/A | Beacon_ResOps | Beacon ResOps | Created | Object/Tab/Field access for the ResOps persona: Create/Read/Edit on Lead, Account, Contact; Read on Opportunity, Campaign (custom fields follow the same split). |
+| 6 | Permission Set | N/A | Beacon_Consulting | Beacon Consulting | Created | Object/Tab/Field access for the Consulting persona: Create/Read/Edit on Lead, Account, Contact, Opportunity; Read on Campaign (custom fields follow the same split). |
+| 7 | Permission Set | N/A | Beacon_Product | Beacon Product | Created | Object/Tab/Field access for the Product persona: Create/Read/Edit on Lead, Account, Contact; Read on Opportunity, Campaign (custom fields follow the same split). |
+| 8 | Permission Set | N/A | Beacon_Tech | Beacon Tech | Created | Object/Tab/Field access for the Tech persona: Read only on Lead, Account, Contact, Opportunity, Campaign objects and their custom fields. |
