@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Date_Demo_Booked__c</fullName>
+    <description>Date the demo was booked.</description>
     <inlineHelpText>Saves the date the first demo is booked against the opportunity
 NB - This records the day the demo was booked. Not the day the demo is due to take place</inlineHelpText>
     <label>Date Demo Booked</label>

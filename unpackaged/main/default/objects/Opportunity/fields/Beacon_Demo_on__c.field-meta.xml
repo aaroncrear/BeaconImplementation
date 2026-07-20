@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Beacon_Demo_on__c</fullName>
-    <description>This field will have the actual Date and Time of when a Beacon Demo is due to take place.</description>
+    <description>Date the demo is booked for</description>
     <inlineHelpText>This field will have the actual Date and Time of when a Beacon Demo is due to take place.</inlineHelpText>
     <label>Beacon Demo on</label>
     <required>false</required>

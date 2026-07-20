@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Seat_Utilisation_Rate_YTD__c</fullName>
+    <description>Seat utilisation rate year to date.</description>
     <formula>Pendo_Visitors_Year_To_Date__c  /  Total_Number_Of_Seats__c</formula>
     <inlineHelpText>Pendo No. Of Visitors Year To Date (MAU) / Total Number Of Seats</inlineHelpText>
     <label>Seat Utilisation Rate YTD (%)</label>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Beacon_Account_Segment__c</fullName>
-    <description>Company classification based on Beacon terminology. Uses the LS Company Type field to determine Beacon classification</description>
+    <description>Beacon account segment classification and grouping of LS Company Type values</description>
     <externalId>false</externalId>
     <formula>CASE(
 				LS_Company_Type__c	,

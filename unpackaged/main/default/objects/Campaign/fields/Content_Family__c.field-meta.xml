@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Content_Family__c</fullName>
+    <description>Content family associated with the campaign.</description>
     <inlineHelpText>For repeat events please use the SAME content family as the previous edition. For launch events, please use the content family that most matches a beacon module as a priority. If you are unsure, please ask Hannah.</inlineHelpText>
     <label>Content Family</label>
     <required>false</required>
