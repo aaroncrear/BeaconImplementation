@@ -3,6 +3,7 @@
     <description>Used to provide Object, Tab and Field level access.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Beacon Product</label>
+    <license>Salesforce</license>
     <fieldPermissions>
         <editable>false</editable>
         <field>Account.Beacon_Account_Segment__c</field>

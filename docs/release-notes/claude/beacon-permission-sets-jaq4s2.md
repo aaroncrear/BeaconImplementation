@@ -62,6 +62,13 @@ yet) were left untouched. One row in the workbook's Campaign sheet ("Module" →
 correctly used by the "Beacon Module Family" row; that row was skipped. Where a field already had
 a `description`, the workbook's value replaced it.
 
+All eight permission sets were then updated to add `<license>Salesforce</license>`, restricting
+assignment to users holding the standard Salesforce (full CRM) user license. Tab visibility was
+re-verified at the same time: every object each permission set grants access to (Lead, Account,
+Contact, Opportunity, Campaign) already had its standard tab set to `DefaultOn`, so no tab
+changes were needed — this confirms the "Tab" portion of each permission set's description is
+fully satisfied alongside the license restriction.
+
 ## Acceptance Criteria
 
 1. In Setup > Permission Sets, confirm the following eight permission sets exist:
@@ -84,6 +91,9 @@ a `description`, the workbook's value replaced it.
    fields on each object are editable or read-only consistent with the object access level.
 7. In Setup > Object Manager, spot-check the fields listed in rows 9–91 of the Component
    Manifest below and confirm each field's Description matches the value shown.
+8. For each of the eight permission sets, confirm the "License" field on the permission set
+   detail page reads "Salesforce," and confirm the permission set can only be assigned to users
+   with a Salesforce (full CRM) user license.
 
 ## Post Deployment Items
 
@@ -199,3 +209,11 @@ Github Branch: https://github.com/aaroncrear/beaconimplementation/tree/claude/be
 | 89 | Field | Task | Type | Type | Updated | Type classification for the task record. |
 | 90 | Field | Task | WhatId | WhatId | Updated | Record that the task is related to. |
 | 91 | Field | Task | WhoId | WhoId | Updated | Name of the task record or individual. |
+| 92 | Permission Set | N/A | Beacon_Executive | Beacon Executive | Updated | Added `license` = Salesforce (full CRM user license required for assignment); confirmed Lead, Account, Contact, Opportunity, Campaign tabs are visible (`DefaultOn`). |
+| 93 | Permission Set | N/A | Beacon_Sales | Beacon Sales | Updated | Added `license` = Salesforce; confirmed Lead, Account, Contact, Opportunity, Campaign tabs are visible (`DefaultOn`). |
+| 94 | Permission Set | N/A | Beacon_Marketing | Beacon Marketing | Updated | Added `license` = Salesforce; confirmed Lead, Account, Contact, Opportunity, Campaign tabs are visible (`DefaultOn`). |
+| 95 | Permission Set | N/A | Beacon_Customer_Success | Beacon Customer Success | Updated | Added `license` = Salesforce; confirmed Lead, Account, Contact, Opportunity, Campaign tabs are visible (`DefaultOn`). |
+| 96 | Permission Set | N/A | Beacon_ResOps | Beacon ResOps | Updated | Added `license` = Salesforce; confirmed Lead, Account, Contact, Opportunity, Campaign tabs are visible (`DefaultOn`). |
+| 97 | Permission Set | N/A | Beacon_Consulting | Beacon Consulting | Updated | Added `license` = Salesforce; confirmed Lead, Account, Contact, Opportunity, Campaign tabs are visible (`DefaultOn`). |
+| 98 | Permission Set | N/A | Beacon_Product | Beacon Product | Updated | Added `license` = Salesforce; confirmed Lead, Account, Contact, Opportunity, Campaign tabs are visible (`DefaultOn`). |
+| 99 | Permission Set | N/A | Beacon_Tech | Beacon Tech | Updated | Added `license` = Salesforce; confirmed Lead, Account, Contact, Opportunity, Campaign tabs are visible (`DefaultOn`). |
