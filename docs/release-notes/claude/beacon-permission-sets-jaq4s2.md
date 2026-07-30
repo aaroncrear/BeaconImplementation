@@ -6,7 +6,9 @@ The business requested eight new permission sets — one per Beacon persona (Exe
 Marketing, Customer Success, ResOps, Consulting, Product, and Tech) — to provide standardized
 Object, Tab, and Field Level Security (FLS) access for the core sales objects: Lead, Account,
 Contact, Opportunity, and Campaign. Object-level access requirements for each persona were
-supplied in the `Object_Access.xlsx` reference file.
+supplied in the `Object_Access.xlsx` reference file. A ninth permission set, Beacon Salesforce
+Admin, was later requested to provide full Create/Read/Edit/Delete object access and Edit access
+to all tracked custom fields across those same five objects.
 
 ## Release Notes
 
@@ -25,6 +27,7 @@ matrix:
 | Consulting | CRU | CRU | CRU | CRU | R |
 | Product | CRU | CRU | CRU | R | R |
 | Tech | R | R | R | R | R |
+| Salesforce Admin | CRUD | CRUD | CRUD | CRUD | CRUD |
 
 For each object where a persona was granted at least Read access, the corresponding standard
 object tab was set to `DefaultOn` visibility so the persona can navigate to the object in the
@@ -76,11 +79,23 @@ own. Field metadata for all seven was deleted from
 the permission sets after an earlier fix) remains absent. See Post Deployment Items for how to
 reintroduce them once their dependencies are resolved.
 
+A ninth permission set, `Beacon Salesforce Admin`, was added with the same description ("Used to
+provide Object, Tab and Field level access.") and `license` (`Salesforce`) as the eight persona
+permission sets. Unlike the persona-scoped sets, it grants full Create/Read/Edit/Delete on all
+five core objects (Lead, Account, Contact, Opportunity, Campaign), Edit access to all 33 custom
+fields tracked on those objects, and visible tab settings for all five — the same field universe
+used by the other eight permission sets, minus the seven fields removed above. Edit access was
+not granted on the 5 fields in that set that are formula fields (`Contact.NAICS_Code__c`,
+`Contact.NAICS_Description__c`, `Lead.Email_Communication__c`, `Lead.Phone_Communication__c`,
+`Opportunity.Price_Increase_Value__c`), since formula fields are always system read-only in
+Salesforce regardless of permission set access — they remain Read-only (`readable=true`,
+`editable=false`) even in this admin permission set.
+
 ## Acceptance Criteria
 
-1. In Setup > Permission Sets, confirm the following eight permission sets exist:
+1. In Setup > Permission Sets, confirm the following nine permission sets exist:
    Beacon Executive, Beacon Sales, Beacon Marketing, Beacon Customer Success, Beacon ResOps,
-   Beacon Consulting, Beacon Product, Beacon Tech.
+   Beacon Consulting, Beacon Product, Beacon Tech, Beacon Salesforce Admin.
 2. For each permission set, confirm the description reads "Used to provide Object, Tab and
    Field level access."
 3. For each permission set, open Object Settings and confirm the Create/Read/Edit/Delete
@@ -98,17 +113,23 @@ reintroduce them once their dependencies are resolved.
    fields on each object are editable or read-only consistent with the object access level.
 7. In Setup > Object Manager, spot-check the field rows in the Component Manifest below marked
    "Updated" and confirm each field's Description matches the value shown.
-8. For each of the eight permission sets, confirm the "License" field on the permission set
+8. For each of the nine permission sets, confirm the "License" field on the permission set
    detail page reads "Salesforce," and confirm the permission set can only be assigned to users
    with a Salesforce (full CRM) user license.
-9. Confirm all eight permission sets deploy cleanly to a sandbox with no `PermissionSetTabVisibility`
+9. Confirm all nine permission sets deploy cleanly to a sandbox with no `PermissionSetTabVisibility`
    errors.
 10. Confirm `Account.Beacon_Account_Segment__c`, `Account.Beacon_Account_Type__c`,
     `Account.Seat_Utilisation_Rate_Last_30_Days__c`, `Account.Seat_Utilisation_Rate_YTD__c`,
     `Contact.Email_Communication__c`, `Contact.Phone_Communication__c`, and
     `CampaignMember.Account_Status__c` no longer exist anywhere in this repo (deleted — see
-    Post Deployment Items for the reintroduction plan), and that none of the eight permission
+    Post Deployment Items for the reintroduction plan), and that none of the nine permission
     sets reference them.
+11. For Beacon Salesforce Admin specifically: confirm Object Settings shows Create/Read/Edit/
+    Delete checked for Lead, Account, Contact, Opportunity, and Campaign; confirm all 5 tabs are
+    visible; and confirm all 33 tracked custom fields on those objects show Edit checked, except
+    the 5 formula fields (`Contact.NAICS_Code__c`, `Contact.NAICS_Description__c`,
+    `Lead.Email_Communication__c`, `Lead.Phone_Communication__c`,
+    `Opportunity.Price_Increase_Value__c`), which should show Read only.
 
 ## Post Deployment Items
 
@@ -253,3 +274,4 @@ Github Branch: https://github.com/aaroncrear/beaconimplementation/tree/claude/be
 | 97 | Field | Contact | Email_Communication__c | Email Communication | Deleted | Removed — formula references Blacklisted__c, Account.Blacklisted__c, Is_Email_Valid__c, pi__pardot_hard_bounced__c, and Email_Bounced_Back__c, none of which exist in this repo or the target sandbox, blocking deployment. |
 | 98 | Field | Contact | Phone_Communication__c | Phone Communication | Deleted | Removed — formula references Blacklisted__c, Account.Blacklisted__c, Contact_Suspended__c, and is_Phone_Valid__c, none of which exist in this repo or the target sandbox, blocking deployment. |
 | 99 | Field | CampaignMember | Account_Status__c | Account Status | Deleted | Removed — formula references Contact.Account.Account_Status__c and Contact.Account.Account_History__c, neither of which exist in this repo or the target sandbox, blocking deployment. |
+| 100 | Permission Set | N/A | Beacon_Salesforce_Admin | Beacon Salesforce Admin | Created | Object/Tab/Field access for the Salesforce Admin persona: Create/Read/Edit/Delete on Lead, Account, Contact, Opportunity, Campaign; Edit access on all 33 tracked custom fields on those objects, except the 5 formula fields, which remain Read-only. License = Salesforce. |
