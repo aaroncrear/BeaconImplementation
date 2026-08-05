@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Beacon_Account_Segment__c</fullName>
+    <description>Company classification based on Beacon terminology. Uses the LS Company Type field to determine Beacon classification</description>
+    <externalId>false</externalId>
+    <formula>CASE(
+				LS_Company_Type__c	,
+				"MarCap Pharma 1-30", "Top 200 Pharma",
+				"MarCap Pharma 31-50", "Top 200 Pharma",
+				"MarCap Pharma 51-200", "Top 200 Pharma",
+				"Pharma", "Other Pharma",
+				"Mid Market Pharma", "Mid Market Pharma",
+				"Emerging Pharma", "Emerging Pharma",
+				"CDMO", "Contract Org",
+				"CMO", "Contract Org",
+				"CRO", "Contract Org",
+				"Other"
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Company classification based on Beacon terminology. Uses the LS Company Type field to determine Beacon classification</inlineHelpText>
+    <label>Beacon Account Segment</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

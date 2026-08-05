@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Total_Beacon_Revenue_Last_365_Days__c</fullName>
+    <description>Total Beacon Revenue with the last 365 days for this account, currency not converted</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Total Beacon Revenue with the last 365 days for this account, currency not converted</inlineHelpText>
+    <label>Total Beacon Revenue Last 365 Days</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>
