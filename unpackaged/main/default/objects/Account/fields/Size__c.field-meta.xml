@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Size__c</fullName>
+    <description>Checks the total revenue over the last 365 days to determine the beacon account type.
+&gt;100000 = Large Account,
+&gt; 40000 = Mid - Tier Account,
+&lt; 40000 = SME Account.</description>
+    <externalId>false</externalId>
+    <formula>IF(
+Total_Revenue_Last_365_Days__c &gt;= 100000,
+"Large Account",
+IF(
+Total_Revenue_Last_365_Days__c &gt;= 40000,
+"Mid-Tier Account",
+IF(
+Total_Revenue_Last_365_Days__c = 0,
+"No Revenue",
+"SME Account"
+)
+)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Checks the total revenue over the last 365 days to determine the beacon account type.
+&gt;100000 = Large Account,
+&gt; 40000 = Mid - Tier Account,
+&lt; 40000 = SME Account.</inlineHelpText>
+    <label>Size</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

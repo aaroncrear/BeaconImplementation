@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Subscription_New</fullName>
+    <active>true</active>
+    <businessProcess>Subscription New</businessProcess>
+    <label>Subscription New</label>
+    <picklistValues>
+        <picklist>ForecastCategoryName</picklist>
+        <values>
+            <fullName>Best Case</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Closed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Commit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Omitted</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pipeline</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Invoice_Terms__c</picklist>
+        <values>
+            <fullName>10</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>120</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>30</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>45</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>60</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>90</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fixed Date</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Split</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>LeadSource</picklist>
+        <values>
+            <fullName>Account Upgrade</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Allocated List</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Customer Referral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Customer Success Referral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ex User - New Company</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Founding Partner</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HW Customer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In Person Meeting</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Internal Referral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>KOL Referral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Marketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Own Research</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Social Network</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Winback</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Lead_Type__c</picklist>
+        <values>
+            <fullName>Active Inquiry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Brochure Download</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Client Meeting</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Conference Referral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Content Download</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Demo Request</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Digest Download</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Event Delegates</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Google Ads</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HW Conference</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HW Speaker</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HW Sponsor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ICP</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Intelligence Referral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LinkedIn Campaign</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Natural Demo Request</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Newsletter Subscriber</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Non HW Conference</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Onsite Enquiry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Own Research</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Past AtLs</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Past Demos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Past Pipeline and Deals</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Targeted Sales Research</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>WeChat</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Webinar Attendee</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Webinar Registrant</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Loss_Reason__c</picklist>
+        <values>
+            <fullName>Lost to Competitor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No Budget %2F Lost Funding</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No Decision %2F Non-Responsive</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Price</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Payment_Status__c</picklist>
+        <values>
+            <fullName>Paid</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Partially Paid</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Unpaid</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Primary_Module__c</picklist>
+        <values>
+            <fullName>ADC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Allogeneic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bispecific</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CVRM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cancer Vaccines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cell Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Checkpoint</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cytokine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DDR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gene Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>General</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Immune Tolerance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lung Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbiome</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuro-Degenerative</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neurology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuroscience</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncolytic Viruses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Psychiatric</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RNA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TPD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Targeted Radiopharmaceuticals</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Split_Payment_1_Term__c</picklist>
+        <values>
+            <fullName>10</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>30</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Split_Payment_2_Term__c</picklist>
+        <values>
+            <fullName>180</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>60</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>90</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Split_Payment__c</picklist>
+        <values>
+            <fullName>10%25 %2F 90%25</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>20%25 %2F 80%25</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>25%25 %2F 75%25</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>50%25 %2F 50%25</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Type</picklist>
+        <values>
+            <fullName>Existing Business</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>New Business</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

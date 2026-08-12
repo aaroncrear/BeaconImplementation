@@ -1893,6 +1893,21 @@
         <readable>true</readable>
     </fieldPermissions>
     <layoutAssignments>
+        <layout>Opportunity-Opportunity Layout</layout>
+        <recordType>Opportunity.Consulting</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Opportunity-Opportunity Layout</layout>
+        <recordType>Opportunity.Subscription_New</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Opportunity-Opportunity Layout</layout>
+        <recordType>Opportunity.Subscription_Renewal</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>OpportunityTeamMember-Opportunity Team Member Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
         <layout>cdpactvstrgptnr__ActivationPlatformCredential__mdt-cdpactvstrgptnr__ActivationPlatformCredential Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
