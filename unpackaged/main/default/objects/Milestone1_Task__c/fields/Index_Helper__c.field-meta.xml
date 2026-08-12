@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Index_Helper__c</fullName>
+    <externalId>false</externalId>
+    <formula>Assigned_To__r.FirstName &amp; ' ' &amp; Assigned_To__r.LastName &amp; ' ' &amp; Project_Milestone__r.Project__r.Name &amp; ' ' &amp; Project_Milestone__r.Name &amp; ' complete:' &amp; IF(Complete__c, 'yes', 'no') &amp; ' ' &amp; Name</formula>
+    <label>Index Helper</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

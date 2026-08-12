@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Slack_Channel_Name__c</fullName>
+    <description>Sets the Slack Channel Name to proj-project name</description>
+    <externalId>false</externalId>
+    <formula>"proj-"+LOWER(SUBSTITUTE(Name ," ","-"))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Slack Channel Name</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

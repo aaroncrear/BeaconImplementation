@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Project__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF( OR($User.UIThemeDisplayed == "Theme4d", $User.UIThemeDisplayed == "Theme4t"),
+        HYPERLINK('one.app?source=aloha#/sObject/' + Project_Milestone__r.Project__c + '/view',
+                  Project_Milestone__r.Project__r.Name,
+                  '_self'),
+        HYPERLINK(Project_Milestone__r.Project__c,
+                  Project_Milestone__r.Project__r.Name,
+                  '_self')
+   )</formula>
+    <inlineHelpText>A link to the Project which this task is included in via its milestone.</inlineHelpText>
+    <label>Project</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

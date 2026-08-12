@@ -4513,6 +4513,24 @@
         <readable>true</readable>
     </fieldPermissions>
     <layoutAssignments>
+        <layout>Milestone1_Expense__c-Expense Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Milestone1_Log__c-Log Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Milestone1_Milestone__c-Milestone Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Milestone1_Project__c-Project Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Milestone1_Task__c-Project Task Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Milestone1_Time__c-Time Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
         <layout>Opportunity-Opportunity Layout</layout>
         <recordType>Opportunity.Consulting</recordType>
     </layoutAssignments>
