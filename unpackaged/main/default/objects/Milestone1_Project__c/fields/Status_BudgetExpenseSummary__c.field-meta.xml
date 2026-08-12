@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status_BudgetExpenseSummary__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF( Total_Expense_Budget__c &gt; 0,
+IMAGE(
+"http://chart.apis.google.com/chart?chtt=Task+Expense+Budget+Analysis&amp;" &amp;
+"chxr=0,0," &amp; Text(max( Total_Expense_Budget__c,Total_Expense_Budget_from_Milestones__c,Total_Expense_Estimate__c, Total_Expense_Incurred__c)) &amp; "&amp;" &amp;
+"chxt=y&amp;chbh=a&amp;chs=300x225&amp;cht=bvg&amp;"&amp;
+"chco=2299bb,eeaa66,ee3322,666666&amp;&amp;"&amp;
+"chdl="&amp;
+"Budget (" &amp; TEXT(Total_Expense_Budget__c) &amp; ")"&amp;
+"|Planned (" &amp; TEXT(Total_Expense_Budget_from_Milestones__c) &amp; ")"&amp;
+"|Estimated (" &amp; TEXT(Total_Expense_Estimate__c) &amp; ")"&amp;
+"|Incurred (" &amp; TEXT(Total_Expense_Incurred__c) &amp; ")"&amp;
+"&amp;chd=t:"&amp;
+TEXT( Total_Expense_Budget__c / max( Total_Expense_Budget__c,Total_Expense_Budget_from_Milestones__c,Total_Expense_Estimate__c, Total_Expense_Incurred__c) * 100 )&amp;"|"&amp; 
+TEXT( Total_Expense_Budget_from_Milestones__c / max( Total_Expense_Budget__c,Total_Expense_Budget_from_Milestones__c,Total_Expense_Estimate__c, Total_Expense_Incurred__c) * 100)  &amp;"|" &amp; 
+TEXT( Total_Expense_Estimate__c / max( Total_Expense_Budget__c,Total_Expense_Budget_from_Milestones__c,Total_Expense_Estimate__c, Total_Expense_Incurred__c) * 100 ) &amp;"|" &amp; 
+TEXT(  Total_Expense_Incurred__c / max( Total_Expense_Budget__c,Total_Expense_Budget_from_Milestones__c,Total_Expense_Estimate__c, Total_Expense_Incurred__c) * 100) 
+, "Project Expense - Budget, Planned, Estimated, Incurred"), '')</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Expense Summary - Deprecated</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

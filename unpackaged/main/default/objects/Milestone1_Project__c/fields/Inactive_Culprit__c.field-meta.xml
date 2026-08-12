@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Inactive_Culprit__c</fullName>
+    <label>Inactive Culprit</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Us</fullName>
+                <default>false</default>
+                <label>Us</label>
+            </value>
+            <value>
+                <fullName>Them</fullName>
+                <default>false</default>
+                <label>Them</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
