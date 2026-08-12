@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>ADC</fullName>
+        <default>false</default>
+        <label>ADC</label>
+    </customValue>
+    <customValue>
+        <fullName>Allogeneic</fullName>
+        <default>false</default>
+        <label>Allogeneic</label>
+    </customValue>
+    <customValue>
+        <fullName>Bispecific</fullName>
+        <default>false</default>
+        <label>Bispecific</label>
+    </customValue>
+    <customValue>
+        <fullName>Cancer Vaccines</fullName>
+        <default>false</default>
+        <label>Cancer Vaccines</label>
+    </customValue>
+    <customValue>
+        <fullName>Cell Therapy</fullName>
+        <default>false</default>
+        <label>Cell Therapy</label>
+    </customValue>
+    <customValue>
+        <fullName>Checkpoint</fullName>
+        <default>false</default>
+        <label>Checkpoint</label>
+    </customValue>
+    <customValue>
+        <fullName>CVRM</fullName>
+        <default>false</default>
+        <label>CVRM</label>
+    </customValue>
+    <customValue>
+        <fullName>Cytokine</fullName>
+        <default>false</default>
+        <label>Cytokine</label>
+    </customValue>
+    <customValue>
+        <fullName>DDR</fullName>
+        <default>false</default>
+        <label>DDR</label>
+    </customValue>
+    <customValue>
+        <fullName>General</fullName>
+        <default>false</default>
+        <label>General</label>
+    </customValue>
+    <customValue>
+        <fullName>Gene Therapy</fullName>
+        <default>false</default>
+        <label>Gene Therapy</label>
+    </customValue>
+    <customValue>
+        <fullName>Immune Tolerance</fullName>
+        <default>false</default>
+        <label>Immune Tolerance</label>
+    </customValue>
+    <customValue>
+        <fullName>Lung Cancer</fullName>
+        <default>false</default>
+        <label>Lung Cancer</label>
+    </customValue>
+    <customValue>
+        <fullName>Microbiome</fullName>
+        <default>false</default>
+        <label>Microbiome</label>
+    </customValue>
+    <customValue>
+        <fullName>Neuro-Degenerative</fullName>
+        <default>false</default>
+        <label>Neuro-Degenerative</label>
+    </customValue>
+    <customValue>
+        <fullName>Neurology</fullName>
+        <default>false</default>
+        <label>Neurology</label>
+    </customValue>
+    <customValue>
+        <fullName>Neuroscience</fullName>
+        <default>false</default>
+        <label>Neuroscience</label>
+    </customValue>
+    <customValue>
+        <fullName>Oncology</fullName>
+        <default>false</default>
+        <label>Oncology</label>
+    </customValue>
+    <customValue>
+        <fullName>Oncolytic Viruses</fullName>
+        <default>false</default>
+        <label>Oncolytic Viruses</label>
+    </customValue>
+    <customValue>
+        <fullName>Psychiatric</fullName>
+        <default>false</default>
+        <label>Psychiatric</label>
+    </customValue>
+    <customValue>
+        <fullName>RAS</fullName>
+        <default>false</default>
+        <label>RAS</label>
+    </customValue>
+    <customValue>
+        <fullName>RNA</fullName>
+        <default>false</default>
+        <label>RNA</label>
+    </customValue>
+    <customValue>
+        <fullName>Targeted Radiopharmaceuticals</fullName>
+        <default>false</default>
+        <label>Targeted Radiopharmaceuticals</label>
+    </customValue>
+    <customValue>
+        <fullName>TPD</fullName>
+        <default>false</default>
+        <label>TPD</label>
+    </customValue>
+    <description>Primary Module</description>
+    <masterLabel>Primary Module</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

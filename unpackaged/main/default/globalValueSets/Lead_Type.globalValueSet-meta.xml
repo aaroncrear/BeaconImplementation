@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Active Inquiry</fullName>
+        <default>false</default>
+        <label>Active Inquiry</label>
+    </customValue>
+    <customValue>
+        <fullName>Content Download</fullName>
+        <default>false</default>
+        <label>Content Download</label>
+    </customValue>
+    <customValue>
+        <fullName>Demo Request</fullName>
+        <default>false</default>
+        <label>Demo Request</label>
+    </customValue>
+    <customValue>
+        <fullName>Digest Download</fullName>
+        <default>false</default>
+        <label>Digest Download</label>
+    </customValue>
+    <customValue>
+        <fullName>Webinar Attendee</fullName>
+        <default>false</default>
+        <label>Webinar Attendee</label>
+    </customValue>
+    <customValue>
+        <fullName>Webinar Registrant</fullName>
+        <default>false</default>
+        <label>Webinar Registrant</label>
+    </customValue>
+    <customValue>
+        <fullName>LinkedIn Campaign</fullName>
+        <default>false</default>
+        <label>LinkedIn Campaign</label>
+    </customValue>
+    <customValue>
+        <fullName>Onsite Enquiry</fullName>
+        <default>false</default>
+        <label>Onsite Enquiry</label>
+    </customValue>
+    <customValue>
+        <fullName>Newsletter Subscriber</fullName>
+        <default>false</default>
+        <label>Newsletter Subscriber</label>
+    </customValue>
+    <customValue>
+        <fullName>Natural Demo Request</fullName>
+        <default>false</default>
+        <label>Natural Demo Request</label>
+    </customValue>
+    <customValue>
+        <fullName>WeChat</fullName>
+        <default>false</default>
+        <label>WeChat</label>
+    </customValue>
+    <customValue>
+        <fullName>Google Ads</fullName>
+        <default>false</default>
+        <label>Google Ads</label>
+    </customValue>
+    <customValue>
+        <fullName>Brochure Download</fullName>
+        <default>false</default>
+        <label>Brochure Download</label>
+    </customValue>
+    <customValue>
+        <fullName>Targeted Sales Research</fullName>
+        <default>false</default>
+        <label>Targeted Sales Research</label>
+    </customValue>
+    <customValue>
+        <fullName>Event Delegates</fullName>
+        <default>false</default>
+        <label>Event Delegates</label>
+    </customValue>
+    <customValue>
+        <fullName>ICP</fullName>
+        <default>false</default>
+        <label>ICP</label>
+    </customValue>
+    <customValue>
+        <fullName>Past AtLs</fullName>
+        <default>false</default>
+        <label>Past AtLs</label>
+    </customValue>
+    <customValue>
+        <fullName>Past Demos</fullName>
+        <default>false</default>
+        <label>Past Demos</label>
+    </customValue>
+    <customValue>
+        <fullName>Past Pipeline and Deals</fullName>
+        <default>false</default>
+        <label>Past Pipeline and Deals</label>
+    </customValue>
+    <customValue>
+        <fullName>Own Research</fullName>
+        <default>false</default>
+        <label>Own Research</label>
+    </customValue>
+    <customValue>
+        <fullName>HW Conference</fullName>
+        <default>false</default>
+        <label>HW Conference</label>
+    </customValue>
+    <customValue>
+        <fullName>Non HW Conference</fullName>
+        <default>false</default>
+        <label>Non HW Conference</label>
+    </customValue>
+    <customValue>
+        <fullName>Client Meeting</fullName>
+        <default>false</default>
+        <label>Client Meeting</label>
+    </customValue>
+    <customValue>
+        <fullName>HW Speaker</fullName>
+        <default>false</default>
+        <label>HW Speaker</label>
+    </customValue>
+    <customValue>
+        <fullName>HW Sponsor</fullName>
+        <default>false</default>
+        <label>HW Sponsor</label>
+    </customValue>
+    <customValue>
+        <fullName>Conference Referral</fullName>
+        <default>false</default>
+        <label>Conference Referral</label>
+    </customValue>
+    <customValue>
+        <fullName>Intelligence Referral</fullName>
+        <default>false</default>
+        <label>Intelligence Referral</label>
+    </customValue>
+    <description>Used to give more granular reporting than Lead Source</description>
+    <masterLabel>Lead Type</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

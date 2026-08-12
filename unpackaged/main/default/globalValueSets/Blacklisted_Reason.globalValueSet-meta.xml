@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Competitor - Beacon</fullName>
+        <default>false</default>
+        <label>Competitor - Beacon</label>
+    </customValue>
+    <customValue>
+        <fullName>Competitor - Event</fullName>
+        <default>false</default>
+        <label>Competitor - Event</label>
+    </customValue>
+    <customValue>
+        <fullName>Competitor - Intelligence</fullName>
+        <default>false</default>
+        <label>Competitor - Intelligence</label>
+    </customValue>
+    <customValue>
+        <fullName>Competitor - Searchlight</fullName>
+        <default>false</default>
+        <label>Competitor - Searchlight</label>
+    </customValue>
+    <customValue>
+        <fullName>Breach of Code of Conduct</fullName>
+        <default>false</default>
+        <label>Breach of Code of Conduct</label>
+    </customValue>
+    <customValue>
+        <fullName>Non-Paying Customer</fullName>
+        <default>false</default>
+        <label>Non-Paying Customer</label>
+    </customValue>
+    <customValue>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+    </customValue>
+    <customValue>
+        <fullName>Sanctioned Country</fullName>
+        <default>false</default>
+        <label>Sanctioned Country</label>
+    </customValue>
+    <description>Blacklisted Reason</description>
+    <masterLabel>Blacklisted Reason</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

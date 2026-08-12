@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Lead_Type__c</fullName>
+    <description>Used to give more granular reporting than Lead Source
+Help Text</description>
+    <label>Lead Type</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>LeadSource</controllingField>
+        <restricted>true</restricted>
+        <valueSetName>Lead_Type</valueSetName>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Active Inquiry</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Content Download</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Demo Request</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Digest Download</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Webinar Attendee</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Webinar Registrant</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>LinkedIn Campaign</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Onsite Enquiry</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Newsletter Subscriber</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Natural Demo Request</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>WeChat</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Google Ads</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Brochure Download</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <valueName>Targeted Sales Research</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Allocated List</controllingFieldValue>
+            <valueName>Event Delegates</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Allocated List</controllingFieldValue>
+            <valueName>ICP</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Allocated List</controllingFieldValue>
+            <valueName>Past AtLs</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Allocated List</controllingFieldValue>
+            <valueName>Past Demos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Allocated List</controllingFieldValue>
+            <valueName>Past Pipeline and Deals</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Own Research</controllingFieldValue>
+            <valueName>Own Research</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>In Person Meeting</controllingFieldValue>
+            <valueName>HW Conference</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>In Person Meeting</controllingFieldValue>
+            <valueName>Non HW Conference</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>In Person Meeting</controllingFieldValue>
+            <valueName>Client Meeting</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>HW Customer</controllingFieldValue>
+            <valueName>HW Speaker</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>HW Customer</controllingFieldValue>
+            <valueName>HW Sponsor</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Internal Referral</controllingFieldValue>
+            <valueName>Conference Referral</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Internal Referral</controllingFieldValue>
+            <valueName>Intelligence Referral</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

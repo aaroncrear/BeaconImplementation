@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Pacific Time Zone</fullName>
+        <default>false</default>
+        <label>Pacific Time Zone</label>
+    </customValue>
+    <customValue>
+        <fullName>Mountain Time Zone</fullName>
+        <default>false</default>
+        <label>Mountain Time Zone</label>
+    </customValue>
+    <customValue>
+        <fullName>Central Time Zone</fullName>
+        <default>false</default>
+        <label>Central Time Zone</label>
+    </customValue>
+    <customValue>
+        <fullName>Eastern Time Zone</fullName>
+        <default>false</default>
+        <label>Eastern Time Zone</label>
+    </customValue>
+    <description>United States Time Zones</description>
+    <masterLabel>United States Time Zones</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>
