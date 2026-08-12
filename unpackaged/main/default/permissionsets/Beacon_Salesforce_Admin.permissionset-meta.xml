@@ -6,6 +6,11 @@
     <license>Salesforce</license>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Account.HW_Record_ID__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Account.Invoice_Email__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -26,6 +31,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Activity.HW_Record_ID__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Campaign.Beacon_Module_Family__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -41,12 +51,22 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Campaign.HW_Record_ID__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Campaign.Module__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>Campaign.Website__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Contact.HW_Record_ID__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -67,6 +87,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Lead.Email_Communication__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.HW_Record_ID__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -112,6 +137,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.Date_Proposal_Sent__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.HW_Record_ID__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
