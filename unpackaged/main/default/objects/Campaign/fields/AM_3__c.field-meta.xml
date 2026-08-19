@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Sponsorship_Manager_3__c</fullName>
+    <fullName>AM_3__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
-    <description>Sponsorship Manager 3</description>
-    <label>Sponsorship Manager 3</label>
+    <description>Account Manager 3</description>
+    <label>AM 3</label>
     <referenceTo>User</referenceTo>
     <relationshipName>Campaigns2</relationshipName>
     <required>false</required>
