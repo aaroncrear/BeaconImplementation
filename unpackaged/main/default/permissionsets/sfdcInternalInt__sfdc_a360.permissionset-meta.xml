@@ -25,6 +25,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.Department__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Lead.Lead_Type__c</field>
         <readable>true</readable>
@@ -32,6 +37,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Lead.Region__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.Second_Email__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
