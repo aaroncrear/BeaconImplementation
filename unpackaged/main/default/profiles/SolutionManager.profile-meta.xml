@@ -4513,6 +4513,15 @@
         <readable>true</readable>
     </fieldPermissions>
     <layoutAssignments>
+        <layout>AccountPlan-Account Plan Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>AccountPlanObjective-Account Plan Objective Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>AccountPlanObjectiveMeasure-Account Plan Objective Measure Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
         <layout>Milestone1_Expense__c-Expense Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
