@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Lead</entityName>
+    <fieldName>Status</fieldName>
+    <masterLabel>Default</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>Company</fieldNames>
+        <fieldNames>Website</fieldNames>
+        <fieldNames>LeadSource</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Individual is new to Salesforce.&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Set status to Working if you&amp;#39;re looking to engage the indvidual&lt;/strong&gt;&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>New</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>LeadSource</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Lead is being engaged by Marketing. &lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Once Lead Score passes threshold, Lead will be converted to a Contact&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;You can progress the Lead to Working if you wish to engage&lt;/strong&gt;&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Nurturing</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>&lt;p&gt;&lt;b style=&quot;font-family: Arial; font-size: 10pt;&quot;&gt;Hooray! You have a new deal to bring across the finish line.&lt;/b&gt;&lt;/p&gt;</info>
+        <picklistValueName>Qualified</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>LeadSource</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Lead has been unqualified previously. You can re-engage this contact but if so, move the Lead Status to Working.&lt;/strong&gt;&lt;/p&gt;</info>
+        <picklistValueName>Unqualified</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>LeadSource</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Lead is being worked by Sales&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Once you have confirmed individual is relevant for Beacon, change Status to Converted&lt;/strong&gt;&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Working</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>__MASTER__</recordTypeName>
+</PathAssistant>

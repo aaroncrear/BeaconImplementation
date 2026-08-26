@@ -4,5 +4,23 @@
     <entityName>Contact</entityName>
     <fieldName>Contact_Status__c</fieldName>
     <masterLabel>Contact Status</masterLabel>
+    <pathAssistantSteps>
+        <info>&lt;p&gt;&lt;strong&gt;Individual has an open opportunity. Check with Opportunity Owner whether you can engage Contact&lt;/strong&gt;&lt;/p&gt;</info>
+        <picklistValueName>Active Opp</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>LeadSource</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Individual is new a New Contact&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Check whether the contact was converted from a Lead&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Set status to Working if you&amp;#39;re looking to engage the indvidual&lt;/strong&gt;&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>New</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>LeadSource</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Contact is being engaged by Marketing. &lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Once Lead Score passes threshold, Salesforce will notify Contact Owner&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;You can progress the Contact to Working if you wish to engage&lt;/strong&gt;&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Nurturing</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>&lt;p&gt;&lt;strong&gt;Contact is being worked by Sales&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Once you have booked a demo in with this contact, create an Opportunity. Opening an Opportunity will automatically change the stage to &amp;quot;Active Opp&amp;quot;&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;No activity against the Contact will move the Status to Nurturing&lt;/strong&gt;&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Working</picklistValueName>
+    </pathAssistantSteps>
     <recordTypeName>__MASTER__</recordTypeName>
 </PathAssistant>
