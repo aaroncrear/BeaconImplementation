@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Parent_Campaign</fullName>
+    <active>true</active>
+    <description>Used for Parent Campaigns</description>
+    <label>Parent Campaign</label>
+    <picklistValues>
+        <picklist>Beacon_Module_Family__c</picklist>
+        <values>
+            <fullName>Advanced Therapies</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Biologics</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Small Molecules</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Channels__c</picklist>
+        <values>
+            <fullName>AI Engines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Email - HubSpot</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Email - SendGrid</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Google Ads</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HW Event Onsite</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In-Product</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Landing Page %28Organic%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LinkedIn %28Organic%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LinkedIn %28Paid%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Organic Search</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Remarketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Third Party</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Content_Family__c</picklist>
+        <values>
+            <fullName>ADC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Biomarkers - Diagnostics</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bispecifics</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CNS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CVRM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cancer Vaccine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cell Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Checkpoint</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Construction - AEC Functions</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Construction - Digital Infrastructure</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Construction - HR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Construction - Industrialized</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Construction - Market Type</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cytokine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DDR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ESG</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fibrosis</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Food Science</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gene Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Immunology and Autoimmune</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Internal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Life Science Technologies</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbiome</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuroscience</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncolytic Viruses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ophthalmology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Peptide</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Process Development and Manufacturing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RNA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Small Molecules</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TPD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Uncategorised</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Content_Type__c</picklist>
+        <values>
+            <fullName>Brochure</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Conference Reports</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Infographic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Landscape Reviews</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Market Reports</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Newsletters</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Thought Leadership</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Webinar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Webinar Recording</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Primary_Module__c</picklist>
+        <values>
+            <fullName>ADC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bispecific</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CVRM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cancer Vaccines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cell Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Checkpoint</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cytokine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DDR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gene Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>General</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Immune Tolerance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lung Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbiome</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuro-Degenerative</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neurology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuroscience</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncolytic Viruses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Psychiatric</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RNA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TPD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Targeted Radiopharmaceuticals</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Related_Modules__c</picklist>
+        <values>
+            <fullName>ADC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Allogeneic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bispecific</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CVRM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cancer Vaccines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cell Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Checkpoint</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cytokine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DDR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gene Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>General</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Immune Tolerance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lung Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbiome</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuro-Degenerative</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neurology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuroscience</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncolytic Viruses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Psychiatric</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RNA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TPD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Targeted Radiopharmaceuticals</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Status</picklist>
+        <values>
+            <fullName>Aborted</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Completed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In Progress</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Planned</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Strategy_Type__c</picklist>
+        <values>
+            <fullName>ABM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>New Business</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Type</picklist>
+        <values>
+            <fullName>Content Download</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Demo Request</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Event</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Onsite Enquiry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Webinar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ZoomInfo</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

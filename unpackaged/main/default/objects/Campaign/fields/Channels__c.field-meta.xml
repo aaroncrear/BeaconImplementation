@@ -11,14 +11,14 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Email, Events</fullName>
+                <fullName>AI Engines</fullName>
                 <default>false</default>
-                <label>Email, Events</label>
+                <label>AI Engines</label>
             </value>
             <value>
-                <fullName>Email - Pardot</fullName>
+                <fullName>Email - HubSpot</fullName>
                 <default>false</default>
-                <label>Email - Pardot</label>
+                <label>Email - HubSpot</label>
             </value>
             <value>
                 <fullName>Email - SendGrid</fullName>
@@ -26,24 +26,9 @@
                 <label>Email - SendGrid</label>
             </value>
             <value>
-                <fullName>ABM - Email</fullName>
+                <fullName>Google Ads</fullName>
                 <default>false</default>
-                <label>ABM - Email</label>
-            </value>
-            <value>
-                <fullName>Direct Marketing</fullName>
-                <default>false</default>
-                <label>Direct Marketing</label>
-            </value>
-            <value>
-                <fullName>Social Media (Organic)</fullName>
-                <default>false</default>
-                <label>Social Media (Organic)</label>
-            </value>
-            <value>
-                <fullName>Social Media (Paid)</fullName>
-                <default>false</default>
-                <label>Social Media (Paid)</label>
+                <label>Google Ads</label>
             </value>
             <value>
                 <fullName>HW Event Onsite</fullName>
@@ -51,14 +36,9 @@
                 <label>HW Event Onsite</label>
             </value>
             <value>
-                <fullName>HW Event Collab</fullName>
+                <fullName>In-Product</fullName>
                 <default>false</default>
-                <label>HW Event Collab</label>
-            </value>
-            <value>
-                <fullName>LinkedIn (Paid)</fullName>
-                <default>false</default>
-                <label>LinkedIn (Paid)</label>
+                <label>In-Product</label>
             </value>
             <value>
                 <fullName>Landing Page (Organic)</fullName>
@@ -66,9 +46,77 @@
                 <label>Landing Page (Organic)</label>
             </value>
             <value>
+                <fullName>LinkedIn (Organic)</fullName>
+                <default>false</default>
+                <label>LinkedIn (Organic)</label>
+            </value>
+            <value>
+                <fullName>LinkedIn (Paid)</fullName>
+                <default>false</default>
+                <label>LinkedIn (Paid)</label>
+            </value>
+            <value>
+                <fullName>Organic Search</fullName>
+                <default>false</default>
+                <label>Organic Search</label>
+            </value>
+            <value>
+                <fullName>Remarketing</fullName>
+                <default>false</default>
+                <label>Remarketing</label>
+            </value>
+            <value>
+                <fullName>Third Party</fullName>
+                <default>false</default>
+                <label>Third Party</label>
+            </value>
+            <value>
+                <fullName>ABM - Email</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>ABM - Email</label>
+            </value>
+            <value>
+                <fullName>Direct Marketing</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Direct Marketing</label>
+            </value>
+            <value>
+                <fullName>Email - Pardot</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Email - Pardot</label>
+            </value>
+            <value>
+                <fullName>Email, Events</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Email, Events</label>
+            </value>
+            <value>
+                <fullName>HW Event Collab</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>HW Event Collab</label>
+            </value>
+            <value>
                 <fullName>PPC</fullName>
                 <default>false</default>
+                <isActive>false</isActive>
                 <label>PPC</label>
+            </value>
+            <value>
+                <fullName>Social Media (Organic)</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Social Media (Organic)</label>
+            </value>
+            <value>
+                <fullName>Social Media (Paid)</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Social Media (Paid)</label>
             </value>
         </valueSetDefinition>
     </valueSet>

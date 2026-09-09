@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Content_Type__c</fullName>
+    <description>Content Type</description>
+    <label>Content Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Infographic</fullName>
+                <default>false</default>
+                <label>Infographic</label>
+            </value>
+            <value>
+                <fullName>Webinar</fullName>
+                <default>false</default>
+                <label>Webinar</label>
+            </value>
+            <value>
+                <fullName>Webinar Recording</fullName>
+                <default>false</default>
+                <label>Webinar Recording</label>
+            </value>
+            <value>
+                <fullName>Newsletters</fullName>
+                <default>false</default>
+                <label>Newsletters</label>
+            </value>
+            <value>
+                <fullName>Brochure</fullName>
+                <default>false</default>
+                <label>Brochure</label>
+            </value>
+            <value>
+                <fullName>Conference Reports</fullName>
+                <default>false</default>
+                <label>Conference Reports</label>
+            </value>
+            <value>
+                <fullName>Market Reports</fullName>
+                <default>false</default>
+                <label>Market Reports</label>
+            </value>
+            <value>
+                <fullName>Landscape Reviews</fullName>
+                <default>false</default>
+                <label>Landscape Reviews</label>
+            </value>
+            <value>
+                <fullName>Thought Leadership</fullName>
+                <default>false</default>
+                <label>Thought Leadership</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -2037,6 +2037,14 @@
         <layout>AccountPlanObjectiveMeasure-Account Plan Objective Measure Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
+        <layout>Campaign-Campaign Layout</layout>
+        <recordType>Campaign.Parent_Campaign</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Campaign-Campaign Layout</layout>
+        <recordType>Campaign.Sub_Campaign</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
         <layout>Milestone1_Expense__c-Expense Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
