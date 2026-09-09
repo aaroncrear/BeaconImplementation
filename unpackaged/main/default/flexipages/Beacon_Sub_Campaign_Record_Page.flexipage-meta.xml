@@ -27,6 +27,9 @@
                         <valueListItems>
                             <value>ChangeOwnerOne</value>
                         </valueListItems>
+                        <valueListItems>
+                            <value>ChangeRecordType</value>
+                        </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
@@ -85,7 +88,7 @@
             <fieldInstance>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
-                    <value>none</value>
+                    <value>required</value>
                 </fieldInstanceProperties>
                 <fieldItem>Record.ParentId</fieldItem>
                 <identifier>RecordParentIdField</identifier>
@@ -135,7 +138,7 @@
             <fieldInstance>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
-                    <value>none</value>
+                    <value>readonly</value>
                 </fieldInstanceProperties>
                 <fieldItem>Record.Type</fieldItem>
                 <identifier>RecordTypeField</identifier>
@@ -273,8 +276,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Website__c</fieldItem>
-                <identifier>RecordWebsite_cField</identifier>
+                <fieldItem>Record.Host__c</fieldItem>
+                <identifier>RecordHost_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -283,8 +286,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Host__c</fieldItem>
-                <identifier>RecordHost_cField</identifier>
+                <fieldItem>Record.Website__c</fieldItem>
+                <identifier>RecordWebsite_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-82c397fe-5587-4467-9a25-2fc9a0d46999</name>

@@ -1764,6 +1764,10 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <recordTypeVisibilities>
+        <recordType>Campaign.Parent_Campaign</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
         <recordType>Campaign.Sub_Campaign</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
