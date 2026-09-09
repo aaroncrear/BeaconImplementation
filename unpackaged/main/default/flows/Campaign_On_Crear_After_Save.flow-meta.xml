@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>When a Sub Campaign is created, sets its Type field to match the Type field on its Parent Campaign.</description>
+    <environments>Default</environments>
+    <interviewLabel>Campaign - On Crear - After Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Campaign - On Crear - After Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <decisions>
+        <description>Checks whether the Get Parent Campaign lookup found a Parent Campaign record, so the Type update is skipped if the Sub Campaign has no ParentId set.</description>
+        <name>Parent_Campaign_Found</name>
+        <label>Parent Campaign Found?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No Parent Found</defaultConnectorLabel>
+        <rules>
+            <name>Parent_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Parent_Campaign.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Sub_Campaign_Type</targetReference>
+            </connector>
+            <label>Parent Found</label>
+        </rules>
+    </decisions>
+    <recordLookups>
+        <description>Retrieves the Parent Campaign referenced by this Sub Campaign's ParentId, so its Type field can be copied onto the Sub Campaign.</description>
+        <name>Get_Parent_Campaign</name>
+        <label>Get Parent Campaign</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Parent_Campaign_Found</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.ParentId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Campaign</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Sets the Sub Campaign's Type field to the Type field value from its Parent Campaign.</description>
+        <name>Update_Sub_Campaign_Type</name>
+        <label>Update Sub Campaign Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Type</field>
+            <value>
+                <elementReference>Get_Parent_Campaign.Type</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Parent_Campaign</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>RecordType.DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Sub_Campaign</stringValue>
+            </value>
+        </filters>
+        <object>Campaign</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

@@ -18,6 +18,9 @@ categorization and ownership tracking on the `Campaign` object:
 - Extend the existing Beacon persona permission sets so each persona can see (and, for Marketing
   and Salesforce Admin, edit) the new campaign fields, consistent with how the persona permission
   sets were built in the prior `beacon-permission-sets-jaq4s2` branch.
+- When a Sub Campaign is created, automatically default its `Type` to the same value as its
+  Parent Campaign's `Type`, so reporting on Sub Campaigns can rely on `Type` being populated
+  without requiring the user to re-enter it.
 
 ## Release Notes
 
@@ -72,6 +75,15 @@ Create/Read/Edit/Delete on Campaign and Salesforce Admin holding full CRUD on al
 `Campaign.Sub_Campaign` (no permission set was given explicit visibility to `Campaign.Parent_Campaign`
 — see Post Deployment Items).
 
+A record-triggered flow, `Campaign - On Crear - After Save`, was added to keep a Sub Campaign's
+`Type` in sync with its Parent Campaign at creation time. It runs after save, only on Campaign
+insert, and its entry criteria filters on `RecordType.DeveloperName` equals `Sub_Campaign` (rather
+than a hardcoded `RecordTypeId`, which isn't portable between orgs) so it only fires for Sub
+Campaigns. When it fires, it looks up the Parent Campaign via `$Record.ParentId`; if a parent is
+found, it updates the triggering record's `Type` field to match the parent's `Type`. If
+`ParentId` is blank (no parent selected), the flow's decision element detects that the lookup
+found no record and skips the update rather than faulting.
+
 ## Acceptance Criteria
 
 1. In Object Manager > Campaign > Record Types, confirm `Parent Campaign` and `Sub Campaign`
@@ -102,6 +114,16 @@ Create/Read/Edit/Delete on Campaign and Salesforce Admin holding full CRUD on al
    different persona's permission set cannot.
 9. Confirm all 23 profiles deploy cleanly with the two new `layoutAssignments` entries for
    `Campaign.Parent_Campaign` and `Campaign.Sub_Campaign`.
+10. Create a Parent Campaign with `Type` set to a specific value (e.g. `Webinar`), then create a
+    Sub Campaign with that Parent Campaign as its `ParentId`. Confirm the new Sub Campaign's
+    `Type` is automatically set to match the Parent Campaign's `Type` after save.
+11. Create a Sub Campaign with no `ParentId` set and confirm it saves successfully with no error,
+    and that `Type` is left as whatever the user set (not overwritten or blanked).
+12. Create a Parent Campaign and confirm its `Type` is unaffected — the flow should not fire for
+    the Parent Campaign record type.
+13. Update an existing Sub Campaign's `Type` field directly and confirm it is not reset — the flow
+    only fires on Campaign creation, not on update.
+14. Confirm `Campaign - On Crear - After Save` shows `Status = Active` in Setup > Flows.
 
 ## Post Deployment Items
 
@@ -122,6 +144,11 @@ Create/Read/Edit/Delete on Campaign and Salesforce Admin holding full CRUD on al
 - No requirements doc accompanied this deploy — recommend documenting the actual business
   requirements (who requested the Parent/Sub Campaign model, and the target audience for each new
   field) for future reference.
+- `Campaign - On Crear - After Save` only syncs `Type` at Sub Campaign creation time. If a Sub
+  Campaign's `ParentId` is changed after creation, or the Parent Campaign's `Type` changes later,
+  the Sub Campaign's `Type` is not automatically re-synced. Confirm with the business whether that
+  ongoing-sync behavior is needed; if so, the flow's trigger would need to change from Create to
+  Create and Update.
 
 ## Component Manifest
 
@@ -179,3 +206,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Campaigns
 | 48 | Profile | N/A | SalesforceIQ Integration User | SalesforceIQ Integration User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
 | 49 | Profile | N/A | SolutionManager | SolutionManager | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
 | 50 | Profile | N/A | Standard | Standard | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 51 | Flow | Campaign | Campaign_On_Crear_After_Save | Campaign - On Crear - After Save | Created | Record-triggered flow (after save, on create, entry criteria RecordType.DeveloperName = Sub_Campaign) that looks up the Parent Campaign via ParentId and sets the Sub Campaign's Type field to match the Parent Campaign's Type. |
