@@ -2,22 +2,8 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <assignments>
-        <description>Sets the Lead's Account lookup to the matched Account. Because this flow runs before the record is saved, assigning directly to $Record saves the value with no extra DML operation.</description>
-        <name>Update_Lead_Account</name>
-        <label>Update Lead Account</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>$Record.Account__c</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>Get_Matching_Account.Id</elementReference>
-            </value>
-        </assignmentItems>
-    </assignments>
     <decisions>
-        <description>Checks whether the Get Matching Account lookup found an Account record, so the Account field is only populated when a matching Account is found.</description>
+        <description>Checks whether the Get Matching Account lookup found an Account record, so the Account field is only updated when a matching Account is found.</description>
         <name>Matching_Account_Found</name>
         <label>Matching Account Found?</label>
         <locationX>0</locationX>
@@ -39,10 +25,10 @@
             <label>Account Found</label>
         </rules>
     </decisions>
-    <description>When a Lead is created, matches it to an Account by comparing the Lead's Email Domain to the Account's Domain field and the Lead's Country to the Account's Billing Country, then populates the Lead's Account lookup field with the matched Account.</description>
+    <description>When a Lead is created, matches it to an Account by comparing the Lead's Email Domain to the Account's Domain field and the Lead's Country to the Account's Billing Country, then updates the Lead's Account lookup field with the matched Account.</description>
     <environments>Default</environments>
-    <interviewLabel>Lead - On Create - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Lead - On Create - Before Save</label>
+    <interviewLabel>Lead - On Create - After Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Lead - On Create - After Save</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -91,6 +77,20 @@
         <object>Account</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
+    <recordUpdates>
+        <description>Updates the triggering Lead's Account lookup to the matched Account. Runs after save, so this issues a separate update DML against the Lead record that was just inserted.</description>
+        <name>Update_Lead_Account</name>
+        <label>Update Lead Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Account__c</field>
+            <value>
+                <elementReference>Get_Matching_Account.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
     <start>
         <locationX>0</locationX>
         <locationY>0</locationY>
@@ -100,7 +100,7 @@
         <filterFormula>NOT(ISBLANK({!$Record.Email_Domain__c})) &amp;&amp; NOT(ISBLANK({!$Record.Country}))</filterFormula>
         <object>Lead</object>
         <recordTriggerType>Create</recordTriggerType>
-        <triggerType>RecordBeforeSave</triggerType>
+        <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>
 </Flow>

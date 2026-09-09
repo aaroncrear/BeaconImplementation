@@ -45,18 +45,20 @@ persona permission sets without the `_Object_Tab_FLS` suffix (`Beacon_Consulting
 field permissions — an earlier push on this branch had added them everywhere a permission set
 name started with `Beacon`, and that was subsequently narrowed to just the nine FLS sets.
 
-A new record-triggered flow, **`Lead - On Create - Before Save`**
-(`Lead_On_Create_Before_Save`), runs before a new Lead is saved. Its entry criteria only fires the
+A new record-triggered flow, **`Lead - On Create - After Save`**
+(`Lead_On_Create_After_Save`), runs after a new Lead is saved. Its entry criteria only fires the
 flow when both `Email_Domain__c` and `Country` are populated on the incoming Lead (so it doesn't
 run a lookup on every single Lead insert). It then retrieves the first Account whose `Domain__c`
 equals the Lead's `Email_Domain__c` AND whose `BillingCountry` equals the Lead's `Country`. A
-decision element checks whether a matching Account was found; if so, an assignment sets
-`$Record.Account__c` to the matched Account's Id directly (no extra DML, since the flow runs
-before save and the assignment is picked up by the same save transaction). If no match is found,
-the flow does nothing further and the Lead saves without an Account set. Every element in the flow
-(the record lookup, the decision, and the assignment) has a `description` explaining its purpose,
-matching the documentation convention used in the existing `Campaign - On Create - Before Save`
-and `Contact - On Update - Before Save` flows.
+decision element checks whether a matching Account was found; if so, an Update Records element
+sets `Account__c` on the triggering Lead (`$Record`) to the matched Account's Id, issuing an
+update DML against the Lead that was just inserted. If no match is found, the flow does nothing
+further. This flow was originally built as a before-save flow (`Lead_On_Create_Before_Save`); that
+version was deleted and rebuilt as this after-save flow because the before-save version did not
+work as intended. Every element in the flow (the record
+lookup, the decision, and the record update) has a `description` explaining its purpose, matching
+the documentation convention used in the existing `Campaign - On Create - Before Save` and
+`Contact - On Update - Before Save` flows.
 
 ## Acceptance Criteria
 
@@ -94,7 +96,8 @@ and `Contact - On Update - Before Save` flows.
     `Beacon - Baseline - System & App Access`) and the nine base persona permission sets without
     the `_Object_Tab_FLS` suffix show no access (Read or Edit) to `Domain`, `Email Domain`, or
     `Account` on Account/Lead.
-13. Confirm `Lead - On Create - Before Save` shows `Status = Active` in Setup > Flows.
+13. Confirm `Lead - On Create - After Save` shows `Status = Active` in Setup > Flows, and that
+    `Lead - On Create - Before Save` no longer exists.
 
 ## Post Deployment Items
 
@@ -120,13 +123,14 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Lead-to-A
 | 3 | Field | Lead | Account__c | Account | Created | Lookup to Account, populated via automation by matching Email Domain (Lead) to Domain (Account). |
 | 4 | Layout | Account | Account-Account Layout | Account Layout | Updated | Added the Domain field directly below Website. |
 | 5 | Layout | Lead | Lead-Lead Layout | Lead Layout | Updated | Added the read-only Email Domain field directly below Second Email, and the editable Account field directly below Company. |
-| 6 | Flow | Lead | Lead_On_Create_Before_Save | Lead - On Create - Before Save | Created | Before-save, record-triggered on Lead create; matches Email Domain to Account Domain and Lead Country to Account Billing Country, and populates the Lead's Account lookup when a match is found. Every element has a description. |
-| 7 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 8 | Permission Set | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 9 | Permission Set | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 10 | Permission Set | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 11 | Permission Set | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 12 | Permission Set | N/A | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 13 | Permission Set | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 14 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 15 | Permission Set | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 6 | Flow | Lead | Lead_On_Create_Before_Save | Lead - On Create - Before Save | Deleted | Removed and superseded by Lead_On_Create_After_Save (row 7), which replicates the same matching logic on an after-save trigger. |
+| 7 | Flow | Lead | Lead_On_Create_After_Save | Lead - On Create - After Save | Created | After-save, record-triggered on Lead create; matches Email Domain to Account Domain and Lead Country to Account Billing Country, and updates the Lead's Account lookup when a match is found. Every element has a description. |
+| 8 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 9 | Permission Set | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 10 | Permission Set | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 11 | Permission Set | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 12 | Permission Set | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 13 | Permission Set | N/A | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 14 | Permission Set | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 15 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 16 | Permission Set | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
