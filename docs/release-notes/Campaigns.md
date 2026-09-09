@@ -18,9 +18,10 @@ categorization and ownership tracking on the `Campaign` object:
 - Extend the existing Beacon persona permission sets so each persona can see (and, for Marketing
   and Salesforce Admin, edit) the new campaign fields, consistent with how the persona permission
   sets were built in the prior `beacon-permission-sets-jaq4s2` branch.
-- When a Sub Campaign is created, automatically default its `Type` to the same value as its
-  Parent Campaign's `Type`, so reporting on Sub Campaigns can rely on `Type` being populated
-  without requiring the user to re-enter it.
+- When a Sub Campaign is created, automatically default its `Primary Module` to the same value as
+  its Parent Campaign's `Primary Module`, so Sub Campaigns don't need the field re-entered by hand.
+  (This requirement originally targeted the `Type` field; it was changed to `Primary Module` in a
+  later push on this branch — see Release Notes below.)
 
 ## Release Notes
 
@@ -62,21 +63,21 @@ The `Campaign-Campaign Layout` page layout was updated: `Module__c` was swapped 
 `Primary_Module__c` in the top info section, `Content_Type__c` and `Strategy_Type__c` were added
 to that same section, `Related_Modules__c` was added to the description section, a `Related Entity
 History` related list was added, and the layout's excluded quick-action button was changed from
-`OpenSlackRecordChannel` to `GenerateKnowledge`. A new field, `Primary_Module__c` (Picklist:
-ADC, Bispecific, Cancer Vaccines, Cell Therapy, Checkpoint, CVRM, Cytokine, DDR, General, Gene
-Therapy, Immune Tolerance, Lung Cancer, Microbiome, Neuro-Degenerative, Neurology, Neuroscience,
-Oncology, Oncolytic Viruses, Psychiatric, RAS, RNA, Targeted Radiopharmaceuticals, TPD, plus the
-inactive legacy value Adoptive Cell), was created to back that layout field — the layout and
-persona permission sets already referenced `Primary_Module__c`, but the field itself hadn't been
-created yet in this repo until this deploy.
+`OpenSlackRecordChannel` to `GenerateKnowledge`. A new field, `Primary_Module__c` (Picklist: ADC,
+Bispecific, Cancer Vaccines, Cell Therapy, Checkpoint, CVRM, Cytokine, DDR, General, Gene Therapy,
+Immune Tolerance, Lung Cancer, Microbiome, Neuro-Degenerative, Neurology, Neuroscience, Oncology,
+Oncolytic Viruses, Psychiatric, RAS, RNA, Targeted Radiopharmaceuticals, TPD, plus the inactive
+legacy value Adoptive Cell), was created to back that layout field — the layout and persona
+permission sets already referenced `Primary_Module__c`, but the field itself hadn't been created
+yet in this repo until partway through this branch.
 
 Both Lightning record pages were tuned for data entry: on `Beacon_Parent_Campaign_Record_Page`,
-the `Type` field was changed from optional to required. On `Beacon_Sub_Campaign_Record_Page`,
-`ParentId` was changed from optional to required (a Sub Campaign must reference a Parent
-Campaign), `Type` was changed from editable to read-only (since `Campaign - On Create - Before
-Save` now sets it automatically from the parent), a `Change Record Type` quick action was added
-to the highlights panel alongside the existing `Change Owner` action, and the `Host__c` /
-`Website__c` fields were reordered (Host now appears before Website).
+the `Type` field was changed from optional to required, and a `Record Type` field was added to the
+same section (optional). On `Beacon_Sub_Campaign_Record_Page`, `ParentId` was changed from
+optional to required (a Sub Campaign must reference a Parent Campaign), `Type` was changed from
+editable to read-only, a `Change Record Type` quick action was added to the highlights panel
+alongside the existing `Change Owner` action, and the `Host__c` / `Website__c` fields were
+reordered (Host now appears before Website).
 
 All nine existing Beacon persona permission sets (`Beacon Executive`, `Beacon Sales`, `Beacon
 Marketing`, `Beacon Customer Success`, `Beacon ResOps`, `Beacon Consulting`, `Beacon Product`,
@@ -85,23 +86,31 @@ lookup/picklist/text fields above (`Related_Modules__c` was not added to the per
 Read access was granted to every persona; `Beacon Marketing` and `Beacon Salesforce Admin`
 additionally received Edit access, consistent with Marketing already holding
 Create/Read/Edit/Delete on Campaign and Salesforce Admin holding full CRUD on all tracked fields.
-`Beacon Marketing` and `Beacon Salesforce Admin` were granted `recordTypeVisibilities` for both
-`Campaign.Sub_Campaign` and, in this latest push, `Campaign.Parent_Campaign` — closing the gap
-flagged in the previous Post Deployment Items, where only `Sub_Campaign` visibility had been
-granted.
+`Beacon Marketing` and `Beacon Salesforce Admin` were also granted `recordTypeVisibilities` for
+both `Campaign.Parent_Campaign` and `Campaign.Sub_Campaign`.
 
-A record-triggered flow, `Campaign - On Create - Before Save`, was added to keep a Sub Campaign's
-`Type` in sync with its Parent Campaign at creation time. It runs before save, only on Campaign
-insert, and its entry criteria uses a formula —
-`{!$Record.RecordType.DeveloperName} = "Sub_Campaign"` — rather than a hardcoded `RecordTypeId`
-(which isn't portable between orgs) or a plain field filter, so it only fires for Sub Campaigns.
-When it fires, it looks up the Parent Campaign via `$Record.ParentId`; if a parent is found, it
-assigns the parent's `Type` directly onto `$Record.Type`. Because the flow runs before save, that
-assignment is picked up by the same save operation with no extra DML — this replaced an earlier
-after-save version of this flow (`Campaign - On Crear - After Save`, which used an explicit
-Record Update element) that has been deleted and superseded by this one. If `ParentId` is blank
-(no parent selected), the flow's decision element detects that the lookup found no record and
-skips the assignment rather than faulting.
+A record-triggered flow, `Campaign - On Create - Before Save`, keeps a Sub Campaign's
+`Primary_Module__c` in sync with its Parent Campaign at creation time. It runs before save, only
+on Campaign insert, with a formula entry criteria —
+`{!$Record.RecordType.DeveloperName} = "Sub_Campaign"` — so it only fires for Sub Campaigns. When
+it fires, it looks up the Parent Campaign via `$Record.ParentId`; if a parent is found, it assigns
+the parent's `Primary_Module__c` directly onto `$Record.Primary_Module__c` (no extra DML, since
+the assignment is picked up by the same before-save transaction). If `ParentId` is blank (no
+parent selected), the flow's decision element detects that the lookup found no record and skips
+the assignment rather than faulting. This flow originally synced the `Type` field instead; the
+latest push on this branch retargeted both the lookup's consumer and the assignment to
+`Primary_Module__c` (element names and some element `description`s inside the flow, e.g. "Get
+Parent Campaign" and the decision's description, still read "Type" — cosmetic leftovers from the
+retarget worth cleaning up next time the flow is opened in Flow Builder, but they don't affect
+behavior).
+
+**Two items from this latest push need verification, not just documentation** (see Post
+Deployment Items): the flow's `<start>` entry criteria no longer includes
+`<filterLogic>formula</filterLogic>` — only `<filterFormula>` remains — which needs confirming in
+a sandbox, since a formula-based entry criteria typically requires `filterLogic` set to `formula`
+for the formula to actually be evaluated; and `Type` is now locked read-only on the Sub Campaign
+page even though the flow no longer sets `Type` at all, so as deployed a new Sub Campaign's `Type`
+can end up permanently blank with no way to set it from the UI.
 
 ## Acceptance Criteria
 
@@ -133,15 +142,18 @@ skips the assignment rather than faulting.
    different persona's permission set cannot.
 9. Confirm all 23 profiles deploy cleanly with the two new `layoutAssignments` entries for
    `Campaign.Parent_Campaign` and `Campaign.Sub_Campaign`.
-10. Create a Parent Campaign with `Type` set to a specific value (e.g. `Webinar`), then create a
-    Sub Campaign with that Parent Campaign as its `ParentId`. Confirm the new Sub Campaign's
-    `Type` is set to match the Parent Campaign's `Type` immediately on save.
+10. Create a Parent Campaign with `Primary Module` set to a specific value (e.g. `Oncology`), then
+    create a Sub Campaign with that Parent Campaign as its `ParentId`. Confirm the new Sub
+    Campaign's `Primary Module` is set to match the Parent Campaign's `Primary Module` immediately
+    on save, and that `Type` is **not** auto-populated (it currently has no way to be set from the
+    UI on a Sub Campaign — see Post Deployment Items).
 11. Create a Sub Campaign with no `ParentId` set and confirm it saves successfully with no error,
-    and that `Type` is left as whatever the user set (not overwritten or blanked).
-12. Create a Parent Campaign and confirm its `Type` is unaffected — the flow should not fire for
-    the Parent Campaign record type.
-13. Update an existing Sub Campaign's `Type` field directly and confirm it is not reset — the flow
-    only fires on Campaign creation, not on update.
+    and that `Primary Module` is left as whatever the user set (not overwritten or blanked).
+12. Create a Parent Campaign and confirm its `Primary Module` is unaffected — the flow should not
+    fire for the Parent Campaign record type.
+13. Update an existing Sub Campaign's `Primary Module` field directly (e.g. via a permission set
+    that grants edit access, or Data Loader) and confirm it is not reset — the flow only fires on
+    Campaign creation, not on update.
 14. Confirm `Campaign - On Create - Before Save` shows `Status = Active` in Setup > Flows, and
     that `Campaign - On Crear - After Save` no longer exists.
 15. Open Object Manager > Campaign > Fields and confirm `Primary Module` exists as a Picklist
@@ -149,37 +161,55 @@ skips the assignment rather than faulting.
     is present but inactive). Confirm the Campaign Layout's info section shows `Primary Module`
     populated with a value, not blank/broken.
 16. On the Parent Campaign record page, confirm `Type` is a required field (record can't be saved
-    without it).
+    without it), and that a `Record Type` field is visible in the same section.
 17. On the Sub Campaign record page, confirm `Parent Campaign` (ParentId) is required, `Type` is
-    read-only (can't be hand-edited — only set by the flow), and the `Change Record Type` quick
-    action is available from the highlights panel alongside `Change Owner`.
+    read-only, and the `Change Record Type` quick action is available from the highlights panel
+    alongside `Change Owner`.
 18. For `Beacon Marketing` and `Beacon Salesforce Admin`, confirm Object Settings > Campaign shows
     both `Parent Campaign` and `Sub Campaign` record types visible (not just `Sub Campaign`).
+19. **Critical — verify the entry criteria still works.** Create several Campaigns of the
+    **Parent Campaign** record type with a ParentId manually set via API/Data Loader (bypassing
+    UI validation), and confirm `Primary Module` is **not** copied onto them. If it is, the flow's
+    entry criteria formula is not actually being enforced (see the missing `filterLogic` note in
+    Post Deployment Items) and needs to be fixed before this can go to production.
 
 ## Post Deployment Items
 
+- **Verify the flow's entry criteria formula is actually being evaluated.** The latest push
+  removed `<filterLogic>formula</filterLogic>` from the flow's `<start>` element, leaving only
+  `<filterFormula>`. Confirm in a sandbox (Acceptance Criterion 19) that the flow still limits
+  itself to Sub Campaign inserts. If it now fires on every Campaign create, re-open the flow in
+  Flow Builder, re-select "Formula evaluates to true" for the entry conditions (which should
+  re-add `filterLogic=formula` on save), and re-deploy.
+- **Reconcile the Sub Campaign page's read-only `Type` field with the flow no longer setting
+  `Type`.** `Type` is locked read-only on `Beacon_Sub_Campaign_Record_Page`, but the flow was
+  retargeted to sync `Primary_Module__c` instead of `Type` — so a new Sub Campaign's `Type` now has
+  no way to be set at all (not by the user, not by automation). Confirm with the business whether
+  `Type` should be unlocked for manual entry on Sub Campaigns, or synced by the flow in addition to
+  `Primary Module`.
+- **Clean up stale element descriptions inside `Campaign - On Create - Before Save`.** The Get
+  Parent Campaign lookup and the Parent Campaign Found decision still have `description` text
+  referencing "Type" from before the flow was retargeted to `Primary_Module__c`. Cosmetic only,
+  but worth fixing next time the flow is opened in Flow Builder so the descriptions stay accurate.
 - **Activate the new Lightning record pages.** `Beacon_Parent_Campaign_Record_Page` and
   `Beacon_Sub_Campaign_Record_Page` were deployed but page activation/assignment (which app,
   record type, and profile combination each page is shown for) is set through Lightning App
   Builder in the org and is not captured in this metadata — activate each page against its
   matching record type after deploy.
-- ~~**Confirm `Parent_Campaign` record-type visibility.**~~ Resolved in this push: `Beacon
-  Marketing` and `Beacon Salesforce Admin` now hold `recordTypeVisibilities` for both
-  `Campaign.Parent_Campaign` and `Campaign.Sub_Campaign`. The other seven persona permission sets
-  still have no explicit `recordTypeVisibilities` for either record type — confirm with the
-  business whether any other persona should be able to create Parent or Sub Campaigns directly.
 - **Confirm `Related_Modules__c` field-level security.** This field was not added to any of the
   nine Beacon persona permission sets in this deploy — confirm whether it needs Read/Edit access
   granted the same way the other nine new fields were.
+- **Confirm record-type visibility for the other seven personas.** Only `Beacon Marketing` and
+  `Beacon Salesforce Admin` hold explicit `recordTypeVisibilities` for `Campaign.Parent_Campaign`
+  / `Campaign.Sub_Campaign`. Confirm with the business whether any other persona should be able to
+  create Parent or Sub Campaigns directly.
+- `Campaign - On Create - Before Save` only syncs `Primary Module` at Sub Campaign creation time.
+  If a Sub Campaign's `ParentId` is changed after creation, or the Parent Campaign's `Primary
+  Module` changes later, the Sub Campaign's `Primary Module` is not automatically re-synced.
+  Confirm with the business whether ongoing-sync behavior is needed.
 - No requirements doc accompanied this deploy — recommend documenting the actual business
   requirements (who requested the Parent/Sub Campaign model, and the target audience for each new
   field) for future reference.
-- `Campaign - On Create - Before Save` only syncs `Type` at Sub Campaign creation time. If a Sub
-  Campaign's `ParentId` is changed after creation, or the Parent Campaign's `Type` changes later,
-  the Sub Campaign's `Type` is not automatically re-synced. Confirm with the business whether that
-  ongoing-sync behavior is needed; if so, the flow's trigger would need to change from Create to
-  Create and Update (and, if it needs to update the Parent Campaign or another record, an
-  after-save Record Update element rather than a before-save $Record assignment).
 
 ## Component Manifest
 
@@ -202,43 +232,41 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Campaigns
 | 13 | Field | Campaign | Channels__c | Channels | Updated | Added active values AI Engines, Email - HubSpot, Google Ads, In-Product, LinkedIn (Organic), Organic Search, Remarketing, Third Party; deactivated ABM - Email, Direct Marketing, Email - Pardot, Email/Events, HW Event Collab, PPC, Social Media (Organic), Social Media (Paid). |
 | 14 | Standard Value Set | Campaign | CampaignType | Campaign Type | Created | Defined the standard Type picklist values for Campaign (Content Download, Demo Request, Event [default], Onsite Enquiry, Other, Webinar, ZoomInfo). |
 | 15 | Layout | Campaign | Campaign-Campaign Layout | Campaign Layout | Updated | Replaced Module__c with Primary_Module__c; added Content_Type__c and Strategy_Type__c to the info section and Related_Modules__c to the description section; added Related Entity History related list; changed excluded button from OpenSlackRecordChannel to GenerateKnowledge. |
-| 16 | Flexipage | Campaign | Beacon_Parent_Campaign_Record_Page | Beacon Parent Campaign Record Page | Created | Lightning record page for the Parent Campaign record type; Type field set to required. |
+| 16 | Flexipage | Campaign | Beacon_Parent_Campaign_Record_Page | Beacon Parent Campaign Record Page | Created | Lightning record page for the Parent Campaign record type; Type field set to required; Record Type field added to the same section. |
 | 17 | Flexipage | Campaign | Beacon_Sub_Campaign_Record_Page | Beacon Sub Campaign Record Page | Created | Lightning record page for the Sub Campaign record type; ParentId set to required, Type set to read-only, added Change Record Type quick action, reordered Host/Website fields. |
-| 53 | Field | Campaign | Primary_Module__c | Primary Module | Created | Picklist backing the Campaign Layout's "Primary Module" field (23 active module values plus inactive legacy value Adoptive Cell); already referenced by the layout and persona permission sets but was missing as a field until this deploy. |
-| 54 | Permission Set | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added recordTypeVisibilities for Campaign.Parent_Campaign (already had Campaign.Sub_Campaign). |
-| 55 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added recordTypeVisibilities for Campaign.Parent_Campaign (already had Campaign.Sub_Campaign). |
-| 18 | Permission Set | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields (Content_Type__c, Host__c, Marketing_Primary__c, Marketing_Secondary__c, Product_Primary__c, Product_Secondary__c, ResOps_Primary__c, ResOps_Secondary__c, Strategy_Type__c). |
-| 19 | Permission Set | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
-| 20 | Permission Set | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Read/Edit access to the 9 new Campaign fields and recordTypeVisibilities for Campaign.Sub_Campaign. |
-| 21 | Permission Set | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
-| 22 | Permission Set | N/A | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
-| 23 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
-| 24 | Permission Set | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
-| 25 | Permission Set | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
-| 26 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Read/Edit access to the 9 new Campaign fields and recordTypeVisibilities for Campaign.Sub_Campaign. |
-| 27 | Profile | N/A | Admin | Admin | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 28 | Profile | N/A | Analytics Cloud Integration User | Analytics Cloud Integration User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 29 | Profile | N/A | Analytics Cloud Security User | Analytics Cloud Security User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 30 | Profile | N/A | CPQ Integration User | CPQ Integration User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 31 | Profile | N/A | Chatter External User | Chatter External User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 32 | Profile | N/A | Chatter Free User | Chatter Free User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 33 | Profile | N/A | Chatter Moderator User | Chatter Moderator User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 34 | Profile | N/A | ContractManager | ContractManager | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 35 | Profile | N/A | Einstein Agent User | Einstein Agent User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 36 | Profile | N/A | End User | End User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 37 | Profile | N/A | Executive Sponsor | Executive Sponsor | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 38 | Profile | N/A | External Apps Login User | External Apps Login User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 39 | Profile | N/A | External Einstein Agent User | External Einstein Agent User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 40 | Profile | N/A | Guest License User | Guest License User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 41 | Profile | N/A | Identity User | Identity User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 42 | Profile | N/A | MarketingProfile | MarketingProfile | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 43 | Profile | N/A | Minimum Access - API Only Integrations | Minimum Access - API Only Integrations | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 44 | Profile | N/A | Minimum Access - Salesforce | Minimum Access - Salesforce | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 45 | Profile | N/A | Read Only | Read Only | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 46 | Profile | N/A | Sales Insights Integration User | Sales Insights Integration User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 47 | Profile | N/A | Salesforce API Only System Integrations | Salesforce API Only System Integrations | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 48 | Profile | N/A | SalesforceIQ Integration User | SalesforceIQ Integration User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 49 | Profile | N/A | SolutionManager | SolutionManager | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 50 | Profile | N/A | Standard | Standard | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 51 | Flow | Campaign | Campaign_On_Crear_After_Save | Campaign - On Crear - After Save | Deleted | Removed and superseded by Campaign_On_Create_Before_Save (row 52), which replicates the same lookup/update logic on a before-save trigger. |
-| 52 | Flow | Campaign | Campaign_On_Create_Before_Save | Campaign - On Create - Before Save | Created | Record-triggered flow (before save, on create, formula entry criteria {!$Record.RecordType.DeveloperName} = "Sub_Campaign") that looks up the Parent Campaign via ParentId and assigns its Type onto the triggering Sub Campaign's Type field. |
+| 18 | Field | Campaign | Primary_Module__c | Primary Module | Created | Picklist backing the Campaign Layout's "Primary Module" field (23 active module values plus inactive legacy value Adoptive Cell); already referenced by the layout and persona permission sets but was missing as a field until this deploy. |
+| 19 | Permission Set | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields (Content_Type__c, Host__c, Marketing_Primary__c, Marketing_Secondary__c, Product_Primary__c, Product_Secondary__c, ResOps_Primary__c, ResOps_Secondary__c, Strategy_Type__c). |
+| 20 | Permission Set | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
+| 21 | Permission Set | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Read/Edit access to the 9 new Campaign fields; granted recordTypeVisibilities for both Campaign.Parent_Campaign and Campaign.Sub_Campaign. |
+| 22 | Permission Set | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
+| 23 | Permission Set | N/A | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
+| 24 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
+| 25 | Permission Set | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
+| 26 | Permission Set | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
+| 27 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Read/Edit access to the 9 new Campaign fields; granted recordTypeVisibilities for both Campaign.Parent_Campaign and Campaign.Sub_Campaign. |
+| 28 | Profile | N/A | Admin | Admin | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 29 | Profile | N/A | Analytics Cloud Integration User | Analytics Cloud Integration User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 30 | Profile | N/A | Analytics Cloud Security User | Analytics Cloud Security User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 31 | Profile | N/A | CPQ Integration User | CPQ Integration User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 32 | Profile | N/A | Chatter External User | Chatter External User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 33 | Profile | N/A | Chatter Free User | Chatter Free User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 34 | Profile | N/A | Chatter Moderator User | Chatter Moderator User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 35 | Profile | N/A | ContractManager | ContractManager | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 36 | Profile | N/A | Einstein Agent User | Einstein Agent User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 37 | Profile | N/A | End User | End User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 38 | Profile | N/A | Executive Sponsor | Executive Sponsor | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 39 | Profile | N/A | External Apps Login User | External Apps Login User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 40 | Profile | N/A | External Einstein Agent User | External Einstein Agent User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 41 | Profile | N/A | Guest License User | Guest License User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 42 | Profile | N/A | Identity User | Identity User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 43 | Profile | N/A | MarketingProfile | MarketingProfile | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 44 | Profile | N/A | Minimum Access - API Only Integrations | Minimum Access - API Only Integrations | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 45 | Profile | N/A | Minimum Access - Salesforce | Minimum Access - Salesforce | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 46 | Profile | N/A | Read Only | Read Only | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 47 | Profile | N/A | Sales Insights Integration User | Sales Insights Integration User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 48 | Profile | N/A | Salesforce API Only System Integrations | Salesforce API Only System Integrations | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 49 | Profile | N/A | SalesforceIQ Integration User | SalesforceIQ Integration User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 50 | Profile | N/A | SolutionManager | SolutionManager | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 51 | Profile | N/A | Standard | Standard | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
+| 52 | Flow | Campaign | Campaign_On_Crear_After_Save | Campaign - On Crear - After Save | Deleted | Removed and superseded by Campaign_On_Create_Before_Save (row 53), which replicates the same lookup/update logic on a before-save trigger. |
+| 53 | Flow | Campaign | Campaign_On_Create_Before_Save | Campaign - On Create - Before Save | Created | Record-triggered flow (before save, on create, formula entry criteria {!$Record.RecordType.DeveloperName} = "Sub_Campaign") that looks up the Parent Campaign via ParentId and assigns its Primary_Module__c onto the triggering Sub Campaign's Primary_Module__c field. Originally synced Type; retargeted to Primary_Module__c in a later push — see Release Notes and Post Deployment Items for two items that need verification (missing filterLogic=formula, and Type now having no way to be set on Sub Campaigns). |
