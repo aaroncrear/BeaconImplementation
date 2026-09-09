@@ -60,6 +60,10 @@
                 <field>Website</field>
             </layoutItems>
             <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Domain__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Readonly</behavior>
                 <field>Total_Revenue__c</field>
             </layoutItems>

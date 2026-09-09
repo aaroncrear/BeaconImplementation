@@ -5,6 +5,11 @@
     <label>Beacon Customer Success</label>
     <license>Salesforce</license>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>Account.Domain__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>Account.Invoice_Email__c</field>
         <readable>true</readable>
@@ -65,8 +70,18 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.Account__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>Lead.Email_Communication__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.Email_Domain__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
