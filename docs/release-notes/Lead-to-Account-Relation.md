@@ -11,9 +11,9 @@ email address, as soon as the Lead is created:
 - Derive an `Email Domain` field on Lead from the portion of the Lead's Email address after the
   `@` symbol, so it can be compared against the Account's `Domain` field.
 - Add an `Account` lookup field on Lead to hold the matched Account.
-- Give the Beacon persona permission sets the right level of access to all three fields: Edit on
-  `Account.Domain__c`, Read on `Lead.Email_Domain__c` (system-derived, not meant to be typed in by
-  users), and Edit on `Lead.Account__c`.
+- Give the nine `_Object_Tab_FLS` Beacon persona permission sets the right level of access to all
+  three fields: Edit on `Account.Domain__c`, Read on `Lead.Email_Domain__c` (system-derived, not
+  meant to be typed in by users), and Edit on `Lead.Account__c`.
 - Automatically populate the new `Account` lookup on Lead creation by matching `Email Domain` to
   `Domain` and the Lead's `Country` to the Account's `Billing Country`, so two different companies
   that happen to share a generic email domain aren't cross-matched.
@@ -32,16 +32,18 @@ Three fields were added:
   intended for manual entry. Not added to the Lead Layout since no placement was requested for it;
   it can be surfaced in a related list or added to the layout in a follow-up if needed.
 
-All 20 permission sets whose API name starts with `Beacon` (the ten persona sets — Baseline
-Standard Field Access, Baseline System & App Access, Consulting, Customer Success, Executive,
-Marketing, Product, ResOps, Sales, Salesforce Admin — and their ten matching `_Object_Tab_FLS`
-companion sets) were updated with field-level security for the three new fields: Edit (Read +
-Edit) on `Account.Domain__c`, Read-only on `Lead.Email_Domain__c`, and Edit (Read + Edit) on
-`Lead.Account__c`. New `fieldPermissions` entries were inserted alphabetically alongside each
-file's existing entries, matching the ordering convention already used in these files.
-`Beacon_Baseline_System_App_Access` did not previously carry any field-level security entries (it
-only grants app/system-level permissions); this deploy adds its first three, per the "all
-permission sets starting with Beacon" requirement.
+Field-level security for the three new fields was scoped to only the nine `_Object_Tab_FLS`
+companion permission sets (Consulting, Customer Success, Executive, Marketing, Product, ResOps,
+Sales, Salesforce Admin, Tech): Edit (Read + Edit) on `Account.Domain__c`, Read-only on
+`Lead.Email_Domain__c`, and Edit (Read + Edit) on `Lead.Account__c`. New `fieldPermissions`
+entries were inserted alphabetically alongside each file's existing entries, matching the
+ordering convention already used in these files. The two Baseline permission sets
+(`Beacon_Baseline_Standard_Field_Access`, `Beacon_Baseline_System_App_Access`) and the nine base
+persona permission sets without the `_Object_Tab_FLS` suffix (`Beacon_Consulting`,
+`Beacon_Customer_Success`, `Beacon_Executive`, `Beacon_Marketing`, `Beacon_Product`,
+`Beacon_ResOps`, `Beacon_Sales`, `Beacon_Salesforce_Admin`, `Beacon_Tech`) do not carry these
+field permissions — an earlier push on this branch had added them everywhere a permission set
+name started with `Beacon`, and that was subsequently narrowed to just the nine FLS sets.
 
 A new record-triggered flow, **`Lead - On Create - Before Save`**
 (`Lead_On_Create_Before_Save`), runs before a new Lead is saved. Its entry criteria only fires the
@@ -82,11 +84,16 @@ and `Contact - On Update - Before Save` flows.
    and the flow does not attempt a lookup (no error).
 10. Update an existing Lead's Email or Country after creation and confirm the `Account` lookup is
     *not* re-evaluated — the flow only runs on Lead creation, not on update.
-11. For each of the 20 permission sets whose name starts with `Beacon`, open Object Settings >
+11. For each of the nine `_Object_Tab_FLS` permission sets (Consulting, Customer Success,
+    Executive, Marketing, Product, ResOps, Sales, Salesforce Admin, Tech), open Object Settings >
     Account > Fields and confirm `Domain` shows both Read and Edit checked. Open Object Settings
     > Lead > Fields and confirm `Email Domain` shows Read checked and Edit unchecked, and
     `Account` shows both Read and Edit checked.
-12. Confirm `Lead - On Create - Before Save` shows `Status = Active` in Setup > Flows.
+12. Confirm the two Baseline permission sets (`Beacon - Baseline - Standard Field Access`,
+    `Beacon - Baseline - System & App Access`) and the nine base persona permission sets without
+    the `_Object_Tab_FLS` suffix show no access (Read or Edit) to `Domain`, `Email Domain`, or
+    `Account` on Account/Lead.
+13. Confirm `Lead - On Create - Before Save` shows `Status = Active` in Setup > Flows.
 
 ## Post Deployment Items
 
@@ -117,23 +124,12 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Lead-to-A
 | 4 | Layout | Account | Account-Account Layout | Account Layout | Updated | Added the Domain field directly below Website. |
 | 5 | Layout | Lead | Lead-Lead Layout | Lead Layout | Updated | Added the read-only Email Domain field directly below Second Email. |
 | 6 | Flow | Lead | Lead_On_Create_Before_Save | Lead - On Create - Before Save | Created | Before-save, record-triggered on Lead create; matches Email Domain to Account Domain and Lead Country to Account Billing Country, and populates the Lead's Account lookup when a match is found. Every element has a description. |
-| 7 | Permission Set | N/A | Beacon_Baseline_Standard_Field_Access | Beacon - Baseline - Standard Field Access | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 8 | Permission Set | N/A | Beacon_Baseline_System_App_Access | Beacon - Baseline - System & App Access | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c (first field-level security entries in this permission set). |
-| 9 | Permission Set | N/A | Beacon_Consulting | Beacon Consulting | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 10 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 11 | Permission Set | N/A | Beacon_Customer_Success | Beacon Customer Success | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 12 | Permission Set | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 13 | Permission Set | N/A | Beacon_Executive | Beacon Executive | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 14 | Permission Set | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 15 | Permission Set | N/A | Beacon_Marketing | Beacon Marketing | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 16 | Permission Set | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 17 | Permission Set | N/A | Beacon_Product | Beacon Product | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 18 | Permission Set | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 19 | Permission Set | N/A | Beacon_ResOps | Beacon ResOps | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 20 | Permission Set | N/A | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 21 | Permission Set | N/A | Beacon_Sales | Beacon Sales | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 22 | Permission Set | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 23 | Permission Set | N/A | Beacon_Salesforce_Admin | Beacon Salesforce Admin | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 24 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 25 | Permission Set | N/A | Beacon_Tech | Beacon Tech | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
-| 26 | Permission Set | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 7 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 8 | Permission Set | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 9 | Permission Set | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 10 | Permission Set | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 11 | Permission Set | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 12 | Permission Set | N/A | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 13 | Permission Set | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 14 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
+| 15 | Permission Set | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
