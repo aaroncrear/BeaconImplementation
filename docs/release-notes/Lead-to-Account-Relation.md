@@ -28,9 +28,9 @@ Three fields were added:
   Email) + 1, LEN(Email) - FIND("@", Email)), "")`, i.e. everything after the `@` in the Lead's
   Email address, or blank if Email has no `@`. Placed on the Lead Layout directly under
   `Second Email`, as a read-only field (formula fields can't be edited directly).
-- **`Lead.Account__c`** (Lookup to Account, label "Account") — populated by automation, not
-  intended for manual entry. Not added to the Lead Layout since no placement was requested for it;
-  it can be surfaced in a related list or added to the layout in a follow-up if needed.
+- **`Lead.Account__c`** (Lookup to Account, label "Account") — populated by automation, but left
+  editable so users can see and, if needed, manually correct the matched Account. Placed on the
+  Lead Layout directly under `Company`.
 
 Field-level security for the three new fields was scoped to only the nine `_Object_Tab_FLS`
 companion permission sets (Consulting, Customer Success, Executive, Marketing, Product, ResOps,
@@ -66,7 +66,8 @@ and `Contact - On Update - Before Save` flows.
    formula) exists, and that it appears on the Lead Layout directly below `Second Email` as a
    read-only field.
 3. In Object Manager > Lead > Fields, confirm `Account` (API name `Account__c`, Lookup to
-   Account) exists.
+   Account) exists, and that it appears on the Lead Layout directly below `Company` as an
+   editable field.
 4. On an existing Lead record, set the Email field to `jane@example.com` and save. Confirm
    `Email Domain` auto-populates with `example.com`.
 5. Set a Lead's Email to a value with no `@` (or leave it blank) and confirm `Email Domain`
@@ -102,10 +103,6 @@ and `Contact - On Update - Before Save` flows.
   or `Account__c` (automation-only) retroactively populated for the lookup. If existing Leads need
   to be matched to Accounts, a one-time data fix (e.g. Data Loader update or anonymous Apex) will
   be needed to run the same matching logic against them.
-- **Confirm whether `Lead.Account__c` should be added to the Lead Layout or a related list.** The
-  request only specified creating the field, not a layout placement, so it was left off the
-  layout. Confirm with the business whether users should be able to see/reference it directly on
-  the Lead page.
 - **Confirm Domain data quality on existing Accounts.** `Account.Domain__c` is a new, currently
   blank field on all existing Accounts. The matching flow will not find a match for any Account
   until `Domain__c` is populated — confirm whether a data-population project (e.g. deriving Domain
@@ -122,7 +119,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Lead-to-A
 | 2 | Field | Lead | Email_Domain__c | Email Domain | Created | Text formula field returning the portion of Email after the "@" symbol; used in automation to match Leads to Accounts based on this field and the Domain field on Accounts. |
 | 3 | Field | Lead | Account__c | Account | Created | Lookup to Account, populated via automation by matching Email Domain (Lead) to Domain (Account). |
 | 4 | Layout | Account | Account-Account Layout | Account Layout | Updated | Added the Domain field directly below Website. |
-| 5 | Layout | Lead | Lead-Lead Layout | Lead Layout | Updated | Added the read-only Email Domain field directly below Second Email. |
+| 5 | Layout | Lead | Lead-Lead Layout | Lead Layout | Updated | Added the read-only Email Domain field directly below Second Email, and the editable Account field directly below Company. |
 | 6 | Flow | Lead | Lead_On_Create_Before_Save | Lead - On Create - Before Save | Created | Before-save, record-triggered on Lead create; matches Email Domain to Account Domain and Lead Country to Account Billing Country, and populates the Lead's Account lookup when a match is found. Every element has a description. |
 | 7 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
 | 8 | Permission Set | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Edit access to Account.Domain__c, Read access to Lead.Email_Domain__c, Edit access to Lead.Account__c. |
