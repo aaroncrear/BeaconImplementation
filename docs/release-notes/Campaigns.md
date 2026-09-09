@@ -74,10 +74,14 @@ yet in this repo until partway through this branch.
 Both Lightning record pages were tuned for data entry: on `Beacon_Parent_Campaign_Record_Page`,
 the `Type` field was changed from optional to required, and a `Record Type` field was added to the
 same section (optional). On `Beacon_Sub_Campaign_Record_Page`, `ParentId` was changed from
-optional to required (a Sub Campaign must reference a Parent Campaign), `Type` was changed from
-editable to read-only, a `Change Record Type` quick action was added to the highlights panel
-alongside the existing `Change Owner` action, and the `Host__c` / `Website__c` fields were
-reordered (Host now appears before Website).
+optional to required (a Sub Campaign must reference a Parent Campaign), a `Change Record Type`
+quick action was added to the highlights panel alongside the existing `Change Owner` action, and
+the `Host__c` / `Website__c` fields were reordered (Host now appears before Website). `Type` and
+`Primary_Module__c` were each set read-only at first (matching the flow's original design, which
+synced `Type`), then swapped in a follow-up push once the flow was retargeted to sync
+`Primary_Module__c` instead: `Primary_Module__c` is now read-only on the Sub Campaign page (it's
+set automatically by the flow) and `Type` is editable again (`uiBehavior=none`) — resolving the
+gap where `Type` previously had no way to be set on a new Sub Campaign.
 
 All nine existing Beacon persona permission sets (`Beacon Executive`, `Beacon Sales`, `Beacon
 Marketing`, `Beacon Customer Success`, `Beacon ResOps`, `Beacon Consulting`, `Beacon Product`,
@@ -104,13 +108,12 @@ Parent Campaign" and the decision's description, still read "Type" — cosmetic 
 retarget worth cleaning up next time the flow is opened in Flow Builder, but they don't affect
 behavior).
 
-**Two items from this latest push need verification, not just documentation** (see Post
+**One item from these pushes still needs verification, not just documentation** (see Post
 Deployment Items): the flow's `<start>` entry criteria no longer includes
 `<filterLogic>formula</filterLogic>` — only `<filterFormula>` remains — which needs confirming in
 a sandbox, since a formula-based entry criteria typically requires `filterLogic` set to `formula`
-for the formula to actually be evaluated; and `Type` is now locked read-only on the Sub Campaign
-page even though the flow no longer sets `Type` at all, so as deployed a new Sub Campaign's `Type`
-can end up permanently blank with no way to set it from the UI.
+for the formula to actually be evaluated. The `Type`-has-no-way-to-be-set gap flagged previously
+is now resolved (see above — `Type` is editable again on the Sub Campaign page).
 
 ## Acceptance Criteria
 
@@ -145,8 +148,8 @@ can end up permanently blank with no way to set it from the UI.
 10. Create a Parent Campaign with `Primary Module` set to a specific value (e.g. `Oncology`), then
     create a Sub Campaign with that Parent Campaign as its `ParentId`. Confirm the new Sub
     Campaign's `Primary Module` is set to match the Parent Campaign's `Primary Module` immediately
-    on save, and that `Type` is **not** auto-populated (it currently has no way to be set from the
-    UI on a Sub Campaign — see Post Deployment Items).
+    on save (and that the field is read-only on the page, since it's meant to be set only by the
+    flow), and that `Type` remains manually editable and is not touched by the flow.
 11. Create a Sub Campaign with no `ParentId` set and confirm it saves successfully with no error,
     and that `Primary Module` is left as whatever the user set (not overwritten or blanked).
 12. Create a Parent Campaign and confirm its `Primary Module` is unaffected — the flow should not
@@ -162,9 +165,9 @@ can end up permanently blank with no way to set it from the UI.
     populated with a value, not blank/broken.
 16. On the Parent Campaign record page, confirm `Type` is a required field (record can't be saved
     without it), and that a `Record Type` field is visible in the same section.
-17. On the Sub Campaign record page, confirm `Parent Campaign` (ParentId) is required, `Type` is
-    read-only, and the `Change Record Type` quick action is available from the highlights panel
-    alongside `Change Owner`.
+17. On the Sub Campaign record page, confirm `Parent Campaign` (ParentId) is required,
+    `Primary Module` is read-only, `Type` is editable, and the `Change Record Type` quick action
+    is available from the highlights panel alongside `Change Owner`.
 18. For `Beacon Marketing` and `Beacon Salesforce Admin`, confirm Object Settings > Campaign shows
     both `Parent Campaign` and `Sub Campaign` record types visible (not just `Sub Campaign`).
 19. **Critical — verify the entry criteria still works.** Create several Campaigns of the
@@ -181,12 +184,9 @@ can end up permanently blank with no way to set it from the UI.
   itself to Sub Campaign inserts. If it now fires on every Campaign create, re-open the flow in
   Flow Builder, re-select "Formula evaluates to true" for the entry conditions (which should
   re-add `filterLogic=formula` on save), and re-deploy.
-- **Reconcile the Sub Campaign page's read-only `Type` field with the flow no longer setting
-  `Type`.** `Type` is locked read-only on `Beacon_Sub_Campaign_Record_Page`, but the flow was
-  retargeted to sync `Primary_Module__c` instead of `Type` — so a new Sub Campaign's `Type` now has
-  no way to be set at all (not by the user, not by automation). Confirm with the business whether
-  `Type` should be unlocked for manual entry on Sub Campaigns, or synced by the flow in addition to
-  `Primary Module`.
+- ~~**Reconcile the Sub Campaign page's read-only `Type` field with the flow no longer setting
+  `Type`.**~~ Resolved in the latest push: `Primary_Module__c` (set automatically by the flow) is
+  now read-only on `Beacon_Sub_Campaign_Record_Page`, and `Type` is editable again.
 - **Clean up stale element descriptions inside `Campaign - On Create - Before Save`.** The Get
   Parent Campaign lookup and the Parent Campaign Found decision still have `description` text
   referencing "Type" from before the flow was retargeted to `Primary_Module__c`. Cosmetic only,
@@ -233,7 +233,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Campaigns
 | 14 | Standard Value Set | Campaign | CampaignType | Campaign Type | Created | Defined the standard Type picklist values for Campaign (Content Download, Demo Request, Event [default], Onsite Enquiry, Other, Webinar, ZoomInfo). |
 | 15 | Layout | Campaign | Campaign-Campaign Layout | Campaign Layout | Updated | Replaced Module__c with Primary_Module__c; added Content_Type__c and Strategy_Type__c to the info section and Related_Modules__c to the description section; added Related Entity History related list; changed excluded button from OpenSlackRecordChannel to GenerateKnowledge. |
 | 16 | Flexipage | Campaign | Beacon_Parent_Campaign_Record_Page | Beacon Parent Campaign Record Page | Created | Lightning record page for the Parent Campaign record type; Type field set to required; Record Type field added to the same section. |
-| 17 | Flexipage | Campaign | Beacon_Sub_Campaign_Record_Page | Beacon Sub Campaign Record Page | Created | Lightning record page for the Sub Campaign record type; ParentId set to required, Type set to read-only, added Change Record Type quick action, reordered Host/Website fields. |
+| 17 | Flexipage | Campaign | Beacon_Sub_Campaign_Record_Page | Beacon Sub Campaign Record Page | Created | Lightning record page for the Sub Campaign record type; ParentId set to required, added Change Record Type quick action, reordered Host/Website fields; Primary_Module__c set read-only (synced by the flow) and Type left editable. |
 | 18 | Field | Campaign | Primary_Module__c | Primary Module | Created | Picklist backing the Campaign Layout's "Primary Module" field (23 active module values plus inactive legacy value Adoptive Cell); already referenced by the layout and persona permission sets but was missing as a field until this deploy. |
 | 19 | Permission Set | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields (Content_Type__c, Host__c, Marketing_Primary__c, Marketing_Secondary__c, Product_Primary__c, Product_Secondary__c, ResOps_Primary__c, ResOps_Secondary__c, Strategy_Type__c). |
 | 20 | Permission Set | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
