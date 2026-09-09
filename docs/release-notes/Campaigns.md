@@ -62,7 +62,21 @@ The `Campaign-Campaign Layout` page layout was updated: `Module__c` was swapped 
 `Primary_Module__c` in the top info section, `Content_Type__c` and `Strategy_Type__c` were added
 to that same section, `Related_Modules__c` was added to the description section, a `Related Entity
 History` related list was added, and the layout's excluded quick-action button was changed from
-`OpenSlackRecordChannel` to `GenerateKnowledge`.
+`OpenSlackRecordChannel` to `GenerateKnowledge`. A new field, `Primary_Module__c` (Picklist:
+ADC, Bispecific, Cancer Vaccines, Cell Therapy, Checkpoint, CVRM, Cytokine, DDR, General, Gene
+Therapy, Immune Tolerance, Lung Cancer, Microbiome, Neuro-Degenerative, Neurology, Neuroscience,
+Oncology, Oncolytic Viruses, Psychiatric, RAS, RNA, Targeted Radiopharmaceuticals, TPD, plus the
+inactive legacy value Adoptive Cell), was created to back that layout field — the layout and
+persona permission sets already referenced `Primary_Module__c`, but the field itself hadn't been
+created yet in this repo until this deploy.
+
+Both Lightning record pages were tuned for data entry: on `Beacon_Parent_Campaign_Record_Page`,
+the `Type` field was changed from optional to required. On `Beacon_Sub_Campaign_Record_Page`,
+`ParentId` was changed from optional to required (a Sub Campaign must reference a Parent
+Campaign), `Type` was changed from editable to read-only (since `Campaign - On Create - Before
+Save` now sets it automatically from the parent), a `Change Record Type` quick action was added
+to the highlights panel alongside the existing `Change Owner` action, and the `Host__c` /
+`Website__c` fields were reordered (Host now appears before Website).
 
 All nine existing Beacon persona permission sets (`Beacon Executive`, `Beacon Sales`, `Beacon
 Marketing`, `Beacon Customer Success`, `Beacon ResOps`, `Beacon Consulting`, `Beacon Product`,
@@ -71,9 +85,10 @@ lookup/picklist/text fields above (`Related_Modules__c` was not added to the per
 Read access was granted to every persona; `Beacon Marketing` and `Beacon Salesforce Admin`
 additionally received Edit access, consistent with Marketing already holding
 Create/Read/Edit/Delete on Campaign and Salesforce Admin holding full CRUD on all tracked fields.
-`Beacon Marketing` and `Beacon Salesforce Admin` were also granted `recordTypeVisibilities` for
-`Campaign.Sub_Campaign` (no permission set was given explicit visibility to `Campaign.Parent_Campaign`
-— see Post Deployment Items).
+`Beacon Marketing` and `Beacon Salesforce Admin` were granted `recordTypeVisibilities` for both
+`Campaign.Sub_Campaign` and, in this latest push, `Campaign.Parent_Campaign` — closing the gap
+flagged in the previous Post Deployment Items, where only `Sub_Campaign` visibility had been
+granted.
 
 A record-triggered flow, `Campaign - On Create - Before Save`, was added to keep a Sub Campaign's
 `Type` in sync with its Parent Campaign at creation time. It runs before save, only on Campaign
@@ -129,6 +144,17 @@ skips the assignment rather than faulting.
     only fires on Campaign creation, not on update.
 14. Confirm `Campaign - On Create - Before Save` shows `Status = Active` in Setup > Flows, and
     that `Campaign - On Crear - After Save` no longer exists.
+15. Open Object Manager > Campaign > Fields and confirm `Primary Module` exists as a Picklist
+    field with the 23 active values listed in the Release Notes section (and that `Adoptive Cell`
+    is present but inactive). Confirm the Campaign Layout's info section shows `Primary Module`
+    populated with a value, not blank/broken.
+16. On the Parent Campaign record page, confirm `Type` is a required field (record can't be saved
+    without it).
+17. On the Sub Campaign record page, confirm `Parent Campaign` (ParentId) is required, `Type` is
+    read-only (can't be hand-edited — only set by the flow), and the `Change Record Type` quick
+    action is available from the highlights panel alongside `Change Owner`.
+18. For `Beacon Marketing` and `Beacon Salesforce Admin`, confirm Object Settings > Campaign shows
+    both `Parent Campaign` and `Sub Campaign` record types visible (not just `Sub Campaign`).
 
 ## Post Deployment Items
 
@@ -137,12 +163,11 @@ skips the assignment rather than faulting.
   record type, and profile combination each page is shown for) is set through Lightning App
   Builder in the org and is not captured in this metadata — activate each page against its
   matching record type after deploy.
-- **Confirm `Parent_Campaign` record-type visibility.** Only `Beacon Marketing` and `Beacon
-  Salesforce Admin` were given explicit `recordTypeVisibilities` for `Campaign.Sub_Campaign`, and
-  no permission set (or these profiles) was given explicit visibility for `Campaign.Parent_Campaign`
-  in this deploy. Confirm with the business which personas should be able to create each record
-  type and grant/restrict `recordTypeVisibilities` accordingly — as deployed, record type
-  visibility for both record types is effectively governed by whatever the profiles already grant.
+- ~~**Confirm `Parent_Campaign` record-type visibility.**~~ Resolved in this push: `Beacon
+  Marketing` and `Beacon Salesforce Admin` now hold `recordTypeVisibilities` for both
+  `Campaign.Parent_Campaign` and `Campaign.Sub_Campaign`. The other seven persona permission sets
+  still have no explicit `recordTypeVisibilities` for either record type — confirm with the
+  business whether any other persona should be able to create Parent or Sub Campaigns directly.
 - **Confirm `Related_Modules__c` field-level security.** This field was not added to any of the
   nine Beacon persona permission sets in this deploy — confirm whether it needs Read/Edit access
   granted the same way the other nine new fields were.
@@ -177,8 +202,11 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Campaigns
 | 13 | Field | Campaign | Channels__c | Channels | Updated | Added active values AI Engines, Email - HubSpot, Google Ads, In-Product, LinkedIn (Organic), Organic Search, Remarketing, Third Party; deactivated ABM - Email, Direct Marketing, Email - Pardot, Email/Events, HW Event Collab, PPC, Social Media (Organic), Social Media (Paid). |
 | 14 | Standard Value Set | Campaign | CampaignType | Campaign Type | Created | Defined the standard Type picklist values for Campaign (Content Download, Demo Request, Event [default], Onsite Enquiry, Other, Webinar, ZoomInfo). |
 | 15 | Layout | Campaign | Campaign-Campaign Layout | Campaign Layout | Updated | Replaced Module__c with Primary_Module__c; added Content_Type__c and Strategy_Type__c to the info section and Related_Modules__c to the description section; added Related Entity History related list; changed excluded button from OpenSlackRecordChannel to GenerateKnowledge. |
-| 16 | Flexipage | Campaign | Beacon_Parent_Campaign_Record_Page | Beacon Parent Campaign Record Page | Created | Lightning record page for the Parent Campaign record type. |
-| 17 | Flexipage | Campaign | Beacon_Sub_Campaign_Record_Page | Beacon Sub Campaign Record Page | Created | Lightning record page for the Sub Campaign record type. |
+| 16 | Flexipage | Campaign | Beacon_Parent_Campaign_Record_Page | Beacon Parent Campaign Record Page | Created | Lightning record page for the Parent Campaign record type; Type field set to required. |
+| 17 | Flexipage | Campaign | Beacon_Sub_Campaign_Record_Page | Beacon Sub Campaign Record Page | Created | Lightning record page for the Sub Campaign record type; ParentId set to required, Type set to read-only, added Change Record Type quick action, reordered Host/Website fields. |
+| 53 | Field | Campaign | Primary_Module__c | Primary Module | Created | Picklist backing the Campaign Layout's "Primary Module" field (23 active module values plus inactive legacy value Adoptive Cell); already referenced by the layout and persona permission sets but was missing as a field until this deploy. |
+| 54 | Permission Set | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added recordTypeVisibilities for Campaign.Parent_Campaign (already had Campaign.Sub_Campaign). |
+| 55 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added recordTypeVisibilities for Campaign.Parent_Campaign (already had Campaign.Sub_Campaign). |
 | 18 | Permission Set | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields (Content_Type__c, Host__c, Marketing_Primary__c, Marketing_Secondary__c, Product_Primary__c, Product_Secondary__c, ResOps_Primary__c, ResOps_Secondary__c, Strategy_Type__c). |
 | 19 | Permission Set | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read access to the 9 new Campaign fields. |
 | 20 | Permission Set | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Read/Edit access to the 9 new Campaign fields and recordTypeVisibilities for Campaign.Sub_Campaign. |
