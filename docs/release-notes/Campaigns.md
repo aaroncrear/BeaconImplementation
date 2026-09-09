@@ -75,14 +75,18 @@ Create/Read/Edit/Delete on Campaign and Salesforce Admin holding full CRUD on al
 `Campaign.Sub_Campaign` (no permission set was given explicit visibility to `Campaign.Parent_Campaign`
 — see Post Deployment Items).
 
-A record-triggered flow, `Campaign - On Crear - After Save`, was added to keep a Sub Campaign's
-`Type` in sync with its Parent Campaign at creation time. It runs after save, only on Campaign
-insert, and its entry criteria filters on `RecordType.DeveloperName` equals `Sub_Campaign` (rather
-than a hardcoded `RecordTypeId`, which isn't portable between orgs) so it only fires for Sub
-Campaigns. When it fires, it looks up the Parent Campaign via `$Record.ParentId`; if a parent is
-found, it updates the triggering record's `Type` field to match the parent's `Type`. If
-`ParentId` is blank (no parent selected), the flow's decision element detects that the lookup
-found no record and skips the update rather than faulting.
+A record-triggered flow, `Campaign - On Create - Before Save`, was added to keep a Sub Campaign's
+`Type` in sync with its Parent Campaign at creation time. It runs before save, only on Campaign
+insert, and its entry criteria uses a formula —
+`{!$Record.RecordType.DeveloperName} = "Sub_Campaign"` — rather than a hardcoded `RecordTypeId`
+(which isn't portable between orgs) or a plain field filter, so it only fires for Sub Campaigns.
+When it fires, it looks up the Parent Campaign via `$Record.ParentId`; if a parent is found, it
+assigns the parent's `Type` directly onto `$Record.Type`. Because the flow runs before save, that
+assignment is picked up by the same save operation with no extra DML — this replaced an earlier
+after-save version of this flow (`Campaign - On Crear - After Save`, which used an explicit
+Record Update element) that has been deleted and superseded by this one. If `ParentId` is blank
+(no parent selected), the flow's decision element detects that the lookup found no record and
+skips the assignment rather than faulting.
 
 ## Acceptance Criteria
 
@@ -116,14 +120,15 @@ found no record and skips the update rather than faulting.
    `Campaign.Parent_Campaign` and `Campaign.Sub_Campaign`.
 10. Create a Parent Campaign with `Type` set to a specific value (e.g. `Webinar`), then create a
     Sub Campaign with that Parent Campaign as its `ParentId`. Confirm the new Sub Campaign's
-    `Type` is automatically set to match the Parent Campaign's `Type` after save.
+    `Type` is set to match the Parent Campaign's `Type` immediately on save.
 11. Create a Sub Campaign with no `ParentId` set and confirm it saves successfully with no error,
     and that `Type` is left as whatever the user set (not overwritten or blanked).
 12. Create a Parent Campaign and confirm its `Type` is unaffected — the flow should not fire for
     the Parent Campaign record type.
 13. Update an existing Sub Campaign's `Type` field directly and confirm it is not reset — the flow
     only fires on Campaign creation, not on update.
-14. Confirm `Campaign - On Crear - After Save` shows `Status = Active` in Setup > Flows.
+14. Confirm `Campaign - On Create - Before Save` shows `Status = Active` in Setup > Flows, and
+    that `Campaign - On Crear - After Save` no longer exists.
 
 ## Post Deployment Items
 
@@ -144,11 +149,12 @@ found no record and skips the update rather than faulting.
 - No requirements doc accompanied this deploy — recommend documenting the actual business
   requirements (who requested the Parent/Sub Campaign model, and the target audience for each new
   field) for future reference.
-- `Campaign - On Crear - After Save` only syncs `Type` at Sub Campaign creation time. If a Sub
+- `Campaign - On Create - Before Save` only syncs `Type` at Sub Campaign creation time. If a Sub
   Campaign's `ParentId` is changed after creation, or the Parent Campaign's `Type` changes later,
   the Sub Campaign's `Type` is not automatically re-synced. Confirm with the business whether that
   ongoing-sync behavior is needed; if so, the flow's trigger would need to change from Create to
-  Create and Update.
+  Create and Update (and, if it needs to update the Parent Campaign or another record, an
+  after-save Record Update element rather than a before-save $Record assignment).
 
 ## Component Manifest
 
@@ -206,4 +212,5 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Campaigns
 | 48 | Profile | N/A | SalesforceIQ Integration User | SalesforceIQ Integration User | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
 | 49 | Profile | N/A | SolutionManager | SolutionManager | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
 | 50 | Profile | N/A | Standard | Standard | Updated | Added layoutAssignments mapping Campaign.Parent_Campaign and Campaign.Sub_Campaign record types to the Campaign Layout. |
-| 51 | Flow | Campaign | Campaign_On_Crear_After_Save | Campaign - On Crear - After Save | Created | Record-triggered flow (after save, on create, entry criteria RecordType.DeveloperName = Sub_Campaign) that looks up the Parent Campaign via ParentId and sets the Sub Campaign's Type field to match the Parent Campaign's Type. |
+| 51 | Flow | Campaign | Campaign_On_Crear_After_Save | Campaign - On Crear - After Save | Deleted | Removed and superseded by Campaign_On_Create_Before_Save (row 52), which replicates the same lookup/update logic on a before-save trigger. |
+| 52 | Flow | Campaign | Campaign_On_Create_Before_Save | Campaign - On Create - Before Save | Created | Record-triggered flow (before save, on create, formula entry criteria {!$Record.RecordType.DeveloperName} = "Sub_Campaign") that looks up the Parent Campaign via ParentId and assigns its Type onto the triggering Sub Campaign's Type field. |

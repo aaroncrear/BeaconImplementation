@@ -4,8 +4,8 @@
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <description>When a Sub Campaign is created, sets its Type field to match the Type field on its Parent Campaign.</description>
     <environments>Default</environments>
-    <interviewLabel>Campaign - On Crear - After Save {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Campaign - On Crear - After Save</label>
+    <interviewLabel>Campaign - On Create - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Campaign - On Create - Before Save</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -25,6 +25,20 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <assignments>
+        <description>Sets the Sub Campaign's Type field to the Type field value from its Parent Campaign. Because this flow runs before the record is saved, assigning directly to $Record saves the value with no extra DML operation.</description>
+        <name>Update_Sub_Campaign_Type</name>
+        <label>Update Sub Campaign Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Type</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Parent_Campaign.Type</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
     <decisions>
         <description>Checks whether the Get Parent Campaign lookup found a Parent Campaign record, so the Type update is skipped if the Sub Campaign has no ParentId set.</description>
         <name>Parent_Campaign_Found</name>
@@ -69,37 +83,17 @@
         <object>Campaign</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
-    <recordUpdates>
-        <description>Sets the Sub Campaign's Type field to the Type field value from its Parent Campaign.</description>
-        <name>Update_Sub_Campaign_Type</name>
-        <label>Update Sub Campaign Type</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <inputAssignments>
-            <field>Type</field>
-            <value>
-                <elementReference>Get_Parent_Campaign.Type</elementReference>
-            </value>
-        </inputAssignments>
-        <inputReference>$Record</inputReference>
-    </recordUpdates>
     <start>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
             <targetReference>Get_Parent_Campaign</targetReference>
         </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>RecordType.DeveloperName</field>
-            <operator>EqualTo</operator>
-            <value>
-                <stringValue>Sub_Campaign</stringValue>
-            </value>
-        </filters>
+        <filterFormula>{!$Record.RecordType.DeveloperName} = &quot;Sub_Campaign&quot;</filterFormula>
+        <filterLogic>formula</filterLogic>
         <object>Campaign</object>
         <recordTriggerType>Create</recordTriggerType>
-        <triggerType>RecordAfterSave</triggerType>
+        <triggerType>RecordBeforeSave</triggerType>
     </start>
     <status>Active</status>
 </Flow>
