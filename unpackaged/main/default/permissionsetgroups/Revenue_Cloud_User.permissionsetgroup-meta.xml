@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Contains Permission Sets for Revenue Cloud usage.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Revenue Cloud User</label>
+    <permissionSets>force__ContextServiceRuntimePsl</permissionSets>
+    <permissionSets>force__ProductCatalogManagementViewer</permissionSets>
+    <permissionSets>force__ProductDiscoveryUser</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>
