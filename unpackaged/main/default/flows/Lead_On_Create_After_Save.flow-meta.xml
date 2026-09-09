@@ -8,12 +8,15 @@
         <label>Matching Account Found?</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Get_Matching_Account_by_Domain_Only</targetReference>
+        </defaultConnector>
         <defaultConnectorLabel>No Matching Account Found</defaultConnectorLabel>
         <rules>
             <name>Account_Found</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Get_Matching_Account.Id</leftValueReference>
+                <leftValueReference>Get_Matching_Account_by_Domain_and_Country.Id</leftValueReference>
                 <operator>IsNull</operator>
                 <rightValue>
                     <booleanValue>false</booleanValue>
@@ -25,7 +28,30 @@
             <label>Account Found</label>
         </rules>
     </decisions>
-    <description>When a Lead is created, matches it to an Account by comparing the Lead's Email Domain to the Account's Domain field and the Lead's Country to the Account's Billing Country, then updates the Lead's Account lookup field with the matched Account.</description>
+    <decisions>
+        <description>Checks whether the Get Matching Account lookup found an Account record, so the Account field is only updated when a matching Account is found.</description>
+        <name>Matching_Domain_Account_Found</name>
+        <label>Matching Domain Account Found?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No Matching Account Found</defaultConnectorLabel>
+        <rules>
+            <name>Domain_Matching_Account_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Matching_Account_by_Domain_and_Country.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Relate_Lead_to_Account</targetReference>
+            </connector>
+            <label>Domain Matching Account Found</label>
+        </rules>
+    </decisions>
+    <description>When a Lead is created, matches it to an Account by comparing the Lead&apos;s Email Domain to the Account&apos;s Domain field and the Lead&apos;s Country to the Account&apos;s Billing Country, then updates the Lead&apos;s Account lookup field with the matched Account.</description>
     <environments>Default</environments>
     <interviewLabel>Lead - On Create - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Lead - On Create - After Save</label>
@@ -49,9 +75,9 @@
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
     <recordLookups>
-        <description>Retrieves the Account whose Domain field matches the Lead's Email Domain and whose Billing Country matches the Lead's Country, so the Lead can be linked to it.</description>
-        <name>Get_Matching_Account</name>
-        <label>Get Matching Account</label>
+        <description>Retrieves the Account whose Domain field matches the Lead&apos;s Email Domain and whose Billing Country matches the Lead&apos;s Country, so the Lead can be linked to it.</description>
+        <name>Get_Matching_Account_by_Domain_and_Country</name>
+        <label>Get Matching Account by Domain and Country</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
@@ -75,18 +101,66 @@
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
         <object>Account</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Domain__c</queriedFields>
+        <queriedFields>BillingCountry</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Retrieves the Account whose Domain field matches the Lead&apos;s Email Domain, so the Lead can be linked to it.</description>
+        <name>Get_Matching_Account_by_Domain_Only</name>
+        <label>Get Matching Account by Domain Only</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Matching_Domain_Account_Found</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Domain__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Email_Domain__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Domain__c</queriedFields>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordUpdates>
-        <description>Updates the triggering Lead's Account lookup to the matched Account. Runs after save, so this issues a separate update DML against the Lead record that was just inserted.</description>
+        <description>Relate Lead to Account</description>
+        <name>Relate_Lead_to_Account</name>
+        <label>Relate Lead to Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>Account__c</field>
+            <value>
+                <elementReference>Get_Matching_Account_by_Domain_Only.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <description>Updates the triggering Lead&apos;s Account lookup to the matched Account. Runs after save, so this issues a separate update DML against the Lead record that was just inserted.</description>
         <name>Update_Lead_Account</name>
         <label>Update Lead Account</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
         <inputAssignments>
             <field>Account__c</field>
             <value>
-                <elementReference>Get_Matching_Account.Id</elementReference>
+                <elementReference>Get_Matching_Account_by_Domain_and_Country.Id</elementReference>
             </value>
         </inputAssignments>
         <inputReference>$Record</inputReference>
@@ -95,12 +169,25 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Get_Matching_Account</targetReference>
+            <targetReference>Get_Matching_Account_by_Domain_and_Country</targetReference>
         </connector>
-        <filterFormula>NOT(ISBLANK({!$Record.Email_Domain__c})) &amp;&amp; NOT(ISBLANK({!$Record.Country}))</filterFormula>
         <object>Lead</object>
         <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>
+    <subflows>
+        <description>Used to send email notification</description>
+        <name>Fault_Path_Subflow</name>
+        <label>Fault Path Subflow</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>Fault_Path_Subflow</flowName>
+        <inputAssignments>
+            <name>varFaultMessage</name>
+            <value>
+                <elementReference>$Flow.FaultMessage</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
 </Flow>
