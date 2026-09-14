@@ -1,34 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <customValue>
+        <fullName>Breach of Contract</fullName>
+        <default>false</default>
+        <label>Breach of Contract</label>
+    </customValue>
+    <customValue>
         <fullName>Competitor - Beacon</fullName>
         <default>false</default>
         <label>Competitor - Beacon</label>
     </customValue>
     <customValue>
-        <fullName>Competitor - Event</fullName>
+        <fullName>Competitor – Consulting</fullName>
         <default>false</default>
-        <label>Competitor - Event</label>
+        <label>Competitor – Consulting</label>
     </customValue>
     <customValue>
-        <fullName>Competitor - Intelligence</fullName>
+        <fullName>Sanctioned Country</fullName>
         <default>false</default>
-        <label>Competitor - Intelligence</label>
-    </customValue>
-    <customValue>
-        <fullName>Competitor - Searchlight</fullName>
-        <default>false</default>
-        <label>Competitor - Searchlight</label>
-    </customValue>
-    <customValue>
-        <fullName>Breach of Code of Conduct</fullName>
-        <default>false</default>
-        <label>Breach of Code of Conduct</label>
-    </customValue>
-    <customValue>
-        <fullName>Non-Paying Customer</fullName>
-        <default>false</default>
-        <label>Non-Paying Customer</label>
+        <label>Sanctioned Country</label>
     </customValue>
     <customValue>
         <fullName>Other</fullName>
@@ -36,9 +26,34 @@
         <label>Other</label>
     </customValue>
     <customValue>
-        <fullName>Sanctioned Country</fullName>
+        <fullName>Competitor - Event</fullName>
         <default>false</default>
-        <label>Sanctioned Country</label>
+        <isActive>false</isActive>
+        <label>Competitor - Event</label>
+    </customValue>
+    <customValue>
+        <fullName>Competitor - Searchlight</fullName>
+        <default>false</default>
+        <isActive>false</isActive>
+        <label>Competitor - Searchlight</label>
+    </customValue>
+    <customValue>
+        <fullName>Competitor - Intelligence</fullName>
+        <default>false</default>
+        <isActive>false</isActive>
+        <label>Competitor - Intelligence</label>
+    </customValue>
+    <customValue>
+        <fullName>Breach of Code of Conduct</fullName>
+        <default>false</default>
+        <isActive>false</isActive>
+        <label>Breach of Code of Conduct</label>
+    </customValue>
+    <customValue>
+        <fullName>Non-Paying Customer</fullName>
+        <default>false</default>
+        <isActive>false</isActive>
+        <label>Non-Paying Customer</label>
     </customValue>
     <description>Blacklisted Reason</description>
     <masterLabel>Blacklisted Reason</masterLabel>

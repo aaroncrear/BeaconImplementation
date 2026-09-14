@@ -16,30 +16,6 @@
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>checked</controllingFieldValue>
-            <valueName>Competitor - Event</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>checked</controllingFieldValue>
-            <valueName>Competitor - Intelligence</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>checked</controllingFieldValue>
-            <valueName>Competitor - Searchlight</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>checked</controllingFieldValue>
-            <valueName>Breach of Code of Conduct</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>checked</controllingFieldValue>
-            <valueName>Non-Paying Customer</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>checked</controllingFieldValue>
-            <valueName>Other</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>checked</controllingFieldValue>
             <valueName>Sanctioned Country</valueName>
         </valueSettings>
     </valueSet>

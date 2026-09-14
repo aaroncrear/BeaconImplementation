@@ -3,11 +3,12 @@
     <fullName>Account__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Populated via automation to match Leads to Accounts based on the Email Domain field and the Domain field on Accounts.</description>
+    <inlineHelpText>Link to Salesforce Account record. Automatically populated where possible.</inlineHelpText>
     <label>Account</label>
     <referenceTo>Account</referenceTo>
     <relationshipLabel>Leads</relationshipLabel>
     <relationshipName>Leads</relationshipName>
     <required>false</required>
-    <trackTrending>false</trackTrending>
+    <trackFeedHistory>false</trackFeedHistory>
     <type>Lookup</type>
 </CustomField>
