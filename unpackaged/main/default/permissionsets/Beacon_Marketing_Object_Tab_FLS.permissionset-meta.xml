@@ -16,7 +16,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Account.Do_Not_Contact__c</field>
+        <field>Account.Do_Not_Call__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
