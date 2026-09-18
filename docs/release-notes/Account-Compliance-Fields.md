@@ -40,8 +40,8 @@ Four custom fields were added to the Account object:
 - **`Account.Email_Opt_Out__c`** (Checkbox, default `false`) — indicates the account has opted
   out of email communications and should be excluded from email sends.
 
-A new **Compliance** section was added to the Account page layout (`Account-Account Layout`),
-placed between the existing **Address Information** and **System Information** sections. It uses
+A new **Compliance & Data Quality** section was added to the Account page layout
+(`Account-Account Layout`), placed at the **bottom** of the page as the last section. It uses
 a two-column top-to-bottom layout, with **Blacklisted** and **Blacklisted Reason** in the first
 column and **Do Not Call** and **Email Opt Out** in the second. All four items are set to the
 **Edit** behavior.
@@ -65,8 +65,8 @@ touched.
 3. Confirm **Do Not Call** (API name `Do_Not_Call__c`) and **Email Opt Out** (API name
    `Email_Opt_Out__c`) each exist as Checkbox fields defaulting to unchecked, with their
    respective descriptions.
-4. Open an Account record page and confirm a **Compliance** section appears between the Address
-   Information and System Information sections, showing **Blacklisted** and **Blacklisted Reason**
+4. Open an Account record page and confirm a **Compliance & Data Quality** section appears at the
+   bottom of the page as the last section, showing **Blacklisted** and **Blacklisted Reason**
    in the left column and **Do Not Call** and **Email Opt Out** in the right column, all
    editable.
 5. On an Account with **Blacklisted** unchecked, confirm **Blacklisted Reason** is disabled / has
@@ -98,7 +98,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Account-C
 | 2 | CustomField | Account | Blacklisted_Reason__c | Blacklisted Reason | Created | Restricted picklist dependent on Blacklisted__c, reusing the Blacklisted_Reason global value set (Competitor - Beacon, Sanctioned Country mapped to the checked state), mirroring Contact. |
 | 3 | CustomField | Account | Do_Not_Call__c | Do Not Call | Created | Checkbox (default false) indicating the account should not be called. |
 | 4 | CustomField | Account | Email_Opt_Out__c | Email Opt Out | Created | Checkbox (default false) indicating the account has opted out of email communications. |
-| 5 | Layout | Account | Account-Account Layout | Account Layout | Updated | Added a Compliance section (between Address Information and System Information) containing all four new compliance fields as editable items. |
+| 5 | Layout | Account | Account-Account Layout | Account Layout | Updated | Added a Compliance & Data Quality section (at the bottom of the page as the last section) containing all four new compliance fields as editable items. |
 | 6 | PermissionSet | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Edit FLS for Account.Blacklisted__c, Blacklisted_Reason__c, Do_Not_Call__c, and Email_Opt_Out__c. |
 | 7 | PermissionSet | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Edit FLS for Account.Blacklisted__c, Blacklisted_Reason__c, Do_Not_Call__c, and Email_Opt_Out__c. |
 | 8 | PermissionSet | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Edit FLS for Account.Blacklisted__c, Blacklisted_Reason__c, Do_Not_Call__c, and Email_Opt_Out__c. |
