@@ -103,9 +103,10 @@ Completed). Existing entries were untouched.
 
 A new record-triggered, **after-save** flow (`Account_On_Update_After_Save`, label *Account - On
 Update - After Save*, API version 67.0, status Active) was added on the **Account** object. It is
-gated by an entry (`filterFormula`) condition of
-`OR(ISCHANGED(Blacklisted__c), ISCHANGED(Blacklisted_Reason__c), ISCHANGED(Do_Not_Call__c),
-ISCHANGED(Email_Opt_Out__c))`, so it only runs when at least one of the four compliance fields
+gated by an entry condition built from four **Is Changed** field conditions — one each on
+**Blacklisted** (`Blacklisted__c`), **Blacklisted Reason** (`Blacklisted_Reason__c`), **Do Not
+Call** (`Do_Not_Call__c`), and **Email Opt Out** (`Email_Opt_Out__c`) — combined with **OR**
+logic (`1 OR 2 OR 3 OR 4`), so it only runs when at least one of the four compliance fields
 actually changes on the Account.
 
 When it fires, the flow queries and loops over three sets of related records, sets the four
@@ -122,10 +123,13 @@ Because Contact and Lead expose the standard **Do Not Call** (`DoNotCall`) and *
 **custom** fields on Opportunity; the custom `Blacklisted__c` and `Blacklisted_Reason__c` map
 directly on all three objects.
 
-Every database operation (the three Get lookups and the three Update DML operations) routes its
-**fault path** to the existing reusable **`Fault_Path_Subflow`**, which emails an
-automation-failure notification containing the fault message. That subflow already exists in the
-org and was not modified.
+After each of the three Get lookups, a **Decision** checks whether any records were returned
+before looping: because the Get output is stored automatically, its collection is null when
+nothing is found, so each decision tests the Get element **Is Null false** and only enters the
+corresponding loop when records exist (otherwise it skips ahead to the next stage). Only the
+three **Update** DML operations carry a **fault path**, each routed to the existing reusable
+**`Fault_Path_Subflow`**, which emails an automation-failure notification containing the fault
+message. That subflow already exists in the org and was not modified.
 
 ## Acceptance Criteria
 
@@ -180,9 +184,13 @@ org and was not modified.
     Do Not Call / Email Opt Out where applicable), while the **closed** Opportunity is left
     unchanged.
 15. Confirm the flow only fires on change: edit an unrelated Account field (leaving all four
-    compliance fields the same) and verify no sync occurs (the ISCHANGED entry condition is not
-    met).
-16. Verify the fault handling: force a failure on one of the DML operations (for example, a
+    compliance fields the same) and verify no sync occurs (none of the four **Is Changed** entry
+    conditions is met).
+16. Confirm the record-found decisions: on an Account with **no** related Contacts (but with
+    related Leads and/or open Opportunities), change a compliance field and verify the flow skips
+    the Contact loop and still syncs the Leads and open Opportunities — the empty Get result routes
+    through the "No Contacts Found" path without error.
+17. Verify the fault handling: force a failure on one of the Update DML operations (for example, a
     validation rule that blocks the update on a child record) and confirm the
     **Fault Path Subflow** sends its automation-failure notification email containing the fault
     message.
@@ -224,4 +232,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Account-C
 | 20 | RecordType | Opportunity | Consulting | Consulting | Updated | Added a Blacklisted_Reason__c picklistValues block exposing all five active values (Breach of Contract, Competitor - Beacon, Competitor – Consulting, Other, Sanctioned Country). |
 | 21 | RecordType | Opportunity | Subscription_New | Subscription New | Updated | Added a Blacklisted_Reason__c picklistValues block exposing all five active values (Breach of Contract, Competitor - Beacon, Competitor – Consulting, Other, Sanctioned Country). |
 | 22 | RecordType | Opportunity | Subscription_Renewal | Subscription Renewal | Updated | Added a Blacklisted_Reason__c picklistValues block exposing all five active values (Breach of Contract, Competitor - Beacon, Competitor – Consulting, Other, Sanctioned Country). |
-| 23 | Flow | Account | Account_On_Update_After_Save | Account - On Update - After Save | Created | Record-triggered after-save flow gated by an ISCHANGED entry formula on the four compliance fields; syncs Blacklisted, Blacklisted Reason, Do Not Call, and Email Opt Out from the Account to its related Contacts, related Leads (Account__c lookup), and open Opportunities (IsClosed = false), mapping to standard DoNotCall/HasOptedOutOfEmail on Contact/Lead and to the custom fields on Opportunity. All faults route to the existing Fault_Path_Subflow. |
+| 23 | Flow | Account | Account_On_Update_After_Save | Account - On Update - After Save | Created | Record-triggered after-save flow gated by four Is Changed entry conditions (Blacklisted, Blacklisted Reason, Do Not Call, Email Opt Out) combined with OR logic; syncs those fields from the Account to its related Contacts, related Leads (Account__c lookup), and open Opportunities (IsClosed = false), mapping to standard DoNotCall/HasOptedOutOfEmail on Contact/Lead and to the custom fields on Opportunity. After each Get Records a decision checks whether records were found before looping, and only the three Update DML elements route their fault paths to the existing Fault_Path_Subflow. |
