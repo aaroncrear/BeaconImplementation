@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Blacklisted_Reason__c</fullName>
+    <description>The reason the related account has been blacklisted. Available only when Blacklisted is checked. Synced from the related Account by the Account - On Update - After Save flow.</description>
+    <label>Blacklisted Reason</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Blacklisted__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetName>Blacklisted_Reason</valueSetName>
+        <valueSettings>
+            <controllingFieldValue>checked</controllingFieldValue>
+            <valueName>Competitor - Beacon</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>checked</controllingFieldValue>
+            <valueName>Sanctioned Country</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

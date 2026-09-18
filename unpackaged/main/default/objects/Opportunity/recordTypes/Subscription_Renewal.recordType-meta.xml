@@ -5,6 +5,29 @@
     <businessProcess>Subscription Renewal</businessProcess>
     <label>Subscription Renewal</label>
     <picklistValues>
+        <picklist>Blacklisted_Reason__c</picklist>
+        <values>
+            <fullName>Breach of Contract</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Competitor - Beacon</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Competitor – Consulting</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sanctioned Country</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>ForecastCategoryName</picklist>
         <values>
             <fullName>Best Case</fullName>
