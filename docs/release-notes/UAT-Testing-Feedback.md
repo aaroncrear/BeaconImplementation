@@ -26,9 +26,11 @@ Feedback from UAT identified two changes needed to the Lead and Contact complian
   Business** is second.
 - Remove the **Additional Information** section from the Opportunity page layout entirely,
   including its **Next Steps** and **Description** fields.
-- Add the **Child Campaign** (New) button to the **Campaign Hierarchy** related list on the
-  Campaign page layout, so a new child campaign can be created directly from a Campaign's
-  hierarchy related list.
+- Add a **Sub Campaign** quick action to the **Campaign Hierarchy** related list on the Campaign
+  page layout, so a new child campaign can be created directly from a Campaign's hierarchy
+  related list. The action must use the **Sub Campaign** record type and default the new
+  record's Parent Campaign to the campaign it was launched from. (An earlier pass added the
+  plain standard **New** button here; that was replaced with this dedicated action.)
 
 ## Release Notes
 
@@ -121,12 +123,21 @@ standard Opportunity fields and were not deleted (unlike Deceased__c earlier in 
 they're simply no longer surfaced on this layout. No other section of the layout referenced
 either field, so no further cleanup was needed.
 
-**Child Campaign button (Campaign Hierarchy related list).** On `Campaign-Campaign Layout`, a
-`relatedListButtons` entry of **`New`** was added to the existing `RelatedCampaignHierarchyList`
-related list block, so the standard **New** ("Child Campaign") button now appears on the
-Campaign Hierarchy related list, letting users create a new campaign with the current record
-pre-populated as its Parent Campaign directly from that related list. No other properties of the
-related list (its columns) were changed.
+**Sub Campaign quick action (Campaign Hierarchy related list).** A new **Create** quick action,
+**`Sub_Campaign`** (label "Sub Campaign"), was added to the Campaign object
+(`unpackaged/main/default/objects/Campaign/quickActions/Sub_Campaign.quickAction-meta.xml`):
+`targetObject` Campaign, `targetRecordType` `Campaign.Sub_Campaign` (the existing Sub Campaign
+record type), and `targetParentField` `ParentId`. `targetParentField` is the standard mechanism
+Salesforce provides for a related-list create action to auto-populate a lookup field with the ID
+of the record the action was launched from, so a campaign created via this action always has its
+**Parent Campaign** (`ParentId`) set to the campaign it was created from — no predefined-value
+formula was needed.
+
+On `Campaign-Campaign Layout`, the `RelatedCampaignHierarchyList` related list's
+`relatedListButtons` entry was changed from the standard **`New`** button (added in an earlier
+pass on this branch) to **`Sub_Campaign`**, so the Campaign Hierarchy related list's create
+button now launches this quick action instead of a plain, record-type-less New button. No other
+properties of the related list (its columns) were changed.
 
 ## Acceptance Criteria
 
@@ -176,8 +187,10 @@ related list (its columns) were changed.
 16. Open an Opportunity record page and confirm there is no **Additional Information** section,
     and that **Next Steps** and **Description** no longer appear anywhere on the layout.
 17. Open a Campaign record page and confirm the **Campaign Hierarchy** related list shows a
-    **New** ("Child Campaign") button, and that clicking it opens a new Campaign with **Parent
-    Campaign** pre-populated to the current record.
+    **Sub Campaign** button (not a plain "New" button).
+18. Click **Sub Campaign** from that related list and confirm the resulting new-record form uses
+    the **Sub Campaign** record type and has **Parent Campaign** pre-populated with the campaign
+    it was launched from. Save and confirm the new campaign's Parent Campaign is correctly set.
 
 ## Post Deployment Items
 
@@ -214,4 +227,5 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/UAT-Testi
 | 22 | BusinessProcess | Opportunity | Subscription New | Subscription New | Updated | Added "Request for Information" to the Subscription New sales process's stage values (not added to Consulting or Subscription Renewal). |
 | 23 | StandardValueSet | N/A | OpportunityType | Opportunity Type | Created | Newly tracked in source; reordered so New Business is first and Existing Business is second. |
 | 24 | Layout | Opportunity | Opportunity-Opportunity Layout | Opportunity Layout | Updated | Removed the Additional Information section (Next Steps and Description fields) entirely. |
-| 25 | Layout | Campaign | Campaign-Campaign Layout | Campaign Layout | Updated | Added the New (Child Campaign) button to the Campaign Hierarchy related list. |
+| 25 | QuickAction | Campaign | Sub_Campaign | Sub Campaign | Created | Create action using the Sub Campaign record type; targetParentField ParentId auto-populates Parent Campaign from the launching record. |
+| 26 | Layout | Campaign | Campaign-Campaign Layout | Campaign Layout | Updated | Changed the Campaign Hierarchy related list's create button from the standard New button to the Sub Campaign quick action. |
