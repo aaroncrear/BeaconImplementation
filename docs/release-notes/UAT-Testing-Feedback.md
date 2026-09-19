@@ -17,6 +17,8 @@ Feedback from UAT identified two changes needed to the Lead and Contact complian
   **Unqualified**, placed in the bottom-right of the existing **Compliance & Data Quality**
   section on both layouts, and granted **Edit** field-level security on the same nine Beacon
   persona `_Object_Tab_FLS` permission sets used for the other compliance fields.
+- Require **First Name** on both Lead and Contact via a validation rule, since UAT found
+  records being created without one.
 
 ## Release Notes
 
@@ -69,6 +71,13 @@ entry inserted in the correct alphabetical position within that file's existing 
 `fieldPermissions` block (after `United_States_Time_Zone__c`, since "Unqualified" sorts after
 "United" in a case-sensitive ordinal sort). No other entries in these files were changed.
 
+**First Name required (Lead and Contact).** A new validation rule, **`First_Name_Required`**,
+was added to both objects: it fires when `ISBLANK(FirstName)` is true, displaying its error on
+the First Name field with the message "First Name is required." Each rule carries a description
+explaining its purpose. Unlike Unqualified Reason, this is a hard, unconditional requirement
+(not tied to any other field's value), so a validation rule is the correct mechanism here rather
+than a field dependency.
+
 ## Acceptance Criteria
 
 1. In Object Manager, confirm `Deceased__c` no longer exists on Lead or Contact.
@@ -100,6 +109,9 @@ entry inserted in the correct alphabetical position within that file's existing 
    or when DNC and Email Opt Out are both checked — and no longer reference Deceased.
 10. Confirm no remaining references to `Deceased__c` exist anywhere in the metadata (layouts,
     permission sets, flows, or elsewhere).
+11. Attempt to save a Lead with **First Name** blank and confirm the save is blocked with the
+    error "First Name is required." Populate First Name and confirm the save succeeds. Repeat
+    for a Contact.
 
 ## Post Deployment Items
 
@@ -130,3 +142,5 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/UAT-Testi
 | 16 | PermissionSet | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
 | 17 | PermissionSet | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
 | 18 | PermissionSet | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
+| 19 | ValidationRule | Lead | First_Name_Required | First_Name_Required | Created | Blocks save when First Name is blank. |
+| 20 | ValidationRule | Contact | First_Name_Required | First_Name_Required | Created | Blocks save when First Name is blank. |
