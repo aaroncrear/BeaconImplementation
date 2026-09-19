@@ -13,7 +13,7 @@ Feedback from UAT identified two changes needed to the Lead and Contact complian
   captured from a standard list of values: Left Organization, Deceased, Competitor, Country
   Sanction, Blacklisted, Duplicate, Invalid Contact Details, Fake / Spam Individual, No
   response, No Budget, No Authority, No Use Case, Bad Timing, Other.
-- The new field must be required whenever **Lead Status** / **Contact Status** is
+- The new field must only be selectable whenever **Lead Status** / **Contact Status** is
   **Unqualified**, placed in the bottom-right of the existing **Compliance & Data Quality**
   section on both layouts, and granted **Edit** field-level security on the same nine Beacon
   persona `_Object_Tab_FLS` permission sets used for the other compliance fields.
@@ -46,22 +46,21 @@ the existing `Blacklisted_Reason` value set).
 
 A new restricted picklist field, **`Unqualified_Reason__c`** (label "Unqualified Reason"), was
 created on both **Lead** and **Contact**, each referencing the shared global value set and each
-with a field description explaining its purpose and when it is required.
+with a field description explaining its purpose and when it is available.
 
 **Layout placement.** On both `Lead-Lead Layout` and `Contact-Contact Layout`, `Unqualified_Reason__c`
 was added as the last (bottom) item of the right-hand column of the **Compliance & Data
 Quality** section — directly under `Blacklisted_Reason__c` — which is the bottom-right position
 of that section, exactly where `Deceased__c` previously sat.
 
-**Conditional requirement via validation rule.** Salesforce page layouts do not support making
-a field required only when another field holds a specific value — the layout's `Required`
-behavior is unconditional. To implement "required if Status/Contact Status is Unqualified"
-correctly, a validation rule named **`Unqualified_Reason_Required`** was added to both Lead and
-Contact: it fires when `ISPICKVAL(Status, "Unqualified")` (Lead) /
-`ISPICKVAL(Contact_Status__c, "Unqualified")` (Contact) is true and `Unqualified_Reason__c` is
-blank, displaying its error on the Unqualified Reason field. The layout item itself keeps the
-`Edit` behavior (not `Required`) so the field stays optional for every other status, exactly as
-requested.
+**Conditional requirement via field dependency.** `Unqualified_Reason__c` is a **dependent
+picklist**, controlled by `Status` on Lead and `Contact_Status__c` on Contact — the same pattern
+already used for `Blacklisted_Reason__c` (controlled by `Blacklisted__c`). All 14 values are
+mapped to the controlling field value **"Unqualified"**, so the picklist offers no selectable
+values (and shows disabled) unless Status / Contact Status is set to Unqualified, at which point
+all 14 reasons become available. The field itself stays `required=false` and the layout item
+keeps the `Edit` behavior, matching the existing Blacklisted Reason convention rather than
+introducing a validation rule.
 
 **Field-level security.** `Edit` (Read + Edit) FLS was granted on `Lead.Unqualified_Reason__c`
 and `Contact.Unqualified_Reason__c` in all nine `_Object_Tab_FLS` permission sets (Consulting,
@@ -82,13 +81,14 @@ entry inserted in the correct alphabetical position within that file's existing 
    Organization, Deceased, Competitor, Country Sanction, Blacklisted, Duplicate, Invalid
    Contact Details, Fake / Spam Individual, No response, No Budget, No Authority, No Use Case,
    Bad Timing, Other.
-4. On a Lead, set **Status** to **Unqualified**, leave **Unqualified Reason** blank, and attempt
-   to save. Confirm the save is blocked with the error "Unqualified Reason is required when
-   Status is Unqualified." Select a reason and confirm the save succeeds.
-5. Repeat step 4 on a Contact using **Contact Status** = **Unqualified**, confirming the error
-   "Unqualified Reason is required when Contact Status is Unqualified."
-6. On a Lead/Contact with a Status other than Unqualified, confirm Unqualified Reason can be
-   left blank and the record saves without error.
+4. On a Lead with **Status** set to anything other than **Unqualified**, confirm **Unqualified
+   Reason** has no selectable values (disabled/empty), matching how Blacklisted Reason behaves
+   when Blacklisted is unchecked.
+5. Change **Status** to **Unqualified** and confirm **Unqualified Reason** becomes selectable,
+   offering all 14 values. Repeat both checks on a Contact using **Contact Status**.
+6. Confirm a Lead/Contact can still be saved with **Unqualified Reason** blank while Status is
+   Unqualified (the dependency controls which values are offered, not whether the field must be
+   filled in), matching the existing Blacklisted Reason behavior.
 7. For each of the nine `_Object_Tab_FLS` permission sets, open Object Settings > Lead (and
    Contact) > Fields and confirm **Unqualified Reason** shows both **Read** and **Edit**
    checked.
@@ -103,10 +103,8 @@ entry inserted in the correct alphabetical position within that file's existing 
 
 ## Post Deployment Items
 
-None. The new `Unqualified_Reason` global value set, fields, validation rules, and permission
-set changes are all self-contained in this deployment. No data backfill is required — existing
-Unqualified records will only be blocked from future saves until a reason is selected; historical
-data is not touched.
+None. The new `Unqualified_Reason` global value set, fields, and permission set changes are all
+self-contained in this deployment. No data backfill is required.
 
 ## Component Manifest
 
@@ -117,20 +115,18 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/UAT-Testi
 | 1 | CustomField | Lead | Deceased__c | Deceased | Deleted | Removed checkbox field; superseded by Unqualified Reason. |
 | 2 | CustomField | Contact | Deceased__c | Deceased | Deleted | Removed checkbox field; superseded by Unqualified Reason. |
 | 3 | GlobalValueSet | N/A | Unqualified_Reason | Unqualified Reason | Created | Shared picklist value set with 14 values (Left Organization, Deceased, Competitor, Country Sanction, Blacklisted, Duplicate, Invalid Contact Details, Fake / Spam Individual, No response, No Budget, No Authority, No Use Case, Bad Timing, Other). |
-| 4 | CustomField | Lead | Unqualified_Reason__c | Unqualified Reason | Created | Restricted picklist referencing the Unqualified_Reason global value set; required by validation rule when Status is Unqualified. |
-| 5 | CustomField | Contact | Unqualified_Reason__c | Unqualified Reason | Created | Restricted picklist referencing the Unqualified_Reason global value set; required by validation rule when Contact Status is Unqualified. |
-| 6 | ValidationRule | Lead | Unqualified_Reason_Required | Unqualified_Reason_Required | Created | Blocks save when Status is Unqualified and Unqualified Reason is blank. |
-| 7 | ValidationRule | Contact | Unqualified_Reason_Required | Unqualified_Reason_Required | Created | Blocks save when Contact Status is Unqualified and Unqualified Reason is blank. |
-| 8 | Layout | Lead | Lead-Lead Layout | Lead Layout | Updated | Removed Deceased__c and added Unqualified_Reason__c as the last item in the right-hand column (bottom-right) of the Compliance & Data Quality section. |
-| 9 | Layout | Contact | Contact-Contact Layout | Contact Layout | Updated | Removed Deceased__c and added Unqualified_Reason__c as the last item in the right-hand column (bottom-right) of the Compliance & Data Quality section. |
-| 10 | Flow | Lead | Lead_On_Update_Before_Save | Lead - On Update - Before Save | Updated | Removed the Deceased__c = true filter and renumbered the filter logic; description updated to no longer mention Deceased. |
-| 11 | Flow | Contact | Contact_On_Update_Before_Save | Contact - On Update - Before Save | Updated | Removed the Deceased__c = true filter and renumbered the filter logic; description updated to no longer mention Deceased. |
-| 12 | PermissionSet | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
-| 13 | PermissionSet | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
-| 14 | PermissionSet | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
-| 15 | PermissionSet | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
-| 16 | PermissionSet | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
-| 17 | PermissionSet | N/A | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
-| 18 | PermissionSet | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
-| 19 | PermissionSet | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
-| 20 | PermissionSet | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
+| 4 | CustomField | Lead | Unqualified_Reason__c | Unqualified Reason | Created | Restricted, dependent picklist referencing the Unqualified_Reason global value set; controlled by Status, with all 14 values mapped to "Unqualified" so they're only selectable in that status. |
+| 5 | CustomField | Contact | Unqualified_Reason__c | Unqualified Reason | Created | Restricted, dependent picklist referencing the Unqualified_Reason global value set; controlled by Contact_Status__c, with all 14 values mapped to "Unqualified" so they're only selectable in that status. |
+| 6 | Layout | Lead | Lead-Lead Layout | Lead Layout | Updated | Removed Deceased__c and added Unqualified_Reason__c as the last item in the right-hand column (bottom-right) of the Compliance & Data Quality section. |
+| 7 | Layout | Contact | Contact-Contact Layout | Contact Layout | Updated | Removed Deceased__c and added Unqualified_Reason__c as the last item in the right-hand column (bottom-right) of the Compliance & Data Quality section. |
+| 8 | Flow | Lead | Lead_On_Update_Before_Save | Lead - On Update - Before Save | Updated | Removed the Deceased__c = true filter and renumbered the filter logic; description updated to no longer mention Deceased. |
+| 9 | Flow | Contact | Contact_On_Update_Before_Save | Contact - On Update - Before Save | Updated | Removed the Deceased__c = true filter and renumbered the filter logic; description updated to no longer mention Deceased. |
+| 10 | PermissionSet | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
+| 11 | PermissionSet | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
+| 12 | PermissionSet | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
+| 13 | PermissionSet | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
+| 14 | PermissionSet | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
+| 15 | PermissionSet | N/A | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
+| 16 | PermissionSet | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
+| 17 | PermissionSet | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
+| 18 | PermissionSet | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
