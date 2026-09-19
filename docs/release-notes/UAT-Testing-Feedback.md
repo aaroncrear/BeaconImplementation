@@ -24,6 +24,8 @@ Feedback from UAT identified two changes needed to the Lead and Contact complian
   the **Subscription New** sales process, and should be the **first** stage in the order.
 - Reorder the Opportunity **Type** picklist so **New Business** is first and **Existing
   Business** is second.
+- Remove the **Additional Information** section from the Opportunity page layout entirely,
+  including its **Next Steps** and **Description** fields.
 
 ## Release Notes
 
@@ -108,6 +110,14 @@ drives the Type picklist everywhere it's shown, including on all three Opportuni
 (Consulting, Subscription New, Subscription Renewal), none of which needed any changes of their
 own since they don't restrict the Type picklist's order, only its membership.
 
+**Additional Information section removed (Opportunity).** The **Additional Information**
+`layoutSection` was deleted outright from `Opportunity-Opportunity Layout` — it was the only
+section on the layout containing **Next Steps** (`NextStep`) and **Description**, so removing
+the section removes both fields from the layout in one change. The fields themselves are
+standard Opportunity fields and were not deleted (unlike Deceased__c earlier in this branch);
+they're simply no longer surfaced on this layout. No other section of the layout referenced
+either field, so no further cleanup was needed.
+
 ## Acceptance Criteria
 
 1. In Object Manager, confirm `Deceased__c` no longer exists on Lead or Contact.
@@ -153,6 +163,8 @@ own since they don't restrict the Type picklist's order, only its membership.
     order.
 15. Open the **Type** picklist on an Opportunity (any record type) and confirm **New Business**
     is listed first and **Existing Business** is listed second.
+16. Open an Opportunity record page and confirm there is no **Additional Information** section,
+    and that **Next Steps** and **Description** no longer appear anywhere on the layout.
 
 ## Post Deployment Items
 
@@ -188,3 +200,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/UAT-Testi
 | 21 | StandardValueSet | N/A | OpportunityStage | Opportunity Stage | Updated | Added "Request for Information" as the first value: 0% probability, open, Forecast Category Omitted. |
 | 22 | BusinessProcess | Opportunity | Subscription New | Subscription New | Updated | Added "Request for Information" to the Subscription New sales process's stage values (not added to Consulting or Subscription Renewal). |
 | 23 | StandardValueSet | N/A | OpportunityType | Opportunity Type | Created | Newly tracked in source; reordered so New Business is first and Existing Business is second. |
+| 24 | Layout | Opportunity | Opportunity-Opportunity Layout | Opportunity Layout | Updated | Removed the Additional Information section (Next Steps and Description fields) entirely. |
