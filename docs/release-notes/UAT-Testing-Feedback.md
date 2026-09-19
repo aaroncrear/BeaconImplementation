@@ -31,6 +31,10 @@ Feedback from UAT identified two changes needed to the Lead and Contact complian
   related list. The action must use the **Sub Campaign** record type and default the new
   record's Parent Campaign to the campaign it was launched from. (An earlier pass added the
   plain standard **New** button here; that was replaced with this dedicated action.)
+- Create a new Campaign compact layout, **Beacon Campaign Compact Layout**, displaying **Type**,
+  **Status**, **Start Date**, **End Date**, and **Campaign Record Type**.
+- Remove the **Parent Campaign** field from the **Beacon Parent Campaign Record Page** Lightning
+  page.
 
 ## Release Notes
 
@@ -139,6 +143,20 @@ pass on this branch) to **`Sub_Campaign`**, so the Campaign Hierarchy related li
 button now launches this quick action instead of a plain, record-type-less New button. No other
 properties of the related list (its columns) were changed.
 
+**New Campaign compact layout: Beacon Campaign Compact Layout.** A new compact layout,
+**`Beacon_Campaign_Compact_Layout`** (label "Beacon Campaign Compact Layout"), was added under
+`unpackaged/main/default/objects/Campaign/compactLayouts/` — this is the first compact layout
+tracked for Campaign in this repo. It displays, in order: **Type**, **Status**, **Start Date**
+(`StartDate`), **End Date** (`EndDate`), and **Campaign Record Type** (`RecordTypeId`). It was
+only created, not assigned as the object's primary compact layout — Campaign's
+`compactLayoutAssignment` remains `SYSTEM` (unchanged), so an admin still needs to assign it in
+Setup if it should become the default.
+
+**Parent Campaign removed from Beacon Parent Campaign Record Page.** On the
+`Beacon_Parent_Campaign_Record_Page` Lightning record page, the highlights/details field
+instance for **`Record.ParentId`** (Parent Campaign) was removed from its `flexiPageRegions`
+block. No other fields or regions on that page were touched.
+
 ## Acceptance Criteria
 
 1. In Object Manager, confirm `Deceased__c` no longer exists on Lead or Contact.
@@ -191,6 +209,12 @@ properties of the related list (its columns) were changed.
 18. Click **Sub Campaign** from that related list and confirm the resulting new-record form uses
     the **Sub Campaign** record type and has **Parent Campaign** pre-populated with the campaign
     it was launched from. Save and confirm the new campaign's Parent Campaign is correctly set.
+19. In Setup > Object Manager > Campaign > Compact Layouts, confirm **Beacon Campaign Compact
+    Layout** exists and displays, in order: Type, Status, Start Date, End Date, Campaign Record
+    Type.
+20. Open a Campaign record using the **Beacon Parent Campaign Record Page** and confirm
+    **Parent Campaign** no longer appears anywhere on the page; confirm all other fields on the
+    page are unaffected.
 
 ## Post Deployment Items
 
@@ -229,3 +253,5 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/UAT-Testi
 | 24 | Layout | Opportunity | Opportunity-Opportunity Layout | Opportunity Layout | Updated | Removed the Additional Information section (Next Steps and Description fields) entirely. |
 | 25 | QuickAction | Campaign | Sub_Campaign | Sub Campaign | Created | Create action using the Sub Campaign record type; targetParentField ParentId auto-populates Parent Campaign from the launching record. |
 | 26 | Layout | Campaign | Campaign-Campaign Layout | Campaign Layout | Updated | Changed the Campaign Hierarchy related list's create button from the standard New button to the Sub Campaign quick action. |
+| 27 | CompactLayout | Campaign | Beacon_Campaign_Compact_Layout | Beacon Campaign Compact Layout | Created | Displays Type, Status, Start Date, End Date, Campaign Record Type. Not assigned as the object's primary compact layout. |
+| 28 | FlexiPage | Campaign | Beacon_Parent_Campaign_Record_Page | Beacon Parent Campaign Record Page | Updated | Removed the Parent Campaign (ParentId) field instance from the page. |
