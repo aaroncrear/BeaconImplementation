@@ -19,6 +19,9 @@ Feedback from UAT identified two changes needed to the Lead and Contact complian
   persona `_Object_Tab_FLS` permission sets used for the other compliance fields.
 - Require **First Name** on both Lead and Contact via a validation rule, since UAT found
   records being created without one.
+- Add a new Opportunity Stage, **Request for Information**, at **0% probability**, **open**
+  (not closed), and **omitted** from forecast category rollups. It should only be available in
+  the **Subscription New** sales process, and should be the **first** stage in the order.
 
 ## Release Notes
 
@@ -78,7 +81,22 @@ explaining its purpose. Unlike Unqualified Reason, this is a hard, unconditional
 (not tied to any other field's value), so a validation rule is the correct mechanism here rather
 than a field dependency.
 
-## Acceptance Criteria
+**New Opportunity Stage: Request for Information.** A new standard value, **`Request for
+Information`**, was added to the global **Opportunity Stage** picklist (`OpportunityStage`
+standard value set): `probability` 0, `closed` false (open), `won` false, and
+`forecastCategory` `Omitted`. It was added as the **first** entry in that value set, which is
+what drives the stage's position in the Stage picklist everywhere it's shown (Salesforce does
+not support a per-sales-process stage order — a sales process only selects which global stage
+values are included; the display order always follows the global Stage picklist order), so this
+also makes it the first stage anywhere it appears.
+
+It was added to the **`Subscription New`** business process (`Subscription New.businessProcess-meta.xml`)
+only — **not** to `Consulting` or `Subscription Renewal` — so it is selectable exclusively on
+Opportunities using the **Subscription New** record type / sales process, as requested. The
+`Subscription_New` record type has no `StageName` picklist restriction of its own (Stage
+availability there is driven entirely by the business process), so no record type change was
+needed. The record type's existing `ForecastCategoryName` restriction already includes
+`Omitted`, so no change was needed there either.
 
 1. In Object Manager, confirm `Deceased__c` no longer exists on Lead or Contact.
 2. Open a Lead and a Contact record page and confirm the **Compliance & Data Quality** section
@@ -112,6 +130,15 @@ than a field dependency.
 11. Attempt to save a Lead with **First Name** blank and confirm the save is blocked with the
     error "First Name is required." Populate First Name and confirm the save succeeds. Repeat
     for a Contact.
+12. In Setup > Object Manager > Opportunity > Fields & Relationships > Stage, confirm **Request
+    for Information** exists with **Probability** 0%, is **not** marked Closed, and has
+    **Forecast Category** = **Omitted**.
+13. In Setup > Sales Processes, open **Subscription New** and confirm **Request for
+    Information** is included. Open **Consulting** and **Subscription Renewal** and confirm it
+    is **not** included in either.
+14. Create (or edit) an Opportunity with the **Subscription New** record type and confirm
+    **Request for Information** is the **first** value in the Stage picklist / path / kanban
+    order.
 
 ## Post Deployment Items
 
@@ -144,3 +171,5 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/UAT-Testi
 | 18 | PermissionSet | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Removed Lead/Contact.Deceased__c FLS entries; added Edit FLS for Lead.Unqualified_Reason__c and Contact.Unqualified_Reason__c. |
 | 19 | ValidationRule | Lead | First_Name_Required | First_Name_Required | Created | Blocks save when First Name is blank. |
 | 20 | ValidationRule | Contact | First_Name_Required | First_Name_Required | Created | Blocks save when First Name is blank. |
+| 21 | StandardValueSet | N/A | OpportunityStage | Opportunity Stage | Updated | Added "Request for Information" as the first value: 0% probability, open, Forecast Category Omitted. |
+| 22 | BusinessProcess | Opportunity | Subscription New | Subscription New | Updated | Added "Request for Information" to the Subscription New sales process's stage values (not added to Consulting or Subscription Renewal). |
