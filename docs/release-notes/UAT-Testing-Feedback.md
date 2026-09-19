@@ -22,6 +22,8 @@ Feedback from UAT identified two changes needed to the Lead and Contact complian
 - Add a new Opportunity Stage, **Request for Information**, at **0% probability**, **open**
   (not closed), and **omitted** from forecast category rollups. It should only be available in
   the **Subscription New** sales process, and should be the **first** stage in the order.
+- Reorder the Opportunity **Type** picklist so **New Business** is first and **Existing
+  Business** is second.
 
 ## Release Notes
 
@@ -98,6 +100,16 @@ availability there is driven entirely by the business process), so no record typ
 needed. The record type's existing `ForecastCategoryName` restriction already includes
 `Omitted`, so no change was needed there either.
 
+**Opportunity Type reorder.** The **`OpportunityType`** standard value set was not previously
+tracked in this repo, so it was added (`unpackaged/main/default/standardValueSets/OpportunityType.standardValueSet-meta.xml`)
+with its two existing values — **New Business** and **Existing Business** — reordered so
+**New Business** is first and **Existing Business** is second. This is the master order that
+drives the Type picklist everywhere it's shown, including on all three Opportunity record types
+(Consulting, Subscription New, Subscription Renewal), none of which needed any changes of their
+own since they don't restrict the Type picklist's order, only its membership.
+
+## Acceptance Criteria
+
 1. In Object Manager, confirm `Deceased__c` no longer exists on Lead or Contact.
 2. Open a Lead and a Contact record page and confirm the **Compliance & Data Quality** section
    no longer shows a Deceased checkbox, and that **Unqualified Reason** appears instead, as the
@@ -139,6 +151,8 @@ needed. The record type's existing `ForecastCategoryName` restriction already in
 14. Create (or edit) an Opportunity with the **Subscription New** record type and confirm
     **Request for Information** is the **first** value in the Stage picklist / path / kanban
     order.
+15. Open the **Type** picklist on an Opportunity (any record type) and confirm **New Business**
+    is listed first and **Existing Business** is listed second.
 
 ## Post Deployment Items
 
@@ -173,3 +187,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/UAT-Testi
 | 20 | ValidationRule | Contact | First_Name_Required | First_Name_Required | Created | Blocks save when First Name is blank. |
 | 21 | StandardValueSet | N/A | OpportunityStage | Opportunity Stage | Updated | Added "Request for Information" as the first value: 0% probability, open, Forecast Category Omitted. |
 | 22 | BusinessProcess | Opportunity | Subscription New | Subscription New | Updated | Added "Request for Information" to the Subscription New sales process's stage values (not added to Consulting or Subscription Renewal). |
+| 23 | StandardValueSet | N/A | OpportunityType | Opportunity Type | Created | Newly tracked in source; reordered so New Business is first and Existing Business is second. |
