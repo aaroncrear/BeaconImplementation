@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Unqualified_Reason_Required</fullName>
+    <active>true</active>
+    <description>Requires Unqualified Reason to be populated when Contact Status is Unqualified</description>
+    <errorConditionFormula>ISPICKVAL(Contact_Status__c, &quot;Unqualified&quot;) &amp;&amp; ISBLANK(TEXT(Unqualified_Reason__c))</errorConditionFormula>
+    <errorDisplayField>Unqualified_Reason__c</errorDisplayField>
+    <errorMessage>Unqualified Reason is required when Contact Status is Unqualified.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Left Organization</fullName>
+        <default>false</default>
+        <label>Left Organization</label>
+    </customValue>
+    <customValue>
+        <fullName>Deceased</fullName>
+        <default>false</default>
+        <label>Deceased</label>
+    </customValue>
+    <customValue>
+        <fullName>Competitor</fullName>
+        <default>false</default>
+        <label>Competitor</label>
+    </customValue>
+    <customValue>
+        <fullName>Country Sanction</fullName>
+        <default>false</default>
+        <label>Country Sanction</label>
+    </customValue>
+    <customValue>
+        <fullName>Blacklisted</fullName>
+        <default>false</default>
+        <label>Blacklisted</label>
+    </customValue>
+    <customValue>
+        <fullName>Duplicate</fullName>
+        <default>false</default>
+        <label>Duplicate</label>
+    </customValue>
+    <customValue>
+        <fullName>Invalid Contact Details</fullName>
+        <default>false</default>
+        <label>Invalid Contact Details</label>
+    </customValue>
+    <customValue>
+        <fullName>Fake / Spam Individual</fullName>
+        <default>false</default>
+        <label>Fake / Spam Individual</label>
+    </customValue>
+    <customValue>
+        <fullName>No response</fullName>
+        <default>false</default>
+        <label>No response</label>
+    </customValue>
+    <customValue>
+        <fullName>No Budget</fullName>
+        <default>false</default>
+        <label>No Budget</label>
+    </customValue>
+    <customValue>
+        <fullName>No Authority</fullName>
+        <default>false</default>
+        <label>No Authority</label>
+    </customValue>
+    <customValue>
+        <fullName>No Use Case</fullName>
+        <default>false</default>
+        <label>No Use Case</label>
+    </customValue>
+    <customValue>
+        <fullName>Bad Timing</fullName>
+        <default>false</default>
+        <label>Bad Timing</label>
+    </customValue>
+    <customValue>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+    </customValue>
+    <description>Unqualified Reason</description>
+    <masterLabel>Unqualified Reason</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

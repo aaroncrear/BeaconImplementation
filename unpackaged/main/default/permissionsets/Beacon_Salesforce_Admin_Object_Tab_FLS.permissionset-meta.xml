@@ -700,11 +700,6 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
-        <field>Contact.Deceased__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
         <editable>true</editable>
         <field>Contact.Department</field>
         <readable>true</readable>
@@ -841,6 +836,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Contact.Unqualified_Reason__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Event.HW_Record_ID__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -867,11 +867,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Lead.Blacklisted__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Lead.Deceased__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -1002,6 +997,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Lead.United_States_Time_Zone__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.Unqualified_Reason__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
