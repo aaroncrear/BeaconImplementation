@@ -487,6 +487,7 @@
         <fields>TOT_AMOUNT_WON</fields>
         <fields>CAMPAIGN.TOT_WON_OPPORTUNITIES</fields>
         <relatedList>RelatedCampaignHierarchyList</relatedList>
+        <relatedListButtons>New</relatedListButtons>
     </relatedLists>
     <relatedLists>
         <fields>LABEL</fields>

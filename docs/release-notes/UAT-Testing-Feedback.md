@@ -26,6 +26,9 @@ Feedback from UAT identified two changes needed to the Lead and Contact complian
   Business** is second.
 - Remove the **Additional Information** section from the Opportunity page layout entirely,
   including its **Next Steps** and **Description** fields.
+- Add the **Child Campaign** (New) button to the **Campaign Hierarchy** related list on the
+  Campaign page layout, so a new child campaign can be created directly from a Campaign's
+  hierarchy related list.
 
 ## Release Notes
 
@@ -118,6 +121,13 @@ standard Opportunity fields and were not deleted (unlike Deceased__c earlier in 
 they're simply no longer surfaced on this layout. No other section of the layout referenced
 either field, so no further cleanup was needed.
 
+**Child Campaign button (Campaign Hierarchy related list).** On `Campaign-Campaign Layout`, a
+`relatedListButtons` entry of **`New`** was added to the existing `RelatedCampaignHierarchyList`
+related list block, so the standard **New** ("Child Campaign") button now appears on the
+Campaign Hierarchy related list, letting users create a new campaign with the current record
+pre-populated as its Parent Campaign directly from that related list. No other properties of the
+related list (its columns) were changed.
+
 ## Acceptance Criteria
 
 1. In Object Manager, confirm `Deceased__c` no longer exists on Lead or Contact.
@@ -165,6 +175,9 @@ either field, so no further cleanup was needed.
     is listed first and **Existing Business** is listed second.
 16. Open an Opportunity record page and confirm there is no **Additional Information** section,
     and that **Next Steps** and **Description** no longer appear anywhere on the layout.
+17. Open a Campaign record page and confirm the **Campaign Hierarchy** related list shows a
+    **New** ("Child Campaign") button, and that clicking it opens a new Campaign with **Parent
+    Campaign** pre-populated to the current record.
 
 ## Post Deployment Items
 
@@ -201,3 +214,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/UAT-Testi
 | 22 | BusinessProcess | Opportunity | Subscription New | Subscription New | Updated | Added "Request for Information" to the Subscription New sales process's stage values (not added to Consulting or Subscription Renewal). |
 | 23 | StandardValueSet | N/A | OpportunityType | Opportunity Type | Created | Newly tracked in source; reordered so New Business is first and Existing Business is second. |
 | 24 | Layout | Opportunity | Opportunity-Opportunity Layout | Opportunity Layout | Updated | Removed the Additional Information section (Next Steps and Description fields) entirely. |
+| 25 | Layout | Campaign | Campaign-Campaign Layout | Campaign Layout | Updated | Added the New (Child Campaign) button to the Campaign Hierarchy related list. |
