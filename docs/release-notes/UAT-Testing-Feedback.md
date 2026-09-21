@@ -30,6 +30,9 @@ Feedback from UAT identified two changes needed to the Lead and Contact complian
   **Status**, **Start Date**, **End Date**, and **Campaign Record Type**.
 - Remove the **Parent Campaign** field from the **Beacon Parent Campaign Record Page** Lightning
   page.
+- Add a **Sub Campaign** quick action that creates a new Campaign using the **Sub Campaign**
+  record type, and surface it as an action on the **Beacon Parent Campaign Record Page**,
+  replacing the page's existing **Child Campaign** action reference.
 
 ## Release Notes
 
@@ -136,6 +139,26 @@ Setup if it should become the default.
 instance for **`Record.ParentId`** (Parent Campaign) was removed from its `flexiPageRegions`
 block. No other fields or regions on that page were touched.
 
+**Sub Campaign quick action.** A new **Create** quick action, **`Campaign.Sub_Campaign`** (label
+"Sub Campaign"), was added at `unpackaged/main/default/quickActions/Campaign.Sub_Campaign.quickAction-meta.xml`
+— object-specific quick actions live in this top-level `quickActions` folder with the object name
+prefixed onto the filename via dot notation, not nested under `objects/<Object>/quickActions/`
+the way fields, validation rules, and record types are (an earlier attempt on this branch used
+the wrong location and was invisible to metadata comparison tools as a result; it was removed
+and this is the correct replacement). The action targets **Campaign**, uses the **Sub Campaign**
+record type (`Campaign.Sub_Campaign`), and sets `targetParentField` to **`Parent`** — the lookup
+*relationship* name, not the raw field API name `ParentId` — so a campaign created via this
+action always has its Parent Campaign set to the campaign it was launched from. It defines its
+own two-column quick action layout (Name required; Parent Campaign, Start Date on the left;
+Status, Active, End Date, Type on the right) and a custom success message.
+
+This action is surfaced via the **`force:highlightsPanel`** component's `actionNames` list on
+`Beacon_Parent_Campaign_Record_Page` — the record page's action bar — where it replaces a
+pre-existing **`Campaign.Child_Campaign`** action reference that was already in that list. This
+is a different mechanism from the classic page layout's `relatedListButtons` (which the earlier,
+removed attempt used): action-bar buttons for a Lightning record page are configured on the
+FlexiPage itself, not the page layout.
+
 ## Acceptance Criteria
 
 1. In Object Manager, confirm `Deceased__c` no longer exists on Lead or Contact.
@@ -189,6 +212,13 @@ block. No other fields or regions on that page were touched.
 18. Open a Campaign record using the **Beacon Parent Campaign Record Page** and confirm
     **Parent Campaign** no longer appears anywhere on the page; confirm all other fields on the
     page are unaffected.
+19. On that same record page, confirm the action bar shows a **Sub Campaign** action (and no
+    longer shows a separate "Child Campaign" action). Click it and confirm the quick action form
+    shows Name (required), Parent Campaign, Start Date, Status, Active, End Date, and Type, with
+    the new record using the **Sub Campaign** record type.
+20. Save the quick action and confirm the new campaign's **Parent Campaign** is set to the
+    campaign it was launched from, and that the success message "Sub Campaign Successfully
+    Created" appears.
 
 ## Post Deployment Items
 
@@ -226,4 +256,5 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/UAT-Testi
 | 23 | StandardValueSet | N/A | OpportunityType | Opportunity Type | Created | Newly tracked in source; reordered so New Business is first and Existing Business is second. |
 | 24 | Layout | Opportunity | Opportunity-Opportunity Layout | Opportunity Layout | Updated | Removed the Additional Information section (Next Steps and Description fields) entirely. |
 | 25 | CompactLayout | Campaign | Beacon_Campaign_Compact_Layout | Beacon Campaign Compact Layout | Created | Displays Type, Status, Start Date, End Date, Campaign Record Type. Not assigned as the object's primary compact layout. |
-| 26 | FlexiPage | Campaign | Beacon_Parent_Campaign_Record_Page | Beacon Parent Campaign Record Page | Updated | Removed the Parent Campaign (ParentId) field instance from the page. |
+| 26 | FlexiPage | Campaign | Beacon_Parent_Campaign_Record_Page | Beacon Parent Campaign Record Page | Updated | Removed the Parent Campaign (ParentId) field instance from the page; replaced the highlights panel's Campaign.Child_Campaign action reference with Campaign.Sub_Campaign. |
+| 27 | QuickAction | Campaign | Campaign.Sub_Campaign | Sub Campaign | Created | Create action using the Sub Campaign record type; targetParentField Parent (relationship name) auto-populates Parent Campaign from the launching record. Custom quick action layout and success message. |
