@@ -54,7 +54,7 @@ The `README.md` "On/Off Switch and User Bypass Fields" section documents the che
 
 1. In **Setup → Custom Settings**, confirm **On/Off Switch** (`On_Off_Switch__c`) exists with Setting Type **Hierarchy** and Visibility **Public**.
 2. Open the setting and confirm the fields **Run Flows** (`Run_Flows__c`), **Run Validation Rules** (`Run_Validation_Rules__c`) and **Run Apex** (`Run_Apex__c`) exist as Checkbox fields that default to checked.
-3. Click **Manage**, create the **Org Default** record, and confirm all three checkboxes are checked by default. Save it.
+3. Click **Manage**, then click the **New** button in the **Default Organization Level Value** section at the top of the page (the lower **New** button only offers Profile or User). Create the **Org Default** record, and confirm all three checkboxes are checked by default. Save it.
 4. In **Object Manager → User → Fields & Relationships**, confirm **Bypass Val Rules** (`Bypass_Val_Rules__c`), **Bypass Flows** (`Bypass_Flows__c`) and **Bypass Apex** (`Bypass_Apex__c`) exist as Checkbox fields that default to unchecked, each with a description of how to use it.
 5. Open any existing user's record and confirm all three bypass fields are unchecked.
 6. As a user with the **Beacon Salesforce Admin - Object, Tab, FLS** permission set, open a user's record and confirm **Bypass Val Rules**, **Bypass Flows** and **Bypass Apex** appear in the **Additional Information** section. Edit the record and confirm the fields can be checked and saved. Uncheck them again.
@@ -75,7 +75,7 @@ The `README.md` "On/Off Switch and User Bypass Fields" section documents the che
 
 ## Post Deployment Items
 
-- In **Setup → Custom Settings → On/Off Switch → Manage**, create the **Org Default** record with **Run Flows**, **Run Validation Rules** and **Run Apex** all **checked**. The field defaults do not create this record. Create it before any Flow, Validation Rule or Apex is updated to check the switch.
+- In **Setup → Custom Settings → On/Off Switch → Manage**, create the **Org Default** record with **Run Flows**, **Run Validation Rules** and **Run Apex** all **checked**. Use the **New** button at the top of the page, in the **Default Organization Level Value** section. The **New** button lower down, next to the list of records, only offers Profile or User. The field defaults do not create this record. Create it before any Flow, Validation Rule or Apex is updated to check the switch.
 - Confirm the admins who should set the bypass fields are assigned the **Beacon Salesforce Admin - Object, Tab, FLS** permission set.
 - Restrict the **Customize Application** permission to trusted admins, since it allows editing the custom setting.
 - Update the Flows, Validation Rules and Apex that should obey the switch and the bypass fields, as described above. Until then, they have no effect.

@@ -55,7 +55,7 @@ They do not affect Workflow Rules, Process Builder, duplicate rules, required fi
 ### Setup
 
 1. Deploy `unpackaged/main/default/objects/On_Off_Switch__c` and the three `User` bypass fields to your org, using Gearset or `sf project deploy start`.
-2. Go to **Setup → Custom Settings → On/Off Switch → Manage**, and create the **Org Default** record with all three checkboxes **checked**. The field defaults do not create this record for you. Create it before you add the checks below.
+2. Go to **Setup → Custom Settings → On/Off Switch → Manage**, and create the **Org Default** record with all three checkboxes **checked**. Use the **New** button at the top of the page, in the **Default Organization Level Value** section. The **New** button lower down, next to the list of records, only offers Profile or User. The field defaults do not create this record for you. Create it before you add the checks below.
 3. The three User bypass fields are on the **User Layout** (Additional Information section), and only the **Beacon Salesforce Admin - Object, Tab, FLS** permission set grants access to them (Read and Edit). Assign that permission set to the admins who should set the fields. Don't grant access in any other permission set or profile, so users can't bypass automation for themselves.
 4. Limit who can change the custom setting. Anyone with the **Customize Application** permission can edit it.
 
