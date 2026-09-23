@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>Hierarchy</customSettingsType>
+    <description>Used to turn off Flows, Validation Rules and Apex in bulk</description>
+    <enableFeeds>false</enableFeeds>
+    <label>On/Off Switch</label>
+    <visibility>Public</visibility>
+</CustomObject>
