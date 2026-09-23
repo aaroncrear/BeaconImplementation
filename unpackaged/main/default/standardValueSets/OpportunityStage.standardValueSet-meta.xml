@@ -2,6 +2,15 @@
 <StandardValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <sorted>false</sorted>
     <standardValue>
+        <fullName>Request for Information</fullName>
+        <default>false</default>
+        <label>Request for Information</label>
+        <closed>false</closed>
+        <forecastCategory>Omitted</forecastCategory>
+        <probability>0</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
         <fullName>Onboarding</fullName>
         <default>false</default>
         <label>Onboarding</label>

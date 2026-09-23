@@ -436,11 +436,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Contact.Deceased__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
         <field>Contact.Lead_Type__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -476,6 +471,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Contact.Unqualified_Reason__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Lead.Account__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -487,11 +487,6 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Lead.Blacklisted__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.Deceased__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -537,6 +532,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Lead.United_States_Time_Zone__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.Unqualified_Reason__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
