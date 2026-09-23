@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Run_Validation_Rules__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>When checked Validation Rules that reference this Custom Setting will run</description>
+    <externalId>false</externalId>
+    <label>Run Validation Rules</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>
