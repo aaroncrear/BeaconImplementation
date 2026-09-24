@@ -189,39 +189,30 @@ The existing **Lead - On Update - Before Save** and **Contact - On Update - Befo
 
 **New description:** "Sets the Status to Do Not Engage if the record is Blacklisted or DNC and Email Opt Out. Sets the Seniority Level based on the Title when the Title changes."
 
-**Entry criteria.** The flows keep the original field conditions and add a fourth one, **Title Is Changed = True**. The condition logic is `1 OR (2 AND 3) OR 4`:
+**Entry criteria.** Before this change, each flow ran only when a record was updated to meet "Blacklisted, or Do Not Call and Email Opt Out". Flow Builder's **Is Changed** operator only works with "Every time a record is updated and meets the condition requirements". So the start conditions were replaced with a formula that runs every time, and keeps the original behavior by comparing against the prior values:
 
-1. Blacklisted = True
-2. Do Not Call = True
-3. Email Opt Out = True
-4. Title Is Changed = True
+```
+OR(
+    AND(
+        OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
+        NOT(OR(PRIORVALUE({!$Record.Blacklisted__c}), AND(PRIORVALUE({!$Record.DoNotCall}), PRIORVALUE({!$Record.HasOptedOutOfEmail}))))
+    ),
+    ISCHANGED({!$Record.Title})
+)
+```
 
-"When to run the flow for updated records" stays set to **Only when a record is updated to meet the condition requirements**. Any change to the Title meets condition 4, so every Title change starts the flow, including on records that are already Blacklisted, or Do Not Call and Email Opt Out.
-
-Because a Title change can start the flow on a record that is already Blacklisted, or Do Not Call and Email Opt Out, the **Do Not Engage Criteria Met?** decision compares the record to its values before the update (`$Record__Prior`). It only sets the Status when the record newly meets those criteria, so a Title change doesn't set the Status back to Do Not Engage after someone has changed it:
-
-| # | Field | Value |
-|---|-------|-------|
-| 1 | `$Record.Blacklisted__c` | True |
-| 2 | `$Record.DoNotCall` | True |
-| 3 | `$Record.HasOptedOutOfEmail` | True |
-| 4 | `$Record__Prior.Blacklisted__c` | False |
-| 5 | `$Record__Prior.DoNotCall` | False |
-| 6 | `$Record__Prior.HasOptedOutOfEmail` | False |
-
-Condition logic: `(1 OR (2 AND 3)) AND 4 AND (5 OR 6)`. That means the record meets the criteria now, it wasn't Blacklisted before, and it wasn't both Do Not Call and Email Opt Out before.
-
-**Elements.** A Title change now also starts the flow, so the flow checks each part separately. This keeps a Title-only change from setting the Status. Both changes are made with Assignment elements on `$Record`, so the record is only saved once, even when both the Status and the Seniority Level change:
+**Elements.** A Title change now also starts the flow, so the flow checks each part separately. This keeps a Title-only change from setting the Status. Both changes are made with Assignment elements on `$Record` instead of Update Records elements. In a before-save flow, assignments to `$Record` are saved with the record, so the record is only saved once, even when both the Status and the Seniority Level change:
 
 | Element | Type | Description |
 |---------|------|-------------|
-| Do Not Engage Criteria Met? | Decision | Checks whether the record was just updated to be Blacklisted, or Do Not Call and Email Opt Out, and did not meet those criteria before this update. Only then is the Status set to Do Not Engage, so a Title change or an edit to a record that already met the criteria does not reset the Status. |
-| Assign Status to Do Not Engage | Assignment | Sets the Status (Lead) or Contact Status (Contact) to Do Not Engage. Replaces the old Update Status to Do Not Engage (Update Records) element. |
+| Do Not Engage Criteria Met? | Decision | Checks whether the record was just marked Blacklisted, or Do Not Call and Email Opt Out, on this update. Only then is the Status set to Do Not Engage, matching the flow's original entry criteria. |
+| Assign Status to Do Not Engage | Assignment | Sets the Status (Lead) or Contact Status (Contact) to Do Not Engage. Replaces the old Update Status to Do Not Engage (Update Records) element. Continues to the Title check. |
 | Title Changed? | Decision | Checks whether the Title changed on this update, so the Seniority Level is only recalculated when the Title changes. |
 | Assign Seniority Level | Assignment | Sets the Seniority Level field to the value returned by the formSeniorityLevel formula. |
+| formDoNotEngageCriteriaNewlyMet | Formula (Boolean) | True when the record is now Blacklisted, or Do Not Call and Email Opt Out, and was not before this update. |
 | formSeniorityLevel | Formula (Text) | Returns the Seniority Level picklist API name based on the Title. |
 
-Both decisions run in the same save, so one update can set both the Status and the Seniority Level.
+Both checks run in the same save, so one update can set both the Status and the Seniority Level.
 
 **The formSeniorityLevel formula** checks the Title against the same 87 keywords as the Seniority Score, in the same spreadsheet order. The first match wins, so the level always matches the score's level from column D:
 
@@ -427,11 +418,10 @@ Read-only access to **Lead: Seniority Level**, **Lead: Seniority Score** and **C
 12. On a Lead or Contact that isn't Blacklisted, Do Not Call or Email Opt Out, change only the Title. Confirm the Status (Lead) or Contact Status (Contact) doesn't change to Do Not Engage.
 13. Check **Blacklisted** on a Lead and a Contact and save. Confirm the Status (Lead) or Contact Status (Contact) changes to Do Not Engage.
 14. On the same records, change the Status back to another value and save without changing Blacklisted. Confirm it isn't set back to Do Not Engage, because the criteria were already met before this update.
-15. On the same Blacklisted records, change the Title. Confirm the Seniority Level updates and the Status is **not** set back to Do Not Engage.
-16. Check **Do Not Call** and **Email Opt Out** together on a record that is neither, and change the Title in the same save. Confirm the Status changes to Do Not Engage and the Seniority Level is set.
-17. Create a new Lead and a new Contact with the Title "Vice President of Sales". Confirm the Seniority Level is VP.
-18. Create a new Lead and a new Contact with no Title. Confirm the Seniority Level is blank.
-19. In **Setup → Flows**, confirm **Lead - On Create - Before Save** and **Contact - On Create - Before Save** are active, and that every element in all four flows has a description.
+15. Check **Do Not Call** and **Email Opt Out** together on a record that is neither, and change the Title in the same save. Confirm the Status changes to Do Not Engage and the Seniority Level is set.
+16. Create a new Lead and a new Contact with the Title "Vice President of Sales". Confirm the Seniority Level is VP.
+17. Create a new Lead and a new Contact with no Title. Confirm the Seniority Level is blank.
+18. In **Setup → Flows**, confirm **Lead - On Create - Before Save** and **Contact - On Create - Before Save** are active, and that every element in all four flows has a description.
 
 ## Post Deployment Items
 
@@ -459,7 +449,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Seniority
 | 12 | PermissionSet | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added read access to Lead.Seniority_Level__c, Lead.Seniority_Score__c and Contact.Seniority_Score__c. |
 | 13 | PermissionSet | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added read access to Lead.Seniority_Level__c, Lead.Seniority_Score__c and Contact.Seniority_Score__c. |
 | 14 | PermissionSet | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added read access to Lead.Seniority_Level__c, Lead.Seniority_Score__c and Contact.Seniority_Score__c. |
-| 15 | Flow | Lead | Lead_On_Update_Before_Save | Lead - On Update - Before Save | Updated | Added Title Is Changed to the entry criteria (1 OR (2 AND 3) OR 4), which still runs only when a record is updated to meet the criteria. Added a Do Not Engage Criteria Met? decision that uses prior values to keep the original only-when-newly-met Status behavior, a Title Changed? decision, the formSeniorityLevel formula, and an Assign Seniority Level assignment that sets Seniority_Level__c. Replaced the Update Status to Do Not Engage record update with an Assign Status to Do Not Engage assignment. Updated the flow description. |
-| 16 | Flow | Contact | Contact_On_Update_Before_Save | Contact - On Update - Before Save | Updated | Added Title Is Changed to the entry criteria (1 OR (2 AND 3) OR 4), which still runs only when a record is updated to meet the criteria. Added a Do Not Engage Criteria Met? decision that uses prior values to keep the original only-when-newly-met Status behavior, a Title Changed? decision, the formSeniorityLevel formula, and an Assign Seniority Level assignment that sets TitleType. Replaced the Update Status to Do Not Engage record update with an Assign Status to Do Not Engage assignment. Updated the flow description. |
+| 15 | Flow | Lead | Lead_On_Update_Before_Save | Lead - On Update - Before Save | Updated | Entry criteria now also run when Title changes. Added Do Not Engage Criteria Met? and Title Changed? decisions, formDoNotEngageCriteriaNewlyMet and formSeniorityLevel formulas, and an Assign Seniority Level assignment that sets Seniority_Level__c. Replaced the Update Status to Do Not Engage record update with an Assign Status to Do Not Engage assignment. Updated the flow description. |
+| 16 | Flow | Contact | Contact_On_Update_Before_Save | Contact - On Update - Before Save | Updated | Entry criteria now also run when Title changes. Added Do Not Engage Criteria Met? and Title Changed? decisions, formDoNotEngageCriteriaNewlyMet and formSeniorityLevel formulas, and an Assign Seniority Level assignment that sets TitleType. Replaced the Update Status to Do Not Engage record update with an Assign Status to Do Not Engage assignment. Updated the flow description. |
 | 17 | Flow | Lead | Lead_On_Create_Before_Save | Lead - On Create - Before Save | Created | Before-save flow that runs when a Lead is created with a Title and sets Seniority_Level__c using the formSeniorityLevel formula. |
 | 18 | Flow | Contact | Contact_On_Create_Before_Save | Contact - On Create - Before Save | Created | Before-save flow that runs when a Contact is created with a Title and sets TitleType using the formSeniorityLevel formula. |

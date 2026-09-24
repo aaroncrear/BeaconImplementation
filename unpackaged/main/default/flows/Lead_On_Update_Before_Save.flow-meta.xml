@@ -34,7 +34,7 @@
         </connector>
     </assignments>
     <decisions>
-        <description>Checks whether the record was just updated to be Blacklisted, or Do Not Call and Email Opt Out, and did not meet those criteria before this update. Only then is the Status set to Do Not Engage, so a Title change or an edit to a record that already met the criteria does not reset the Status.</description>
+        <description>Checks whether the record was just marked Blacklisted, or Do Not Call and Email Opt Out, on this update. Only then is the Status set to Do Not Engage, matching the flow&apos;s original entry criteria.</description>
         <name>Do_Not_Engage_Criteria_Met</name>
         <label>Do Not Engage Criteria Met?</label>
         <locationX>0</locationX>
@@ -45,47 +45,12 @@
         <defaultConnectorLabel>Criteria Not Met</defaultConnectorLabel>
         <rules>
             <name>Criteria_Met</name>
-            <conditionLogic>(1 OR (2 AND 3)) AND 4 AND (5 OR 6)</conditionLogic>
+            <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>$Record.Blacklisted__c</leftValueReference>
+                <leftValueReference>formDoNotEngageCriteriaNewlyMet</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
                     <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record.DoNotCall</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record.HasOptedOutOfEmail</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record__Prior.Blacklisted__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record__Prior.DoNotCall</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record__Prior.HasOptedOutOfEmail</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
                 </rightValue>
             </conditions>
             <connector>
@@ -119,6 +84,15 @@
     </decisions>
     <description>Sets the Status to Do Not Engage if the record is Blacklisted or DNC and Email Opt Out. Sets the Seniority Level based on the Title when the Title changes.</description>
     <environments>Default</environments>
+    <formulas>
+        <description>True when the record is now Blacklisted, or Do Not Call and Email Opt Out, and was not before this update.</description>
+        <name>formDoNotEngageCriteriaNewlyMet</name>
+        <dataType>Boolean</dataType>
+        <expression>AND(
+    OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
+    NOT(OR({!$Record__Prior.Blacklisted__c}, AND({!$Record__Prior.DoNotCall}, {!$Record__Prior.HasOptedOutOfEmail})))
+)</expression>
+    </formulas>
     <formulas>
         <description>Returns the Seniority Level picklist API name based on the Title. Checks the Title against the Seniority Ranking keywords in order; the first keyword the Title contains sets the level. Scores 0-1 and Titles with no matching keyword return blank, which clears the field.</description>
         <name>formSeniorityLevel</name>
@@ -257,36 +231,14 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
         <connector>
             <targetReference>Do_Not_Engage_Criteria_Met</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
-        <filterLogic>1 OR (2 AND 3) OR 4</filterLogic>
-        <filters>
-            <field>Blacklisted__c</field>
-            <operator>EqualTo</operator>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </filters>
-        <filters>
-            <field>DoNotCall</field>
-            <operator>EqualTo</operator>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </filters>
-        <filters>
-            <field>HasOptedOutOfEmail</field>
-            <operator>EqualTo</operator>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </filters>
-        <filters>
-            <field>Title</field>
-            <operator>IsChanged</operator>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </filters>
+        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>OR(
+    AND(
+        OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
+        NOT(OR(PRIORVALUE({!$Record.Blacklisted__c}), AND(PRIORVALUE({!$Record.DoNotCall}), PRIORVALUE({!$Record.HasOptedOutOfEmail}))))
+    ),
+    ISCHANGED({!$Record.Title})
+)</filterFormula>
         <object>Lead</object>
         <recordTriggerType>Update</recordTriggerType>
         <triggerType>RecordBeforeSave</triggerType>
