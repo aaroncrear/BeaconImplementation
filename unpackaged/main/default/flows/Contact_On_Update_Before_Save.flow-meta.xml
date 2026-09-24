@@ -2,8 +2,39 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Sets the Contact Seniority Level field to the value returned by the formSeniorityLevel formula.</description>
+        <name>Assign_Seniority_Level</name>
+        <label>Assign Seniority Level</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.TitleType</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formSeniorityLevel</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <description>Sets the Contact Status to Do Not Engage.</description>
+        <name>Assign_Status_to_Do_Not_Engage</name>
+        <label>Assign Status to Do Not Engage</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Contact_Status__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Do Not Engage</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Title_Changed</targetReference>
+        </connector>
+    </assignments>
     <decisions>
-        <description>Checks whether the record was just marked Blacklisted, or Do Not Call and Email Opt Out, on this update. Only then is the Status set to Do Not Engage, matching the flow&apos;s original entry criteria.</description>
+        <description>Checks whether the record is Blacklisted, or Do Not Call and Email Opt Out, so the Status is only set to Do Not Engage when those criteria are met and not when only the Title changed.</description>
         <name>Do_Not_Engage_Criteria_Met</name>
         <label>Do Not Engage Criteria Met?</label>
         <locationX>0</locationX>
@@ -14,16 +45,30 @@
         <defaultConnectorLabel>Criteria Not Met</defaultConnectorLabel>
         <rules>
             <name>Criteria_Met</name>
-            <conditionLogic>and</conditionLogic>
+            <conditionLogic>1 OR (2 AND 3)</conditionLogic>
             <conditions>
-                <leftValueReference>formDoNotEngageCriteriaNewlyMet</leftValueReference>
+                <leftValueReference>$Record.Blacklisted__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.HasOptedOutOfEmail</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.DoNotCall</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
                     <booleanValue>true</booleanValue>
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Update_Status_to_Do_Not_Engage</targetReference>
+                <targetReference>Assign_Status_to_Do_Not_Engage</targetReference>
             </connector>
             <label>Criteria Met</label>
         </rules>
@@ -46,22 +91,13 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Update_Seniority_Level</targetReference>
+                <targetReference>Assign_Seniority_Level</targetReference>
             </connector>
             <label>Title Is Changed</label>
         </rules>
     </decisions>
     <description>Sets the Status to Do Not Engage if the record is Blacklisted or DNC and Email Opt Out. Sets the Seniority Level based on the Title when the Title changes.</description>
     <environments>Default</environments>
-    <formulas>
-        <description>True when the record is now Blacklisted, or Do Not Call and Email Opt Out, and was not before this update.</description>
-        <name>formDoNotEngageCriteriaNewlyMet</name>
-        <dataType>Boolean</dataType>
-        <expression>AND(
-    OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
-    NOT(OR({!$Record__Prior.Blacklisted__c}, AND({!$Record__Prior.DoNotCall}, {!$Record__Prior.HasOptedOutOfEmail})))
-)</expression>
-    </formulas>
     <formulas>
         <description>Returns the Seniority Level picklist API name based on the Title. Checks the Title against the Seniority Ranking keywords in order; the first keyword the Title contains sets the level. Scores 0-1 and Titles with no matching keyword return blank, which clears the field.</description>
         <name>formSeniorityLevel</name>
@@ -194,51 +230,42 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
-    <recordUpdates>
-        <description>Update Status to Do Not Engage</description>
-        <name>Update_Status_to_Do_Not_Engage</name>
-        <label>Update Status to Do Not Engage</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <connector>
-            <targetReference>Title_Changed</targetReference>
-        </connector>
-        <inputAssignments>
-            <field>Contact_Status__c</field>
-            <value>
-                <stringValue>Do Not Engage</stringValue>
-            </value>
-        </inputAssignments>
-        <inputReference>$Record</inputReference>
-    </recordUpdates>
-    <recordUpdates>
-        <description>Sets the Contact Seniority Level field to the value returned by the formSeniorityLevel formula.</description>
-        <name>Update_Seniority_Level</name>
-        <label>Update Seniority Level</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <inputAssignments>
-            <field>TitleType</field>
-            <value>
-                <elementReference>formSeniorityLevel</elementReference>
-            </value>
-        </inputAssignments>
-        <inputReference>$Record</inputReference>
-    </recordUpdates>
     <start>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
             <targetReference>Do_Not_Engage_Criteria_Met</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
-        <filterFormula>OR(
-    AND(
-        OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
-        NOT(OR(PRIORVALUE({!$Record.Blacklisted__c}), AND(PRIORVALUE({!$Record.DoNotCall}), PRIORVALUE({!$Record.HasOptedOutOfEmail}))))
-    ),
-    ISCHANGED({!$Record.Title})
-)</filterFormula>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>1 OR (2 AND 3) OR 4</filterLogic>
+        <filters>
+            <field>Blacklisted__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>HasOptedOutOfEmail</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DoNotCall</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Title</field>
+            <operator>IsChanged</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
         <object>Contact</object>
         <recordTriggerType>Update</recordTriggerType>
         <triggerType>RecordBeforeSave</triggerType>
