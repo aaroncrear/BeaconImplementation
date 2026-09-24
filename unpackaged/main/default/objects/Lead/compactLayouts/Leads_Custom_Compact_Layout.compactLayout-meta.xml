@@ -7,5 +7,6 @@
     <fields>Phone</fields>
     <fields>MobilePhone</fields>
     <fields>Email</fields>
+    <fields>Engagement_Status__c</fields>
     <label>Leads Custom Compact Layout</label>
 </CompactLayout>
