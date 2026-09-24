@@ -4,7 +4,7 @@
 
 Users need to see a record's contact status at a glance, as a colored flag icon, on records, in list views and in reports.
 
-- Add an icon for each status: **Blacklisted**, **Customer**, **Do Not Call**, **Do Not Email** and **No Contact**.
+- Add an icon for each status: **Blacklisted**, **Customer**, **Do Not Call**, **Do Not Email** and **Do Not Contact**.
 - Store the icons in Salesforce so formula fields can display them with the `IMAGE()` function.
 
 ## Release Notes
@@ -19,7 +19,7 @@ Five **static resources** were added, one for each status icon. Each is a PNG im
 | `Customer` | Green | Customer |
 | `Do_Not_Call` | Orange | Do Not Call |
 | `Do_Not_Email` | Orange | Do Not Email |
-| `No_Contact` | Red | No Contact |
+| `Do_Not_Contact` | Red | Do Not Contact |
 
 Each resource has the description "Used in formula fields to display icons on records, list views and reports."
 
@@ -51,7 +51,7 @@ No formula fields use the icons yet. They will be added in a later change.
 
 ## Acceptance Criteria
 
-1. In **Setup → Static Resources**, confirm these five static resources exist: **Blacklisted**, **Customer**, **Do_Not_Call**, **Do_Not_Email** and **No_Contact**.
+1. In **Setup → Static Resources**, confirm these five static resources exist: **Blacklisted**, **Customer**, **Do_Not_Call**, **Do_Not_Email** and **Do_Not_Contact**.
 2. For each one, confirm:
    1. **MIME Type** is `image/png`.
    2. **Cache Control** is **Public**.
@@ -61,7 +61,7 @@ No formula fields use the icons yet. They will be added in a later change.
    2. **Customer**: green flag, "Customer".
    3. **Do_Not_Call**: orange flag, "Do Not Call".
    4. **Do_Not_Email**: orange flag, "Do Not Email".
-   5. **No_Contact**: red flag, "No Contact".
+   5. **Do_Not_Contact**: red flag, "Do Not Contact".
 4. To confirm the icons work in a formula field, create a test Text formula field in a sandbox with the formula `IMAGE("/resource/Customer", "Customer")`.
    1. Open a record and confirm the green Customer flag shows.
    2. Add the field to a list view and confirm the flag shows.
@@ -83,4 +83,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Traffic-L
 | 2 | StaticResource | N/A | Customer | Customer | Created | Green flag icon with the text "Customer". Used in formula fields to display icons on records, list views and reports. |
 | 3 | StaticResource | N/A | Do_Not_Call | Do_Not_Call | Created | Orange flag icon with the text "Do Not Call". Used in formula fields to display icons on records, list views and reports. |
 | 4 | StaticResource | N/A | Do_Not_Email | Do_Not_Email | Created | Orange flag icon with the text "Do Not Email". Used in formula fields to display icons on records, list views and reports. |
-| 5 | StaticResource | N/A | No_Contact | No_Contact | Created | Red flag icon with the text "No Contact". Used in formula fields to display icons on records, list views and reports. |
+| 5 | StaticResource | N/A | Do_Not_Contact | Do_Not_Contact | Created | Red flag icon with the text "Do Not Contact". Used in formula fields to display icons on records, list views and reports. |
