@@ -4,9 +4,9 @@
     <fields>Name</fields>
     <fields>Company</fields>
     <fields>Title</fields>
+    <fields>LeadSource</fields>
     <fields>Phone</fields>
     <fields>MobilePhone</fields>
     <fields>Email</fields>
-    <fields>Engagement_Status__c</fields>
     <label>Leads Custom Compact Layout</label>
 </CompactLayout>

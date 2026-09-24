@@ -6,6 +6,5 @@
     <fields>BillingAddress</fields>
     <fields>Website</fields>
     <fields>OwnerId</fields>
-    <fields>Engagement_Status__c</fields>
     <label>Account Compact Layout</label>
 </CompactLayout>
