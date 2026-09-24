@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>Sets the Seniority Level based on the Title when a Contact is created with a Title.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Returns the Seniority Level picklist API name based on the Title. Checks the Title against the Seniority Ranking keywords in order; the first keyword the Title contains sets the level. Scores 0-1 and Titles with no matching keyword return blank, which clears the field.</description>
+        <name>formSeniorityLevel</name>
+        <dataType>String</dataType>
+        <expression>IF(OR(
+CONTAINS({!$Record.Title},&quot;Other&quot;),
+CONTAINS({!$Record.Title},&quot;Graduat&quot;),
+CONTAINS({!$Record.Title},&quot;Intern&quot;),
+CONTAINS({!$Record.Title},&quot;Postdoc&quot;),
+CONTAINS({!$Record.Title},&quot;Student&quot;),
+CONTAINS({!$Record.Title},&quot;Temp&quot;),
+CONTAINS({!$Record.Title},&quot;Train&quot;)
+),
+&quot;&quot;,
+IF(OR(
+CONTAINS({!$Record.Title},&quot;Administra&quot;),
+CONTAINS({!$Record.Title},&quot; Assistant&quot;),
+CONTAINS({!$Record.Title},&quot;Assistant&quot;),
+CONTAINS({!$Record.Title},&quot;Fellow&quot;),
+CONTAINS({!$Record.Title},&quot;Profess&quot;),
+CONTAINS({!$Record.Title},&quot;Research&quot;),
+CONTAINS({!$Record.Title},&quot;Scien&quot;),
+CONTAINS({!$Record.Title},&quot;Coordinat&quot;),
+CONTAINS({!$Record.Title},&quot;Engineer&quot;),
+CONTAINS({!$Record.Title},&quot;Analys&quot;),
+CONTAINS({!$Record.Title},&quot;Lecturer&quot;),
+CONTAINS({!$Record.Title},&quot;Supervis&quot;),
+CONTAINS({!$Record.Title},&quot;Principal &quot;),
+CONTAINS({!$Record.Title},&quot;Specialist&quot;),
+CONTAINS({!$Record.Title},&quot;Associate Prin&quot;),
+CONTAINS({!$Record.Title},&quot;Principal Analys&quot;),
+CONTAINS({!$Record.Title},&quot;Principa Profes&quot;),
+CONTAINS({!$Record.Title},&quot;Principal Research&quot;),
+CONTAINS({!$Record.Title},&quot;Principal Scien&quot;),
+CONTAINS({!$Record.Title},&quot;Principal Specia&quot;),
+CONTAINS({!$Record.Title},&quot;Principal Eng&quot;),
+CONTAINS({!$Record.Title},&quot;Consultant&quot;),
+CONTAINS({!$Record.Title},&quot;Investigator&quot;),
+CONTAINS({!$Record.Title},&quot;Marketing&quot;),
+CONTAINS({!$Record.Title},&quot;PM&quot;),
+CONTAINS({!$Record.Title},&quot;Recruiter&quot;),
+CONTAINS({!$Record.Title},&quot;Sales Representative&quot;),
+CONTAINS({!$Record.Title},&quot;Senior Analys&quot;),
+CONTAINS({!$Record.Title},&quot;Senior Professor&quot;),
+CONTAINS({!$Record.Title},&quot;Senior Research&quot;),
+CONTAINS({!$Record.Title},&quot;Senior Scien&quot;),
+CONTAINS({!$Record.Title},&quot;Senior Special&quot;),
+CONTAINS({!$Record.Title},&quot;Superintendent&quot;),
+CONTAINS({!$Record.Title},&quot;Microb&quot;),
+CONTAINS({!$Record.Title},&quot;Advisor&quot;)
+),
+&quot;individualContributor&quot;,
+IF(OR(
+CONTAINS({!$Record.Title},&quot;Officer&quot;),
+CONTAINS({!$Record.Title},&quot;Associat&quot;),
+CONTAINS({!$Record.Title},&quot;General Super&quot;),
+CONTAINS({!$Record.Title},&quot;Lead&quot;),
+CONTAINS({!$Record.Title},&quot;Manag&quot;),
+CONTAINS({!$Record.Title},&quot;Senior&quot;),
+CONTAINS({!$Record.Title},&quot;Senior PM&quot;),
+CONTAINS({!$Record.Title},&quot;Senior Project&quot;),
+CONTAINS({!$Record.Title},&quot;SeniorSuper&quot;),
+CONTAINS({!$Record.Title},&quot;Direct&quot;),
+CONTAINS({!$Record.Title},&quot;Human Resource Bus&quot;),
+CONTAINS({!$Record.Title},&quot;AVP&quot;),
+CONTAINS({!$Record.Title},&quot;Executive&quot;),
+CONTAINS({!$Record.Title},&quot;Head&quot;),
+CONTAINS({!$Record.Title},&quot;Leader&quot;),
+CONTAINS({!$Record.Title},&quot;Regional&quot;),
+CONTAINS({!$Record.Title},&quot;Senior Associat&quot;)
+),
+&quot;directorOrManager&quot;,
+IF(OR(
+CONTAINS({!$Record.Title},&quot;Vice P&quot;),
+CONTAINS({!$Record.Title},&quot;EVP&quot;),
+CONTAINS({!$Record.Title},&quot;Global Head&quot;),
+CONTAINS({!$Record.Title},&quot;Managing Director&quot;),
+CONTAINS({!$Record.Title},&quot;Partner&quot;),
+CONTAINS({!$Record.Title},&quot;Principal&quot;),
+CONTAINS({!$Record.Title},&quot;SVP&quot;),
+CONTAINS({!$Record.Title},&quot;VP&quot;)
+),
+&quot;vp&quot;,
+IF(OR(
+CONTAINS({!$Record.Title},&quot;Chief&quot;),
+CONTAINS({!$Record.Title},&quot;CFO&quot;),
+CONTAINS({!$Record.Title},&quot;CHRO&quot;),
+CONTAINS({!$Record.Title},&quot;CIO&quot;),
+CONTAINS({!$Record.Title},&quot;CMO&quot;),
+CONTAINS({!$Record.Title},&quot;COO&quot;),
+CONTAINS({!$Record.Title},&quot;CPO&quot;),
+CONTAINS({!$Record.Title},&quot;CSO&quot;),
+CONTAINS({!$Record.Title},&quot;CRO&quot;)
+),
+&quot;executive&quot;,
+IF(OR(
+CONTAINS({!$Record.Title},&quot;Chief Exec&quot;),
+CONTAINS({!$Record.Title},&quot;CEO&quot;),
+CONTAINS({!$Record.Title},&quot;General Counsel&quot;),
+CONTAINS({!$Record.Title},&quot;MD&quot;),
+CONTAINS({!$Record.Title},&quot;Founder&quot;),
+CONTAINS({!$Record.Title},&quot;Founding&quot;),
+CONTAINS({!$Record.Title},&quot;Board Direct&quot;),
+CONTAINS({!$Record.Title},&quot;Board Memb&quot;),
+CONTAINS({!$Record.Title},&quot;Chair&quot;),
+CONTAINS({!$Record.Title},&quot;Preside&quot;),
+CONTAINS({!$Record.Title},&quot;Owner&quot;)
+),
+&quot;ceo&quot;,
+&quot;&quot;))))))</expression>
+    </formulas>
+    <interviewLabel>Contact - On Create - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Contact - On Create - Before Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Sets the Contact Seniority Level field to the value returned by the formSeniorityLevel formula.</description>
+        <name>Update_Seniority_Level</name>
+        <label>Update Seniority Level</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>TitleType</field>
+            <value>
+                <elementReference>formSeniorityLevel</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Update_Seniority_Level</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Title</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Contact</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

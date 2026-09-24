@@ -12,6 +12,7 @@ Leads and Contacts need a numeric seniority score based on the person's Title. L
 - Set **Seniority Level** automatically from the Title on Leads (the new field) and Contacts (the standard field), using the spreadsheet's score-to-level mapping (column D):
   - Update the **Lead - On Update - Before Save** and **Contact - On Update - Before Save** flows to also run when the Title changes, and set Seniority Level with a flow formula named `formSeniorityLevel`.
   - Give each updated flow a new description, and give every flow element a description.
+  - Create **Lead - On Create - Before Save** and **Contact - On Create - Before Save** flows that set Seniority Level the same way when a record is created with a Title.
 
 ## Release Notes
 
@@ -335,6 +336,20 @@ CONTAINS({!$Record.Title},"Owner")
 ""))))))
 ```
 
+### Seniority Level automation (create flows)
+
+Two new before-save flows, **Lead - On Create - Before Save** and **Contact - On Create - Before Save**, set Seniority Level when a record is created with a Title.
+
+- **Description:** "Sets the Seniority Level based on the Title when a Lead is created with a Title." The Contact flow says "Contact" instead of "Lead".
+- **Entry criteria:** Title Is Null = False. Records created without a Title don't start the flow.
+
+| Element | Type | Description |
+|---------|------|-------------|
+| Update Seniority Level | Update Records ($Record) | Sets the Seniority Level field to the value returned by the formSeniorityLevel formula. On Lead this is `Seniority_Level__c`; on Contact it is `TitleType`. |
+| formSeniorityLevel | Formula (Text) | The same formula as the update flows. Returns the Seniority Level picklist API name based on the Title. |
+
+Before-save flows update the record in the same save, without a second DML operation, so no Update Records call on another record is needed.
+
 ### Page layouts
 
 - **Lead Layout:** **Seniority Level** was added under **Department** (`Department__c`), and **Seniority Score** under Seniority Level. Both are read-only. Seniority Score is a formula, and Seniority Level is filled in by automation.
@@ -404,10 +419,12 @@ Read-only access to **Lead: Seniority Level**, **Lead: Seniority Score** and **C
 13. Check **Blacklisted** on a Lead and a Contact and save. Confirm the Status (Lead) or Contact Status (Contact) changes to Do Not Engage.
 14. On the same records, change the Status back to another value and save without changing Blacklisted. Confirm it isn't set back to Do Not Engage, because the criteria were already met before this update.
 15. Check **Do Not Call** and **Email Opt Out** together on a record that is neither, and change the Title in the same save. Confirm the Status changes to Do Not Engage and the Seniority Level is set.
+16. Create a new Lead and a new Contact with the Title "Vice President of Sales". Confirm the Seniority Level is VP.
+17. Create a new Lead and a new Contact with no Title. Confirm the Seniority Level is blank.
+18. In **Setup → Flows**, confirm **Lead - On Create - Before Save** and **Contact - On Create - Before Save** are active, and that every element in all four flows has a description.
 
 ## Post Deployment Items
 
-- **Set Seniority Level on new records.** This build only sets Seniority Level when the Title changes on an existing record. Setting it when a Lead or Contact is created with a Title is planned for the existing **Lead - On Create - Before Save** and **Contact - On Create - Before Save** flows. Those flows aren't in this repository yet, so they need to be synced before they can be updated.
 - **Fill in existing records.** The flows only run when a record is saved. Existing Leads and Contacts with a Title need a one-time data update to set their Seniority Level.
 - **Map Seniority Level on Lead conversion.** In **Object Manager → Lead → Fields & Relationships → Map Lead Fields**, map Lead **Seniority Level** to Contact **Seniority Level**. The API names match, so the value copies over as-is.
 - **Review the keyword order.** The formula follows the spreadsheet order exactly, so some senior titles score low (see the examples in the Release Notes, such as "Chief Executive Officer" = 5). If that isn't intended, reorder the spreadsheet, and the formula can be regenerated from it.
@@ -434,3 +451,5 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Seniority
 | 14 | PermissionSet | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added read access to Lead.Seniority_Level__c, Lead.Seniority_Score__c and Contact.Seniority_Score__c. |
 | 15 | Flow | Lead | Lead_On_Update_Before_Save | Lead - On Update - Before Save | Updated | Entry criteria now also run when Title changes. Added Do Not Engage Criteria Met? and Title Changed? decisions, formDoNotEngageCriteriaNewlyMet and formSeniorityLevel formulas, and an Update Seniority Level element that sets Seniority_Level__c. Updated the flow description. |
 | 16 | Flow | Contact | Contact_On_Update_Before_Save | Contact - On Update - Before Save | Updated | Entry criteria now also run when Title changes. Added Do Not Engage Criteria Met? and Title Changed? decisions, formDoNotEngageCriteriaNewlyMet and formSeniorityLevel formulas, and an Update Seniority Level element that sets TitleType. Updated the flow description. |
+| 17 | Flow | Lead | Lead_On_Create_Before_Save | Lead - On Create - Before Save | Created | Before-save flow that runs when a Lead is created with a Title and sets Seniority_Level__c using the formSeniorityLevel formula. |
+| 18 | Flow | Contact | Contact_On_Create_Before_Save | Contact - On Create - Before Save | Created | Before-save flow that runs when a Contact is created with a Title and sets TitleType using the formSeniorityLevel formula. |
