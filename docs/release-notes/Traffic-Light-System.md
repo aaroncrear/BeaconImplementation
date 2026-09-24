@@ -92,7 +92,7 @@ Each `IMAGE()` call sets an exact height and width. This shows every icon at 16 
 - **Lead:** Leads Custom Compact Layout. This layout also gained **Lead Source** (`LeadSource`), after Title, from the org in the Gearset commit that synced the compact layouts to this branch.
 - **Opportunity:** New Awesome Compact Layout and Opportunity Compact Layout. The Opportunity has two custom compact layouts, so the field was added to both.
 
-Lightning Experience shows only the first seven fields of a compact layout in the record highlights panel. The Leads Custom Compact Layout now has eight fields, so **Engagement Status is the eighth field and will not show in the Lead highlights panel**. See Post Deployment Items.
+Lightning Experience shows up to seven fields of a compact layout in the record highlights panel. The Leads Custom Compact Layout has eight fields, but **Phone** and **Mobile** display as one field with a dropdown to switch between them. That leaves seven items, so Engagement Status still shows in the Lead highlights panel.
 
 The Account, Lead and Opportunity (New Awesome Compact Layout) layouts are assigned as their object's primary compact layout, so the icon shows in the record highlights panel. The **Contact Compact Layout is not assigned**. Contacts still use the System Default compact layout, so the icon will not show in the Contact highlights panel until the layout is assigned. See Post Deployment Items.
 
@@ -140,13 +140,12 @@ Formula fields cannot be edited, so only read access is granted.
 8. **Lead:** on a Lead, set the custom **Account** lookup to an Account with **Type** = Customer, then Prospect. Confirm the Customer and Prospect flags. Repeat the checkbox steps from step 6 using the Lead's **Blacklisted**, **Do Not Call** and **Email Opt Out** fields.
 9. **Opportunity:** on an Opportunity, confirm the Customer and Prospect flags follow the Account's **Type**. Check **Blacklisted**, **Do Not Call** and **Email Opt Out** on the related Account, and confirm the Opportunity's icon updates to match once the flow syncs them.
 10. On each object, add **Engagement Status** to a list view and to a report. Confirm the icons show, at the same small size, sharp and readable.
-11. Open a Lead and confirm whether **Engagement Status** shows in the highlights panel. With eight fields on the layout, it is expected to be hidden until the layout is trimmed to seven fields.
+11. Open a Lead and confirm **Engagement Status** shows in the highlights panel, with **Phone** and **Mobile** shown as one field with a dropdown.
 12. Open each compact layout in **Object Manager → Compact Layouts** and confirm **Engagement Status** is the last field. For Opportunity, check both **New Awesome Compact Layout** and **Opportunity Compact Layout**.
 
 ## Post Deployment Items
 
 - Confirm the Account **Type** picklist has values whose API names are exactly `Customer` and `Prospect`. The formulas match those exact API names. If the org uses different values, such as `Customer - Direct`, update the formulas to match.
-- To show the icon in the Lead highlights panel, remove one field from the **Leads Custom Compact Layout**, or move **Engagement Status** into the first seven fields. The layout has eight fields and the highlights panel shows only the first seven.
 - To show the icon in the Contact highlights panel, assign the **Contact Compact Layout** as the primary compact layout in **Object Manager → Contact → Compact Layouts → Compact Layout Assignment**. It is currently the System Default. Skip this if Contacts should keep the System Default.
 
 ## Component Manifest
