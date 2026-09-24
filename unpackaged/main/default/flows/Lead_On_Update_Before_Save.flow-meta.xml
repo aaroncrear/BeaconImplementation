@@ -257,7 +257,7 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
         <connector>
             <targetReference>Do_Not_Engage_Criteria_Met</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterLogic>1 OR (2 AND 3) OR 4</filterLogic>
         <filters>
             <field>Blacklisted__c</field>
