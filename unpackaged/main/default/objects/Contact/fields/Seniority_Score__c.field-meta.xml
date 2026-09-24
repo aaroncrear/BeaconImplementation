@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Seniority_Score__c</fullName>
+    <description>Populated based on the Title.</description>
+    <externalId>false</externalId>
+    <formula>IF( CONTAINS( Title, "Other" ),
+    0,
+IF( OR(
+    CONTAINS( Title, "Graduat" ),
+    CONTAINS( Title, "Intern" ),
+    CONTAINS( Title, "Postdoc" ),
+    CONTAINS( Title, "Student" ),
+    CONTAINS( Title, "Temp" ),
+    CONTAINS( Title, "Train" )
+),
+    1,
+IF( OR(
+    CONTAINS( Title, "Administra" ),
+    CONTAINS( Title, " Assistant" ),
+    CONTAINS( Title, "Assistant" ),
+    CONTAINS( Title, "Fellow" ),
+    CONTAINS( Title, "Profess" ),
+    CONTAINS( Title, "Research" ),
+    CONTAINS( Title, "Scien" )
+),
+    2,
+IF( OR(
+    CONTAINS( Title, "Coordinat" ),
+    CONTAINS( Title, "Engineer" ),
+    CONTAINS( Title, "Analys" ),
+    CONTAINS( Title, "Lecturer" ),
+    CONTAINS( Title, "Supervis" )
+),
+    3,
+IF( OR(
+    CONTAINS( Title, "Principal " ),
+    CONTAINS( Title, "Specialist" ),
+    CONTAINS( Title, "Associate Prin" ),
+    CONTAINS( Title, "Principal Analys" ),
+    CONTAINS( Title, "Principa Profes" ),
+    CONTAINS( Title, "Principal Research" ),
+    CONTAINS( Title, "Principal Scien" ),
+    CONTAINS( Title, "Principal Specia" ),
+    CONTAINS( Title, "Principal Eng" ),
+    CONTAINS( Title, "Consultant" ),
+    CONTAINS( Title, "Investigator" ),
+    CONTAINS( Title, "Marketing" ),
+    CONTAINS( Title, "PM" ),
+    CONTAINS( Title, "Recruiter" ),
+    CONTAINS( Title, "Sales Representative" ),
+    CONTAINS( Title, "Senior Analys" ),
+    CONTAINS( Title, "Senior Professor" ),
+    CONTAINS( Title, "Senior Research" ),
+    CONTAINS( Title, "Senior Scien" ),
+    CONTAINS( Title, "Senior Special" ),
+    CONTAINS( Title, "Superintendent" ),
+    CONTAINS( Title, "Microb" ),
+    CONTAINS( Title, "Advisor" )
+),
+    4,
+IF( OR(
+    CONTAINS( Title, "Officer" ),
+    CONTAINS( Title, "Associat" ),
+    CONTAINS( Title, "General Super" ),
+    CONTAINS( Title, "Lead" ),
+    CONTAINS( Title, "Manag" ),
+    CONTAINS( Title, "Senior" ),
+    CONTAINS( Title, "Senior PM" ),
+    CONTAINS( Title, "Senior Project" ),
+    CONTAINS( Title, "SeniorSuper" )
+),
+    5,
+IF( OR(
+    CONTAINS( Title, "Direct" ),
+    CONTAINS( Title, "Human Resource Bus" ),
+    CONTAINS( Title, "AVP" ),
+    CONTAINS( Title, "Executive" ),
+    CONTAINS( Title, "Head" ),
+    CONTAINS( Title, "Leader" ),
+    CONTAINS( Title, "Regional" ),
+    CONTAINS( Title, "Senior Associat" )
+),
+    6,
+IF( OR(
+    CONTAINS( Title, "Vice P" ),
+    CONTAINS( Title, "EVP" ),
+    CONTAINS( Title, "Global Head" ),
+    CONTAINS( Title, "Managing Director" ),
+    CONTAINS( Title, "Partner" ),
+    CONTAINS( Title, "Principal" ),
+    CONTAINS( Title, "SVP" ),
+    CONTAINS( Title, "VP" )
+),
+    7,
+IF( OR(
+    CONTAINS( Title, "Chief" ),
+    CONTAINS( Title, "CFO" ),
+    CONTAINS( Title, "CHRO" ),
+    CONTAINS( Title, "CIO" ),
+    CONTAINS( Title, "CMO" ),
+    CONTAINS( Title, "COO" ),
+    CONTAINS( Title, "CPO" ),
+    CONTAINS( Title, "CSO" ),
+    CONTAINS( Title, "CRO" )
+),
+    8,
+IF( OR(
+    CONTAINS( Title, "Chief Exec" ),
+    CONTAINS( Title, "CEO" ),
+    CONTAINS( Title, "General Counsel" ),
+    CONTAINS( Title, "MD" )
+),
+    9,
+IF( OR(
+    CONTAINS( Title, "Founder" ),
+    CONTAINS( Title, "Founding" ),
+    CONTAINS( Title, "Board Direct" ),
+    CONTAINS( Title, "Board Memb" ),
+    CONTAINS( Title, "Chair" ),
+    CONTAINS( Title, "Preside" ),
+    CONTAINS( Title, "Owner" )
+),
+    10,
+NULL
+)))))))))))</formula>
+    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+    <label>Seniority Score</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>
