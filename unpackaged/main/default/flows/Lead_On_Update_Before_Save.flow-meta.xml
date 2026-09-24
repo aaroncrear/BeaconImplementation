@@ -34,7 +34,7 @@
         </connector>
     </assignments>
     <decisions>
-        <description>Checks whether the record is Blacklisted, or Do Not Call and Email Opt Out, so the Status is only set to Do Not Engage when those criteria are met and not when only the Title changed.</description>
+        <description>Checks whether the record was just updated to be Blacklisted, or Do Not Call and Email Opt Out, and did not meet those criteria before this update. Only then is the Status set to Do Not Engage, so a Title change or an edit to a record that already met the criteria does not reset the Status.</description>
         <name>Do_Not_Engage_Criteria_Met</name>
         <label>Do Not Engage Criteria Met?</label>
         <locationX>0</locationX>
@@ -45,7 +45,7 @@
         <defaultConnectorLabel>Criteria Not Met</defaultConnectorLabel>
         <rules>
             <name>Criteria_Met</name>
-            <conditionLogic>1 OR (2 AND 3)</conditionLogic>
+            <conditionLogic>(1 OR (2 AND 3)) AND 4 AND (5 OR 6)</conditionLogic>
             <conditions>
                 <leftValueReference>$Record.Blacklisted__c</leftValueReference>
                 <operator>EqualTo</operator>
@@ -65,6 +65,27 @@
                 <operator>EqualTo</operator>
                 <rightValue>
                     <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.Blacklisted__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.DoNotCall</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.HasOptedOutOfEmail</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
                 </rightValue>
             </conditions>
             <connector>
@@ -236,7 +257,7 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
         <connector>
             <targetReference>Do_Not_Engage_Criteria_Met</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
         <filterLogic>1 OR (2 AND 3) OR 4</filterLogic>
         <filters>
             <field>Blacklisted__c</field>
