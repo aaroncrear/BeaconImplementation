@@ -9,6 +9,9 @@ Leads and Contacts need a numeric seniority score based on the person's Title. L
 - Give read access to the new fields in the nine **Beacon … - Object, Tab, FLS** permission sets.
 - On the Lead page layout, put Seniority Level under Department, then Seniority Score under Seniority Level.
 - On the Contact page layout, put Seniority Score under Seniority Level.
+- Set **Seniority Level** automatically from the Title on Leads (the new field) and Contacts (the standard field), using the spreadsheet's score-to-level mapping (column D):
+  - Update the **Lead - On Update - Before Save** and **Contact - On Update - Before Save** flows to also run when the Title changes, and set Seniority Level with a flow formula named `formSeniorityLevel`.
+  - Give each updated flow a new description, and give every flow element a description.
 
 ## Release Notes
 
@@ -26,7 +29,7 @@ The values were copied from the standard Contact field **Seniority Level** (API 
 | Director or Manager | `directorOrManager` |
 | Individual Contributor | `individualContributor` |
 
-The picklist is restricted, so it can only hold these five values, just like the Contact field. This build doesn't include the automation that fills in the field. See Post Deployment Items.
+The picklist is restricted, so it can only hold these five values, just like the Contact field. The flows below fill it in from the Title.
 
 ### Seniority Score (Lead and Contact)
 
@@ -179,6 +182,159 @@ NULL
 )))))))))))
 ```
 
+### Seniority Level automation (update flows)
+
+The existing **Lead - On Update - Before Save** and **Contact - On Update - Before Save** flows were updated to set Seniority Level when the Title changes. On Lead they set the new `Seniority_Level__c` field. On Contact they set the standard `TitleType` field.
+
+**New description:** "Sets the Status to Do Not Engage if the record is Blacklisted or DNC and Email Opt Out. Sets the Seniority Level based on the Title when the Title changes."
+
+**Entry criteria.** Before this change, each flow ran only when a record was updated to meet "Blacklisted, or Do Not Call and Email Opt Out". Flow Builder's **Is Changed** operator only works with "Every time a record is updated and meets the condition requirements". So the start conditions were replaced with a formula that runs every time, and keeps the original behavior by comparing against the prior values:
+
+```
+OR(
+    AND(
+        OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
+        NOT(OR(PRIORVALUE({!$Record.Blacklisted__c}), AND(PRIORVALUE({!$Record.DoNotCall}), PRIORVALUE({!$Record.HasOptedOutOfEmail}))))
+    ),
+    ISCHANGED({!$Record.Title})
+)
+```
+
+**Elements.** A Title change now also starts the flow, so the flow checks each part separately. This keeps a Title-only change from setting the Status:
+
+| Element | Type | Description |
+|---------|------|-------------|
+| Do Not Engage Criteria Met? | Decision | Checks whether the record was just marked Blacklisted, or Do Not Call and Email Opt Out, on this update. Only then is the Status set to Do Not Engage, matching the flow's original entry criteria. |
+| Update Status to Do Not Engage | Update Records ($Record) | Existing element, unchanged. Sets Status (Lead) or Contact Status (Contact) to Do Not Engage. Now continues to the Title check. |
+| Title Changed? | Decision | Checks whether the Title changed on this update, so the Seniority Level is only recalculated when the Title changes. |
+| Update Seniority Level | Update Records ($Record) | Sets the Seniority Level field to the value returned by the formSeniorityLevel formula. |
+| formDoNotEngageCriteriaNewlyMet | Formula (Boolean) | True when the record is now Blacklisted, or Do Not Call and Email Opt Out, and was not before this update. |
+| formSeniorityLevel | Formula (Text) | Returns the Seniority Level picklist API name based on the Title. |
+
+Both checks run in the same save, so one update can set both the Status and the Seniority Level.
+
+**The formSeniorityLevel formula** checks the Title against the same 87 keywords as the Seniority Score, in the same spreadsheet order. The first match wins, so the level always matches the score's level from column D:
+
+| Score | Seniority Level | Formula returns |
+|-------|-----------------|-----------------|
+| 0–1, or no match | Blank | `""` (clears the field) |
+| 2–4 | Individual Contributor | `individualContributor` |
+| 5–6 | Director or Manager | `directorOrManager` |
+| 7 | VP | `vp` |
+| 8 | Executive | `executive` |
+| 9–10 | CEO | `ceo` |
+
+It returns the picklist API names, which are the same on the Lead and Contact fields. It works from the Title rather than the Seniority Score formula field, because a before-save flow might not see the recalculated score when the Title changes in the same save. It has the same ordering and case-sensitivity behavior as the Seniority Score (see above). It is 3,574 characters, under Flow's 3,900-character formula limit.
+
+```
+IF(OR(
+CONTAINS({!$Record.Title},"Other"),
+CONTAINS({!$Record.Title},"Graduat"),
+CONTAINS({!$Record.Title},"Intern"),
+CONTAINS({!$Record.Title},"Postdoc"),
+CONTAINS({!$Record.Title},"Student"),
+CONTAINS({!$Record.Title},"Temp"),
+CONTAINS({!$Record.Title},"Train")
+),
+"",
+IF(OR(
+CONTAINS({!$Record.Title},"Administra"),
+CONTAINS({!$Record.Title}," Assistant"),
+CONTAINS({!$Record.Title},"Assistant"),
+CONTAINS({!$Record.Title},"Fellow"),
+CONTAINS({!$Record.Title},"Profess"),
+CONTAINS({!$Record.Title},"Research"),
+CONTAINS({!$Record.Title},"Scien"),
+CONTAINS({!$Record.Title},"Coordinat"),
+CONTAINS({!$Record.Title},"Engineer"),
+CONTAINS({!$Record.Title},"Analys"),
+CONTAINS({!$Record.Title},"Lecturer"),
+CONTAINS({!$Record.Title},"Supervis"),
+CONTAINS({!$Record.Title},"Principal "),
+CONTAINS({!$Record.Title},"Specialist"),
+CONTAINS({!$Record.Title},"Associate Prin"),
+CONTAINS({!$Record.Title},"Principal Analys"),
+CONTAINS({!$Record.Title},"Principa Profes"),
+CONTAINS({!$Record.Title},"Principal Research"),
+CONTAINS({!$Record.Title},"Principal Scien"),
+CONTAINS({!$Record.Title},"Principal Specia"),
+CONTAINS({!$Record.Title},"Principal Eng"),
+CONTAINS({!$Record.Title},"Consultant"),
+CONTAINS({!$Record.Title},"Investigator"),
+CONTAINS({!$Record.Title},"Marketing"),
+CONTAINS({!$Record.Title},"PM"),
+CONTAINS({!$Record.Title},"Recruiter"),
+CONTAINS({!$Record.Title},"Sales Representative"),
+CONTAINS({!$Record.Title},"Senior Analys"),
+CONTAINS({!$Record.Title},"Senior Professor"),
+CONTAINS({!$Record.Title},"Senior Research"),
+CONTAINS({!$Record.Title},"Senior Scien"),
+CONTAINS({!$Record.Title},"Senior Special"),
+CONTAINS({!$Record.Title},"Superintendent"),
+CONTAINS({!$Record.Title},"Microb"),
+CONTAINS({!$Record.Title},"Advisor")
+),
+"individualContributor",
+IF(OR(
+CONTAINS({!$Record.Title},"Officer"),
+CONTAINS({!$Record.Title},"Associat"),
+CONTAINS({!$Record.Title},"General Super"),
+CONTAINS({!$Record.Title},"Lead"),
+CONTAINS({!$Record.Title},"Manag"),
+CONTAINS({!$Record.Title},"Senior"),
+CONTAINS({!$Record.Title},"Senior PM"),
+CONTAINS({!$Record.Title},"Senior Project"),
+CONTAINS({!$Record.Title},"SeniorSuper"),
+CONTAINS({!$Record.Title},"Direct"),
+CONTAINS({!$Record.Title},"Human Resource Bus"),
+CONTAINS({!$Record.Title},"AVP"),
+CONTAINS({!$Record.Title},"Executive"),
+CONTAINS({!$Record.Title},"Head"),
+CONTAINS({!$Record.Title},"Leader"),
+CONTAINS({!$Record.Title},"Regional"),
+CONTAINS({!$Record.Title},"Senior Associat")
+),
+"directorOrManager",
+IF(OR(
+CONTAINS({!$Record.Title},"Vice P"),
+CONTAINS({!$Record.Title},"EVP"),
+CONTAINS({!$Record.Title},"Global Head"),
+CONTAINS({!$Record.Title},"Managing Director"),
+CONTAINS({!$Record.Title},"Partner"),
+CONTAINS({!$Record.Title},"Principal"),
+CONTAINS({!$Record.Title},"SVP"),
+CONTAINS({!$Record.Title},"VP")
+),
+"vp",
+IF(OR(
+CONTAINS({!$Record.Title},"Chief"),
+CONTAINS({!$Record.Title},"CFO"),
+CONTAINS({!$Record.Title},"CHRO"),
+CONTAINS({!$Record.Title},"CIO"),
+CONTAINS({!$Record.Title},"CMO"),
+CONTAINS({!$Record.Title},"COO"),
+CONTAINS({!$Record.Title},"CPO"),
+CONTAINS({!$Record.Title},"CSO"),
+CONTAINS({!$Record.Title},"CRO")
+),
+"executive",
+IF(OR(
+CONTAINS({!$Record.Title},"Chief Exec"),
+CONTAINS({!$Record.Title},"CEO"),
+CONTAINS({!$Record.Title},"General Counsel"),
+CONTAINS({!$Record.Title},"MD"),
+CONTAINS({!$Record.Title},"Founder"),
+CONTAINS({!$Record.Title},"Founding"),
+CONTAINS({!$Record.Title},"Board Direct"),
+CONTAINS({!$Record.Title},"Board Memb"),
+CONTAINS({!$Record.Title},"Chair"),
+CONTAINS({!$Record.Title},"Preside"),
+CONTAINS({!$Record.Title},"Owner")
+),
+"ceo",
+""))))))
+```
+
 ### Page layouts
 
 - **Lead Layout:** **Seniority Level** was added under **Department** (`Department__c`), and **Seniority Score** under Seniority Level. Both are read-only. Seniority Score is a formula, and Seniority Level is filled in by automation.
@@ -230,10 +386,29 @@ Read-only access to **Lead: Seniority Level**, **Lead: Seniority Score** and **C
 
 8. Change a record's Title from "Sales Intern" to "Founder". Confirm the score changes from 1 to 10.
 9. Set a Title to "sales intern" (lowercase). Confirm the score is blank, because matching is case-sensitive.
+10. On an existing Lead and an existing Contact, change the Title to each value below, save, and confirm the **Seniority Level**:
+
+| Title | Expected Seniority Level |
+|-------|--------------------------|
+| Sales Intern | Blank |
+| Data Analyst | Individual Contributor |
+| Project Manager | Director or Manager |
+| Head of Product | Director or Manager |
+| Vice President of Sales | VP |
+| CFO | Executive |
+| Founder | CEO |
+| Accountant | Blank |
+
+11. Change the Title of a record with a Seniority Level to blank. Confirm the Seniority Level is cleared.
+12. On a Lead or Contact that isn't Blacklisted, Do Not Call or Email Opt Out, change only the Title. Confirm the Status (Lead) or Contact Status (Contact) doesn't change to Do Not Engage.
+13. Check **Blacklisted** on a Lead and a Contact and save. Confirm the Status (Lead) or Contact Status (Contact) changes to Do Not Engage.
+14. On the same records, change the Status back to another value and save without changing Blacklisted. Confirm it isn't set back to Do Not Engage, because the criteria were already met before this update.
+15. Check **Do Not Call** and **Email Opt Out** together on a record that is neither, and change the Title in the same save. Confirm the Status changes to Do Not Engage and the Seniority Level is set.
 
 ## Post Deployment Items
 
-- **Build the Seniority Level automation.** This build creates the Lead **Seniority Level** field but not the automation that fills it in. The spreadsheet maps scores to levels (column D): 0–1 Blank, 2–4 Individual Contributor, 5–6 Director or Manager, 7 VP, 8 Executive, 9–10 CEO. This can be built as a record-triggered flow in a later branch.
+- **Set Seniority Level on new records.** This build only sets Seniority Level when the Title changes on an existing record. Setting it when a Lead or Contact is created with a Title is planned for the existing **Lead - On Create - Before Save** and **Contact - On Create - Before Save** flows. Those flows aren't in this repository yet, so they need to be synced before they can be updated.
+- **Fill in existing records.** The flows only run when a record is saved. Existing Leads and Contacts with a Title need a one-time data update to set their Seniority Level.
 - **Map Seniority Level on Lead conversion.** In **Object Manager → Lead → Fields & Relationships → Map Lead Fields**, map Lead **Seniority Level** to Contact **Seniority Level**. The API names match, so the value copies over as-is.
 - **Review the keyword order.** The formula follows the spreadsheet order exactly, so some senior titles score low (see the examples in the Release Notes, such as "Chief Executive Officer" = 5). If that isn't intended, reorder the spreadsheet, and the formula can be regenerated from it.
 
@@ -257,3 +432,5 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Seniority
 | 12 | PermissionSet | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added read access to Lead.Seniority_Level__c, Lead.Seniority_Score__c and Contact.Seniority_Score__c. |
 | 13 | PermissionSet | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added read access to Lead.Seniority_Level__c, Lead.Seniority_Score__c and Contact.Seniority_Score__c. |
 | 14 | PermissionSet | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added read access to Lead.Seniority_Level__c, Lead.Seniority_Score__c and Contact.Seniority_Score__c. |
+| 15 | Flow | Lead | Lead_On_Update_Before_Save | Lead - On Update - Before Save | Updated | Entry criteria now also run when Title changes. Added Do Not Engage Criteria Met? and Title Changed? decisions, formDoNotEngageCriteriaNewlyMet and formSeniorityLevel formulas, and an Update Seniority Level element that sets Seniority_Level__c. Updated the flow description. |
+| 16 | Flow | Contact | Contact_On_Update_Before_Save | Contact - On Update - Before Save | Updated | Entry criteria now also run when Title changes. Added Do Not Engage Criteria Met? and Title Changed? decisions, formDoNotEngageCriteriaNewlyMet and formSeniorityLevel formulas, and an Update Seniority Level element that sets TitleType. Updated the flow description. |
