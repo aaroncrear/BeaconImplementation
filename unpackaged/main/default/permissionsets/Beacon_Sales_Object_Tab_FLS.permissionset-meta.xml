@@ -30,6 +30,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Account.Engagement_Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Account.Invoice_Email__c</field>
         <readable>true</readable>
@@ -436,6 +441,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Contact.Engagement_Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Contact.Lead_Type__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -497,6 +507,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Lead.Email_Communication__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.Engagement_Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -607,6 +622,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.Email_Opt_Out__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.Engagement_Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

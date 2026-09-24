@@ -6,5 +6,6 @@
     <fields>CloseDate</fields>
     <fields>Amount</fields>
     <fields>OwnerId</fields>
+    <fields>Engagement_Status__c</fields>
     <label>New Awesome Compact Layout</label>
 </CompactLayout>

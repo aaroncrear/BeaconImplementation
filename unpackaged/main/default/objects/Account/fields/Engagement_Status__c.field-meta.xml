@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Engagement_Status__c</fullName>
+    <description>Used to display colored icons for engagement status using Static Resources.</description>
+    <externalId>false</externalId>
+    <formula>IF( Blacklisted__c,
+    IMAGE("/resource/Blacklisted", "Blacklisted", 20, 89),
+IF( AND( Do_Not_Call__c, Email_Opt_Out__c ),
+    IMAGE("/resource/Do_Not_Contact", "Do Not Contact", 20, 115),
+IF( Do_Not_Call__c,
+    IMAGE("/resource/Do_Not_Call", "Do Not Call", 20, 90),
+IF( Email_Opt_Out__c,
+    IMAGE("/resource/Do_Not_Email", "Do Not Email", 20, 101),
+IF( ISPICKVAL( Type, "Customer" ),
+    IMAGE("/resource/Customer", "Customer", 20, 81),
+IF( ISPICKVAL( Type, "Prospect" ),
+    IMAGE("/resource/Prospect", "Prospect", 20, 76),
+    ""
+))))))</formula>
+    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+    <label>Engagement Status</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
