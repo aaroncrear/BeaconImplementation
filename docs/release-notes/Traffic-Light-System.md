@@ -22,23 +22,24 @@ Users need to see a record's engagement status at a glance, as a colored flag ic
 
 ### Flag icon static resources
 
-Six **static resources** were added, one for each status icon. Each is a PNG image, 32 pixels high, showing a colored flag and the status label in bold on a white rounded badge with a light gray border:
+Six **static resources** were added, one for each status icon. Each is a PNG image, 40 pixels high, showing a colored flag and the status label in bold on a white rounded badge with a light gray border:
 
 | Static Resource | Flag Color | Text | Shown at (pixels) |
 |-----------------|------------|------|-------------------|
-| `Blacklisted` | Black | Blacklisted | 70 × 16 |
-| `Do_Not_Contact` | Red | Do Not Contact | 89 × 16 |
-| `Do_Not_Call` | Orange | Do Not Call | 71 × 16 |
-| `Do_Not_Email` | Orange | Do Not Email | 78 × 16 |
-| `Customer` | Green | Customer | 64 × 16 |
-| `Prospect` | Green | Prospect | 60 × 16 |
+| `Blacklisted` | Black | Blacklisted | 89 × 20 |
+| `Do_Not_Contact` | Red | Do Not Contact | 115 × 20 |
+| `Do_Not_Call` | Orange | Do Not Call | 90 × 20 |
+| `Do_Not_Email` | Orange | Do Not Email | 101 × 20 |
+| `Customer` | Green | Customer | 81 × 20 |
+| `Prospect` | Green | Prospect | 76 × 20 |
 
 Each resource has the description "Used in formula fields to display icons on records, list views and reports."
 
 The icons were drawn so they stay readable anywhere they appear:
 
 - **White badge background.** The first version had a transparent background, so the black "Blacklisted" text disappeared on dark backgrounds. The white badge keeps every label readable on light and dark pages.
-- **Double resolution.** The images are 32 pixels high. The formula fields show them at 16 pixels, the size of a typical list view or report row, so they stay sharp on high-resolution screens instead of looking blurry. Each image is an even number of pixels wide, so it scales to exactly half size.
+- **Double resolution.** The images are 40 pixels high. The formula fields show them at 20 pixels, so they stay sharp on high-resolution screens instead of looking blurry. Each image is an even number of pixels wide, so it scales to exactly half size.
+- **Larger text.** The label fills most of the badge's height, so on screen the text is about 13 pixels, the same size as Salesforce's standard body text. An earlier version showed the icons at 16 pixels high, which made the text too small to read comfortably.
 - **Readable text colors.** Each label uses a darker shade of its flag color so the text has enough contrast against white (at least 4.5:1, the WCAG AA standard). The flags keep the brighter colors.
 
 Static resources were used because Salesforce serves them from a stable URL, `/resource/<Name>`, which the `IMAGE()` function can reference in a formula field. Unlike Documents or Files, they deploy with the rest of the metadata, so the icons stay the same in every org.
@@ -66,22 +67,22 @@ For example, the Lead formula is:
 
 ```
 IF( Blacklisted__c,
-    IMAGE("/resource/Blacklisted", "Blacklisted", 16, 70),
+    IMAGE("/resource/Blacklisted", "Blacklisted", 20, 89),
 IF( AND( DoNotCall, HasOptedOutOfEmail ),
-    IMAGE("/resource/Do_Not_Contact", "Do Not Contact", 16, 89),
+    IMAGE("/resource/Do_Not_Contact", "Do Not Contact", 20, 115),
 IF( DoNotCall,
-    IMAGE("/resource/Do_Not_Call", "Do Not Call", 16, 71),
+    IMAGE("/resource/Do_Not_Call", "Do Not Call", 20, 90),
 IF( HasOptedOutOfEmail,
-    IMAGE("/resource/Do_Not_Email", "Do Not Email", 16, 78),
+    IMAGE("/resource/Do_Not_Email", "Do Not Email", 20, 101),
 IF( ISPICKVAL( Account__r.Type, "Customer" ),
-    IMAGE("/resource/Customer", "Customer", 16, 64),
+    IMAGE("/resource/Customer", "Customer", 20, 81),
 IF( ISPICKVAL( Account__r.Type, "Prospect" ),
-    IMAGE("/resource/Prospect", "Prospect", 16, 60),
+    IMAGE("/resource/Prospect", "Prospect", 20, 76),
     ""
 ))))))
 ```
 
-Each `IMAGE()` call sets an exact height and width. This shows every icon at 16 pixels high with its correct proportions. Each also sets alternate text, which screen readers read aloud and which shows if the image cannot load.
+Each `IMAGE()` call sets an exact height and width. This shows every icon at 20 pixels high with its correct proportions. Each also sets alternate text, which screen readers read aloud and which shows if the image cannot load.
 
 ### Compact layouts
 
@@ -139,7 +140,7 @@ Formula fields cannot be edited, so only read access is granted.
 7. **Contact:** on a Contact whose Account has **Type** = Customer, repeat step 6 using the Contact's **Blacklisted**, **Do Not Call** and **Email Opt Out** fields. Confirm the Customer and Prospect flags follow the Account's Type. Then remove the Account from the Contact and confirm the field is blank when no other status applies.
 8. **Lead:** on a Lead, set the custom **Account** lookup to an Account with **Type** = Customer, then Prospect. Confirm the Customer and Prospect flags. Repeat the checkbox steps from step 6 using the Lead's **Blacklisted**, **Do Not Call** and **Email Opt Out** fields.
 9. **Opportunity:** on an Opportunity, confirm the Customer and Prospect flags follow the Account's **Type**. Check **Blacklisted**, **Do Not Call** and **Email Opt Out** on the related Account, and confirm the Opportunity's icon updates to match once the flow syncs them.
-10. On each object, add **Engagement Status** to a list view and to a report. Confirm the icons show, at the same small size, sharp and readable.
+10. On each object, add **Engagement Status** to a list view and to a report. Confirm the icons show at the same 20-pixel height as on the record, sharp and readable.
 11. Open a Lead and confirm **Engagement Status** shows in the highlights panel, with **Phone** and **Mobile** shown as one field with a dropdown.
 12. Open each compact layout in **Object Manager → Compact Layouts** and confirm **Engagement Status** is the last field. For Opportunity, check both **New Awesome Compact Layout** and **Opportunity Compact Layout**.
 

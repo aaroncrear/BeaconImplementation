@@ -4,17 +4,17 @@
     <description>Used to display colored icons for engagement status using Static Resources.</description>
     <externalId>false</externalId>
     <formula>IF( Blacklisted__c,
-    IMAGE("/resource/Blacklisted", "Blacklisted", 16, 70),
+    IMAGE("/resource/Blacklisted", "Blacklisted", 20, 89),
 IF( AND( Do_Not_Call__c, Email_Opt_Out__c ),
-    IMAGE("/resource/Do_Not_Contact", "Do Not Contact", 16, 89),
+    IMAGE("/resource/Do_Not_Contact", "Do Not Contact", 20, 115),
 IF( Do_Not_Call__c,
-    IMAGE("/resource/Do_Not_Call", "Do Not Call", 16, 71),
+    IMAGE("/resource/Do_Not_Call", "Do Not Call", 20, 90),
 IF( Email_Opt_Out__c,
-    IMAGE("/resource/Do_Not_Email", "Do Not Email", 16, 78),
+    IMAGE("/resource/Do_Not_Email", "Do Not Email", 20, 101),
 IF( ISPICKVAL( Account.Type, "Customer" ),
-    IMAGE("/resource/Customer", "Customer", 16, 64),
+    IMAGE("/resource/Customer", "Customer", 20, 81),
 IF( ISPICKVAL( Account.Type, "Prospect" ),
-    IMAGE("/resource/Prospect", "Prospect", 16, 60),
+    IMAGE("/resource/Prospect", "Prospect", 20, 76),
     ""
 ))))))</formula>
     <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
