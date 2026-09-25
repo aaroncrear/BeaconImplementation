@@ -2,97 +2,8 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <assignments>
-        <description>Sets the Lead Seniority Level field to the value returned by the formSeniorityLevel formula.</description>
-        <name>Assign_Seniority_Level</name>
-        <label>Assign Seniority Level</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>$Record.Seniority_Level__c</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>formSeniorityLevel</elementReference>
-            </value>
-        </assignmentItems>
-    </assignments>
-    <assignments>
-        <description>Sets the Status to Do Not Engage.</description>
-        <name>Assign_Status_to_Do_Not_Engage</name>
-        <label>Assign Status to Do Not Engage</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>$Record.Status</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <stringValue>Do Not Engage</stringValue>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>Title_Changed</targetReference>
-        </connector>
-    </assignments>
-    <decisions>
-        <description>Checks whether the record was just marked Blacklisted, or Do Not Call and Email Opt Out, on this update. Only then is the Status set to Do Not Engage, matching the flow&apos;s original entry criteria.</description>
-        <name>Do_Not_Engage_Criteria_Met</name>
-        <label>Do Not Engage Criteria Met?</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>Title_Changed</targetReference>
-        </defaultConnector>
-        <defaultConnectorLabel>Criteria Not Met</defaultConnectorLabel>
-        <rules>
-            <name>Criteria_Met</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>formDoNotEngageCriteriaNewlyMet</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Assign_Status_to_Do_Not_Engage</targetReference>
-            </connector>
-            <label>Criteria Met</label>
-        </rules>
-    </decisions>
-    <decisions>
-        <description>Checks whether the Title changed on this update, so the Seniority Level is only recalculated when the Title changes.</description>
-        <name>Title_Changed</name>
-        <label>Title Changed?</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <defaultConnectorLabel>Title Not Changed</defaultConnectorLabel>
-        <rules>
-            <name>Title_Is_Changed</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>$Record.Title</leftValueReference>
-                <operator>IsChanged</operator>
-                <rightValue>
-                    <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Assign_Seniority_Level</targetReference>
-            </connector>
-            <label>Title Is Changed</label>
-        </rules>
-    </decisions>
-    <description>Sets the Status to Do Not Engage if the record is Blacklisted or DNC and Email Opt Out. Sets the Seniority Level based on the Title when the Title changes.</description>
+    <description>Sets the Seniority Level based on the Title when a Lead is created with a Title.</description>
     <environments>Default</environments>
-    <formulas>
-        <description>True when the record is now Blacklisted, or Do Not Call and Email Opt Out, and was not before this update.</description>
-        <name>formDoNotEngageCriteriaNewlyMet</name>
-        <dataType>Boolean</dataType>
-        <expression>AND(
-    OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
-    NOT(OR({!$Record__Prior.Blacklisted__c}, AND({!$Record__Prior.DoNotCall}, {!$Record__Prior.HasOptedOutOfEmail})))
-)</expression>
-    </formulas>
     <formulas>
         <description>Returns the Seniority Level picklist API name based on the Title. Checks the Title against the Seniority Ranking keywords in order; the first keyword the Title contains sets the level. Scores 0-1 and Titles with no matching keyword return blank, which clears the field.</description>
         <name>formSeniorityLevel</name>
@@ -204,8 +115,8 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
 &quot;ceo&quot;,
 &quot;&quot;))))))</expression>
     </formulas>
-    <interviewLabel>Lead - On Update - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Lead - On Update - Before Save</label>
+    <interviewLabel>Lead - On Create - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Lead - On Create - Before Save</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -225,22 +136,36 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Sets the Lead Seniority Level field to the value returned by the formSeniorityLevel formula.</description>
+        <name>Update_Seniority_Level</name>
+        <label>Update Seniority Level</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Seniority_Level__c</field>
+            <value>
+                <elementReference>formSeniorityLevel</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
     <start>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Do_Not_Engage_Criteria_Met</targetReference>
+            <targetReference>Update_Seniority_Level</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
-        <filterFormula>OR(
-    AND(
-        OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
-        NOT(OR(PRIORVALUE({!$Record.Blacklisted__c}), AND(PRIORVALUE({!$Record.DoNotCall}), PRIORVALUE({!$Record.HasOptedOutOfEmail}))))
-    ),
-    ISCHANGED({!$Record.Title})
-)</filterFormula>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Title</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
         <object>Lead</object>
-        <recordTriggerType>Update</recordTriggerType>
+        <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordBeforeSave</triggerType>
     </start>
     <status>Active</status>

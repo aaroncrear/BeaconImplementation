@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Seniority_Level__c</fullName>
+    <description>Populated via automation based on Title and Seniority Score. This replicates the standard field on the Contact, which can not have its values updated.</description>
+    <externalId>false</externalId>
+    <label>Seniority Level</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>ceo</fullName>
+                <default>false</default>
+                <label>CEO</label>
+            </value>
+            <value>
+                <fullName>executive</fullName>
+                <default>false</default>
+                <label>Executive</label>
+            </value>
+            <value>
+                <fullName>vp</fullName>
+                <default>false</default>
+                <label>VP</label>
+            </value>
+            <value>
+                <fullName>directorOrManager</fullName>
+                <default>false</default>
+                <label>Director or Manager</label>
+            </value>
+            <value>
+                <fullName>individualContributor</fullName>
+                <default>false</default>
+                <label>Individual Contributor</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
