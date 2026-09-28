@@ -6,7 +6,7 @@
     <errorConditionFormula>AND(
      RecordType.DeveloperName = "Sales_Prospecting",
     ISCHANGED(Survey_Completed__c),  
-    TEXT(Survey_Completed__c) = "YES",  
+    TEXT(Survey_Completed__c) = "Yes",  
     ISBLANK(Any_Further_Feedback__c)
 )</errorConditionFormula>
     <errorDisplayField>Survey_Completed__c</errorDisplayField>

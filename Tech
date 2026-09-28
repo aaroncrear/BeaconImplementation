@@ -76,9 +76,7 @@ Each permission set gets field access for 90 of the 91 fields:
 9. On a **Customer Call** record, enter 201 in **Number Of Customers On Call** and confirm the error "Select a number between 1 and 200". Enter 10 and confirm it saves.
 10. On a **Sales Prospecting** record, leave **Any Further Feedback** blank and change **Survey Completed** to **Yes**. Confirm the error "Please complete the Any Further Feedback field" appears on Survey Completed. Fill in Any Further Feedback and confirm it saves.
 11. On a **Sales Demo** record, leave **Next Steps Date** blank and change **Survey Completed** to **Yes**. Confirm the error "Please fill in the Next Steps Date field when completing the survey" appears. Fill in Next Steps Date and confirm it saves.
-12. Log in as (or assign the permission sets to) a test user. With **Beacon Consulting - Object, Tab, FLS**, confirm the user can view Beacon Feedback records and fields but has no New or Edit button. With **Beacon Sales - Object, Tab, FLS** or **Beacon Customer Success - Object, Tab, FLS**, confirm the user can create and edit records but not delete them. With **Beacon Salesforce Admin - Object, Tab, FLS**, confirm the user can delete records and see all records.
-13. In each of the nine permission sets, open **Object Settings → Beacon Feedback** and confirm the object and field access match the table in the Release Notes.
-14. In **Object Manager → User → Fields & Relationships**, confirm **ByPassVR** no longer exists. Also check **Deleted Fields** and erase it there if it is listed.
+12. In **Object Manager → User → Fields & Relationships**, confirm **ByPassVR** no longer exists. Also check **Deleted Fields** and erase it there if it is listed.
 
 ## Post Deployment Items
 
