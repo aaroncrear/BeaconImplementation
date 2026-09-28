@@ -2,6 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Monthly_Digest_Content</fullName>
     <active>true</active>
+    <description>Makes sure the Monthly Digest usefulness rating is a number between 1 and 5.</description>
     <errorConditionFormula>OR(
 					How_Useful_Is_Monthly_Digest_Content__c &gt; 5,
 					How_Useful_Is_Monthly_Digest_Content__c &lt; 1

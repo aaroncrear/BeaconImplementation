@@ -2,6 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Usability_Of_Platform</fullName>
     <active>true</active>
+    <description>Makes sure Usability Of Platform is a number between 1 and 5.</description>
     <errorConditionFormula>OR(
 					Usability_Of_Platform__c &gt; 5,
 					Usability_Of_Platform__c &lt; 1

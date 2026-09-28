@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Number_Of_Customers_On_Call__c</fullName>
+    <description>The number of customer attendees on the call. Limited to 1-200 by the Number_Of_Customers_On_Call validation rule. Used on Customer Call and Onboarding Call 1 - Kick Off surveys.</description>
     <externalId>false</externalId>
     <label>Number Of Customers On Call</label>
     <precision>3</precision>

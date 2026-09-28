@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Topic_Area_of_Interest__c</fullName>
+    <description>Free-text field for the client's topic area of interest. Used on Intelligence surveys.</description>
     <label>Topic Area of Interest</label>
     <length>32768</length>
     <trackHistory>false</trackHistory>

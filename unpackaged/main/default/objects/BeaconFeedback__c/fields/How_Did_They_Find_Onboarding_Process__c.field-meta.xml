@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>How_Did_They_Find_Onboarding_Process__c</fullName>
+    <description>The client's overall rating of their Beacon onboarding process, from Very Good to Very Poor. Used on Your Input surveys.</description>
     <inlineHelpText>How Did They Find Their Beacon Onboarding Process Overall?</inlineHelpText>
     <label>How Did They Find Onboarding Process?</label>
     <required>false</required>

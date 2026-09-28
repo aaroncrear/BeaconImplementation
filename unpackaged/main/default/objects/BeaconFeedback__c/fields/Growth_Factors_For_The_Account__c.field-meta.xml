@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Growth_Factors_For_The_Account__c</fullName>
+    <description>The growth factors identified for the account. More than one can be selected. If Other is selected, list it in If Growth Factor Is Other Please List. Used on Sales Demo surveys.</description>
     <inlineHelpText>What Are The Growth Factors For The Account? (Tick More That One If Applicable)</inlineHelpText>
     <label>Growth Factors For The Account?</label>
     <required>false</required>

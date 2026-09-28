@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Any_Other_Projects_That_We_Can_Support__c</fullName>
+    <description>Free-text field for any other client projects the Beacon team could support. Used on Customer Call surveys.</description>
     <label>Any Other Projects That We Can Support</label>
     <length>32768</length>
     <trackHistory>false</trackHistory>

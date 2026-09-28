@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>How_Satisfied_Are_You_With_Support__c</fullName>
+    <description>The client's satisfaction with support from the Beacon Customer Success team, from Very Satisfied to Very Dissatisfied. Used on Your Input surveys.</description>
     <inlineHelpText>How Satisfied Are You With The Support From The Beacon Customer Success Team?</inlineHelpText>
     <label>How Satisfied Are You With Support?</label>
     <required>false</required>

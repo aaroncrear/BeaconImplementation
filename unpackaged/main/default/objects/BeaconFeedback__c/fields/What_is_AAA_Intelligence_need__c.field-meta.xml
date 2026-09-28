@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>What_is_AAA_Intelligence_need__c</fullName>
+    <description>Free-text field describing the client's AAA/Intelligence need. Used on Customer Call surveys.</description>
     <label>What is AAA/Intelligence need?</label>
     <length>32768</length>
     <trackHistory>false</trackHistory>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Primary_Use_Cases_For_The_Account__c</fullName>
+    <description>Free-text field for the account's primary use cases for Beacon. Used on Intelligence surveys.</description>
     <inlineHelpText>What Are The Primary Use Cases For The Account?</inlineHelpText>
     <label>Primary Use Cases For The Account?</label>
     <length>32768</length>

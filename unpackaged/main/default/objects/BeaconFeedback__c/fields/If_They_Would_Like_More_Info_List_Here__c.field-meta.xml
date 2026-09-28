@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>If_They_Would_Like_More_Info_List_Here__c</fullName>
+    <description>Lists the sector information the client would like when Would They Like More Information is Yes.</description>
     <inlineHelpText>If They Would Like More Information On The Sector, List What Here</inlineHelpText>
     <label>If They Would Like More Info, List Here</label>
     <required>false</required>

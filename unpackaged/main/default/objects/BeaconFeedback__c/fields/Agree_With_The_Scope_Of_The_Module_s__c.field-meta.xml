@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Agree_With_The_Scope_Of_The_Module_s__c</fullName>
+    <description>Records whether the client agreed with the scope of the module(s) discussed.</description>
     <inlineHelpText>Did They Agree With The Scope Of The Module(s)?</inlineHelpText>
     <label>Agree With The Scope Of The Module(s)?</label>
     <required>false</required>

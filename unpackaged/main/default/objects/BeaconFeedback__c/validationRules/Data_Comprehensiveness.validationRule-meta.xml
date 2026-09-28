@@ -2,6 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Data_Comprehensiveness</fullName>
     <active>true</active>
+    <description>Makes sure Data Comprehensiveness is a number between 1 and 5.</description>
     <errorConditionFormula>OR(
 					Data_Comprehensiveness__c &gt; 5,
 					Data_Comprehensiveness__c &lt; 1

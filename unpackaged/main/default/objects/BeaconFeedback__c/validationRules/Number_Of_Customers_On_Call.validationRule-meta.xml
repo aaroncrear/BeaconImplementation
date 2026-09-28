@@ -2,6 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Number_Of_Customers_On_Call</fullName>
     <active>true</active>
+    <description>Makes sure Number Of Customers On Call is a number between 1 and 200.</description>
     <errorConditionFormula>OR(
 Number_Of_Customers_On_Call__c &gt; 200,
 Number_Of_Customers_On_Call__c &lt; 1

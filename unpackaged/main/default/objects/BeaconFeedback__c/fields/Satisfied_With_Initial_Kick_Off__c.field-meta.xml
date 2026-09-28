@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Satisfied_With_Initial_Kick_Off__c</fullName>
+    <description>Records whether the client was satisfied with the initial kick-off onboarding session. Used on Onboarding Call 2 - Becoming an Expert surveys.</description>
     <inlineHelpText>Were They Satisfied With The Initial Kick-Off Onboarding Session?</inlineHelpText>
     <label>Satisfied With Initial Kick-Off?</label>
     <required>false</required>

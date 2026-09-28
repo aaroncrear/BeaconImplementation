@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>If_Growth_Factor_Is_Other_Please_List__c</fullName>
+    <description>Lists the growth factor when Other is selected in Growth Factors For The Account.</description>
     <inlineHelpText>If Growth Factor Is Other, Please List Here</inlineHelpText>
     <label>If Growth Factor Is Other Please List</label>
     <required>false</required>

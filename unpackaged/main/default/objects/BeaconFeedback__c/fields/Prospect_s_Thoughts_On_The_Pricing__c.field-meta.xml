@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Prospect_s_Thoughts_On_The_Pricing__c</fullName>
+    <description>The prospect's view of the pricing (Reasonable, Expensive But Within Expectation, Overpriced, Not Explored).</description>
     <inlineHelpText>What Was The Prospect's Thoughts On The Pricing?</inlineHelpText>
     <label>Prospect's Thoughts On The Pricing?</label>
     <required>false</required>

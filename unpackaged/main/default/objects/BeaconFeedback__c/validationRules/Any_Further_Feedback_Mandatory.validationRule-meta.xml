@@ -2,12 +2,12 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Any_Further_Feedback_Mandatory</fullName>
     <active>true</active>
+    <description>On Sales Prospecting surveys, requires Any Further Feedback to be filled in when Survey Completed is changed to Yes.</description>
     <errorConditionFormula>AND(
      RecordType.DeveloperName = "Sales_Prospecting",
     ISCHANGED(Survey_Completed__c),  
     TEXT(Survey_Completed__c) = "YES",  
-    ISBLANK(Any_Further_Feedback__c),  
-    NOT($User.ByPassVR__c)
+    ISBLANK(Any_Further_Feedback__c)
 )</errorConditionFormula>
     <errorDisplayField>Survey_Completed__c</errorDisplayField>
     <errorMessage>Please complete the Any Further Feedback field</errorMessage>

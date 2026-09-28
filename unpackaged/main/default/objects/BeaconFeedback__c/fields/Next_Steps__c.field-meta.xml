@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Next_Steps__c</fullName>
+    <description>Free-text field for the agreed next steps. Used on Sales Demo surveys.</description>
     <label>Next Steps</label>
     <length>32768</length>
     <trackHistory>false</trackHistory>

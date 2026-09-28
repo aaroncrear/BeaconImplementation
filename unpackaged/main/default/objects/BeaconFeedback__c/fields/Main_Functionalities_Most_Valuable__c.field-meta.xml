@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Main_Functionalities_Most_Valuable__c</fullName>
+    <description>Free-text field for the Beacon functionality the client finds most valuable, and why. Used on Onboarding Call 2 - Becoming an Expert surveys.</description>
     <inlineHelpText>What are the main functionalities of Beacon do they find most valuable and why?</inlineHelpText>
     <label>Main Functionalities Most Valuable?</label>
     <length>32768</length>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>If_There_Was_Missing_Data_What_Was__c</fullName>
+    <description>Describes what data was missing when missing data is identified in Was Any Missing Data Identified. Used on Sales Demo and Your Input surveys.</description>
     <inlineHelpText>If There Was Missing Data, What Was Missing</inlineHelpText>
     <label>If There Was Missing Data, What Was</label>
     <required>false</required>

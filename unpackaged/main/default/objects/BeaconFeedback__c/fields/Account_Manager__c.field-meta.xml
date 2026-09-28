@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Account_Manager__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>The Account Manager (User) responsible for the prospect on a Sales Prospecting survey.</description>
     <label>Account Manager</label>
     <lookupFilter>
         <active>true</active>

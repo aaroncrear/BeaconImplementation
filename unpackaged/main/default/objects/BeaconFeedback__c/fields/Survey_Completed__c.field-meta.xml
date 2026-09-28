@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Survey_Completed__c</fullName>
+    <description>Records whether the survey has been completed. Setting it to Yes triggers the Any_Further_Feedback_Mandatory (Sales Prospecting) and Next_Steps_Date_Mandatory (Sales Demo) validation rules.</description>
     <label>Survey Completed</label>
     <required>false</required>
     <trackHistory>false</trackHistory>

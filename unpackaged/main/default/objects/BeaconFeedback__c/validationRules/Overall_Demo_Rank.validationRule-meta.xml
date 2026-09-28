@@ -2,6 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Overall_Demo_Rank</fullName>
     <active>true</active>
+    <description>Makes sure Overall Demo Rank is a number between 1 and 5.</description>
     <errorConditionFormula>OR(
 					Overall_Demo_Rank__c &gt; 5,
 					Overall_Demo_Rank__c &lt; 1

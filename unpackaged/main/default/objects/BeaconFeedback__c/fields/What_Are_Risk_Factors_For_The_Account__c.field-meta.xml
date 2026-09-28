@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>What_Are_Risk_Factors_For_The_Account__c</fullName>
+    <description>The risk factor identified for the account. If Other is selected, list it in If Risk Factor Is Other Please List Here. Used on Sales Demo surveys.</description>
     <inlineHelpText>What Are The Risk Factors For The Account? (Tick More That One If Applicable)</inlineHelpText>
     <label>What Are Risk Factors For The Account?</label>
     <required>false</required>

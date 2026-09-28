@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Drug_Trial_Pages_Easy_To_Navigate__c</fullName>
+    <description>Records whether the client found the drug and trial pages easy to navigate and locate data on. Used on Your Input surveys.</description>
     <inlineHelpText>Did They Find The Drug/Trial Pages Easy To Navigate And Locate Data?</inlineHelpText>
     <label>Drug/Trial Pages Easy To Navigate</label>
     <required>false</required>

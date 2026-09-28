@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Have_Set_Up_Their_Own_Saved_Searches__c</fullName>
+    <description>Records whether the client has set up their own saved searches. Used on Onboarding Call 2 - Becoming an Expert surveys.</description>
     <inlineHelpText>Have They Set Up Their Own Saved Searches?</inlineHelpText>
     <label>Have Set Up Their Own Saved Searches?</label>
     <required>false</required>

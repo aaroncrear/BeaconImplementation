@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Due_Date_Days__c</fullName>
+    <description>The number of days used to work out when the survey is due.</description>
     <externalId>false</externalId>
     <label>Due Date Days</label>
     <precision>3</precision>

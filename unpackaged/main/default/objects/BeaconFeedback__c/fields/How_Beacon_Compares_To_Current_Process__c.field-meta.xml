@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>How_Beacon_Compares_To_Current_Process__c</fullName>
+    <description>Free-text field describing how Beacon compares to the user's current process. Used on Your Input surveys.</description>
     <inlineHelpText>How Does Beacon Compare To The User’s Current Process?</inlineHelpText>
     <label>How Beacon Compares To Current Process?</label>
     <length>32768</length>

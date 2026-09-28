@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Survey_Notification_Date__c</fullName>
+    <description>Formula that sets the notification date to 7 days before the Due Date.</description>
     <formula>Due_Date__c - 7</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Survey Notification Date</label>

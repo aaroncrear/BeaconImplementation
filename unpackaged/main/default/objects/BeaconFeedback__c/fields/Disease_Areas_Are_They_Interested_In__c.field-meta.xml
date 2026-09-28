@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Disease_Areas_Are_They_Interested_In__c</fullName>
+    <description>The disease areas the client is interested in. If Other is selected, list it in If Disease Area Is Other, List Here.</description>
     <inlineHelpText>Which Disease Areas Are They Interested In?</inlineHelpText>
     <label>Disease Areas Are They Interested In?</label>
     <required>false</required>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Overall_Sentiment__c</fullName>
+    <description>Free-text field describing the client's overall sentiment. Used on Customer Call surveys.</description>
     <label>Overall Sentiment</label>
     <length>32768</length>
     <trackHistory>false</trackHistory>

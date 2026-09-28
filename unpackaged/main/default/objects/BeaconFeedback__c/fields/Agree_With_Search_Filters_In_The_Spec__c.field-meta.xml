@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Agree_With_Search_Filters_In_The_Spec__c</fullName>
+    <description>Records how happy the client was with the search filters in the specification.</description>
     <inlineHelpText>Did They Agree With The Search Filters In The Specification?</inlineHelpText>
     <label>Agree With Search Filters In The Spec?</label>
     <required>false</required>

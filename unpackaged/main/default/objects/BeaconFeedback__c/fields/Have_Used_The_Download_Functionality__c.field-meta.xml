@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Have_Used_The_Download_Functionality__c</fullName>
+    <description>Records whether the client has used the download functionality. Used on Onboarding Call 2 - Becoming an Expert surveys.</description>
     <inlineHelpText>Have They Used The Download Functionality?</inlineHelpText>
     <label>Have Used The Download Functionality?</label>
     <required>false</required>

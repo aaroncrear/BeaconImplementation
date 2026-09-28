@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Modules_Interested_In_SDR_Prospecting__c</fullName>
+    <description>The Beacon module the prospect is interested in, as recorded by the SDR. Used on Sales Prospecting and Intelligence surveys.</description>
     <inlineHelpText>Modules Interested In (SDR Prospecting)</inlineHelpText>
     <label>Modules Interested In (SDR Prospecting)</label>
     <required>false</required>

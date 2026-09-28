@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Would_They_Like_More_Information__c</fullName>
+    <description>Records whether the client would like more information on the sector as a whole (company info, location data, trends etc.).</description>
     <inlineHelpText>Would They Like More Information On The Sector As A Whole? (Company Info, Location Data, Trends Etc.)</inlineHelpText>
     <label>Would They Like More Information?</label>
     <required>false</required>

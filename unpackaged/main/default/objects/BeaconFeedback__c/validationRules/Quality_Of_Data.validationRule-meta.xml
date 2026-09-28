@@ -2,6 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Quality_Of_Data</fullName>
     <active>true</active>
+    <description>Makes sure Quality Of Data is a number between 1 and 5.</description>
     <errorConditionFormula>OR(
 					Quality_Of_Data__c &gt; 5,
 					Quality_Of_Data__c &lt; 1

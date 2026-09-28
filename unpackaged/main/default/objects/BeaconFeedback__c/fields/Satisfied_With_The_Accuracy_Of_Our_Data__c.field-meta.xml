@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Satisfied_With_The_Accuracy_Of_Our_Data__c</fullName>
+    <description>Records whether the client was satisfied with the accuracy of Beacon's data.</description>
     <inlineHelpText>Were They Satisfied With The Accuracy Of Our Data?</inlineHelpText>
     <label>Satisfied With The Accuracy Of Our Data?</label>
     <required>false</required>

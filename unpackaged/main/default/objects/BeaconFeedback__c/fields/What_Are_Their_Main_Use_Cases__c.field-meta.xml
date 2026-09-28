@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>What_Are_Their_Main_Use_Cases__c</fullName>
+    <description>Free-text field for the client's main use cases. Used on Intelligence surveys.</description>
     <label>What Are Their Main Use Cases?</label>
     <length>32768</length>
     <trackHistory>false</trackHistory>

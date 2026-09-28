@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Survey_Notification_Today__c</fullName>
+    <description>Formula that is checked when today is the Survey Notification Date.</description>
     <formula>Survey_Notification_Date__c = TODAY()</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Survey Notification Today</label>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Beacon_Feedback_Name__c</fullName>
+    <description>Formula that builds a readable name for the survey from the related Opportunity name and the Survey Type (Opportunity Name - Survey Type).</description>
     <externalId>false</externalId>
     <formula>Opportunity__r.Name &amp; '-' &amp; TEXT(Survey_Type__c)</formula>
     <label>Beacon Feedback Name</label>

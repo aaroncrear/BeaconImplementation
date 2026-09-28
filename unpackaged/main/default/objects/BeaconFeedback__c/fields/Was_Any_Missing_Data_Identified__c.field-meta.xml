@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Was_Any_Missing_Data_Identified__c</fullName>
+    <description>The areas where the client identified missing data (Trial, Data with Trial, Drug, Data within Drug, None). Describe it in If There Was Missing Data, What Was. Used on Sales Demo and Your Input surveys.</description>
     <label>Was Any Missing Data Identified?</label>
     <required>false</required>
     <trackHistory>false</trackHistory>

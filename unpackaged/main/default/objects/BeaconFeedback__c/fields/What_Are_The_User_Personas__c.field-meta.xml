@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>What_Are_The_User_Personas__c</fullName>
+    <description>The client's user persona (e.g. Research Scientist, Clinical, Business Development). Used on Customer Call surveys.</description>
     <label>What Are The User Personas?</label>
     <required>false</required>
     <trackHistory>false</trackHistory>

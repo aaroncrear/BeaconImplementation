@@ -2,6 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>User_Friendly_Beacon</fullName>
     <active>true</active>
+    <description>Makes sure the Beacon user-friendliness rating is a number between 1 and 5.</description>
     <errorConditionFormula>OR(
 					How_User_Friendly_Do_You_Find_Beacon__c &gt; 5,
 					How_User_Friendly_Do_You_Find_Beacon__c &lt; 1

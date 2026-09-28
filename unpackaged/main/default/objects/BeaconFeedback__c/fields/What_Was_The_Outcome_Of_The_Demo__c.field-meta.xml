@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>What_Was_The_Outcome_Of_The_Demo__c</fullName>
+    <description>The outcome of the demo, including interest in a paid subscription or founding partnership. Founding Partner question only. Used on Intelligence surveys.</description>
     <inlineHelpText>Founding Partner question only</inlineHelpText>
     <label>What Was The Outcome Of The Demo?</label>
     <required>false</required>

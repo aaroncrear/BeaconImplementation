@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SDR_Notes__c</fullName>
+    <description>Free-text field for the Sales Development Rep's (SDR) notes. Used on Sales Prospecting surveys.</description>
     <label>SDR Notes</label>
     <length>32768</length>
     <trackHistory>false</trackHistory>

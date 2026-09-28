@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Expressed_Interest_In_Other_Modules__c</fullName>
+    <description>The other Beacon modules the client has expressed interest in. Used on Onboarding Call 2 - Becoming an Expert surveys.</description>
     <inlineHelpText>Have They Expressed Interest In Other Modules?</inlineHelpText>
     <label>Expressed Interest In Other Modules?</label>
     <required>false</required>
