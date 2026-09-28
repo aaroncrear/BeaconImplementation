@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Agree_Curating_Module_Specific_Data__c</fullName>
+    <inlineHelpText>Did They Agree With How We Are Going About Curating Module-Specific Data In The Specification?</inlineHelpText>
+    <label>Agree Curating Module Specific Data?</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>100% Happy</fullName>
+                <default>false</default>
+                <label>100% Happy</label>
+            </value>
+            <value>
+                <fullName>Satisfactory</fullName>
+                <default>false</default>
+                <label>Satisfactory</label>
+            </value>
+            <value>
+                <fullName>Not Happy</fullName>
+                <default>false</default>
+                <label>Not Happy</label>
+            </value>
+            <value>
+                <fullName>Not Explored</fullName>
+                <default>false</default>
+                <label>Not Explored</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

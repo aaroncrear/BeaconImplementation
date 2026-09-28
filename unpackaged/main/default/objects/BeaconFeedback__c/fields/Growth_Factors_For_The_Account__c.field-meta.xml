@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Growth_Factors_For_The_Account__c</fullName>
+    <inlineHelpText>What Are The Growth Factors For The Account? (Tick More That One If Applicable)</inlineHelpText>
+    <label>Growth Factors For The Account?</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Company Growing</fullName>
+                <default>false</default>
+                <label>Company Growing</label>
+            </value>
+            <value>
+                <fullName>Successful Preclinical/Clinical Results</fullName>
+                <default>false</default>
+                <label>Successful Preclinical/Clinical Results</label>
+            </value>
+            <value>
+                <fullName>New Pipeline</fullName>
+                <default>false</default>
+                <label>New Pipeline</label>
+            </value>
+            <value>
+                <fullName>User Promotion</fullName>
+                <default>false</default>
+                <label>User Promotion</label>
+            </value>
+            <value>
+                <fullName>DM Promotion</fullName>
+                <default>false</default>
+                <label>DM Promotion</label>
+            </value>
+            <value>
+                <fullName>New Partnership</fullName>
+                <default>false</default>
+                <label>New Partnership</label>
+            </value>
+            <value>
+                <fullName>Increased Focus</fullName>
+                <default>false</default>
+                <label>Increased Focus</label>
+            </value>
+            <value>
+                <fullName>Positive Beacon Feedback</fullName>
+                <default>false</default>
+                <label>Positive Beacon Feedback</label>
+            </value>
+            <value>
+                <fullName>High Usage</fullName>
+                <default>false</default>
+                <label>High Usage</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

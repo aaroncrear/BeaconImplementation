@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Monthly_Digest_Content</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(
+					How_Useful_Is_Monthly_Digest_Content__c &gt; 5,
+					How_Useful_Is_Monthly_Digest_Content__c &lt; 1
+	)</errorConditionFormula>
+    <errorDisplayField>How_Useful_Is_Monthly_Digest_Content__c</errorDisplayField>
+    <errorMessage>Select a number between 1 and 5</errorMessage>
+</ValidationRule>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Agree_With_The_Scope_Of_The_Module_s__c</fullName>
+    <inlineHelpText>Did They Agree With The Scope Of The Module(s)?</inlineHelpText>
+    <label>Agree With The Scope Of The Module(s)?</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Yes</fullName>
+                <default>false</default>
+                <label>Yes</label>
+            </value>
+            <value>
+                <fullName>No</fullName>
+                <default>false</default>
+                <label>No</label>
+            </value>
+            <value>
+                <fullName>Wasn't Mentioned</fullName>
+                <default>false</default>
+                <label>Wasn't Mentioned</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Disease_Areas_Are_They_Interested_In__c</fullName>
+    <inlineHelpText>Which Disease Areas Are They Interested In?</inlineHelpText>
+    <label>Disease Areas Are They Interested In?</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Brain Cancer</fullName>
+                <default>false</default>
+                <label>Brain Cancer</label>
+            </value>
+            <value>
+                <fullName>Breast Cancer</fullName>
+                <default>false</default>
+                <label>Breast Cancer</label>
+            </value>
+            <value>
+                <fullName>Colorectal Cancer</fullName>
+                <default>false</default>
+                <label>Colorectal Cancer</label>
+            </value>
+            <value>
+                <fullName>Endocrine Tumors</fullName>
+                <default>false</default>
+                <label>Endocrine Tumors</label>
+            </value>
+            <value>
+                <fullName>Head and Neck Cancer</fullName>
+                <default>false</default>
+                <label>Head and Neck Cancer</label>
+            </value>
+            <value>
+                <fullName>Leukemia</fullName>
+                <default>false</default>
+                <label>Leukemia</label>
+            </value>
+            <value>
+                <fullName>Lung Cancer</fullName>
+                <default>false</default>
+                <label>Lung Cancer</label>
+            </value>
+            <value>
+                <fullName>Lymphoma</fullName>
+                <default>false</default>
+                <label>Lymphoma</label>
+            </value>
+            <value>
+                <fullName>Myeloma</fullName>
+                <default>false</default>
+                <label>Myeloma</label>
+            </value>
+            <value>
+                <fullName>Multiple Myeloma</fullName>
+                <default>false</default>
+                <label>Multiple Myeloma</label>
+            </value>
+            <value>
+                <fullName>Pancreatic Cancer</fullName>
+                <default>false</default>
+                <label>Pancreatic Cancer</label>
+            </value>
+            <value>
+                <fullName>Prostate Cancer</fullName>
+                <default>false</default>
+                <label>Prostate Cancer</label>
+            </value>
+            <value>
+                <fullName>Skin Cancer</fullName>
+                <default>false</default>
+                <label>Skin Cancer</label>
+            </value>
+            <value>
+                <fullName>Urothelial Cancer</fullName>
+                <default>false</default>
+                <label>Urothelial Cancer</label>
+            </value>
+            <value>
+                <fullName>None</fullName>
+                <default>false</default>
+                <label>None</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

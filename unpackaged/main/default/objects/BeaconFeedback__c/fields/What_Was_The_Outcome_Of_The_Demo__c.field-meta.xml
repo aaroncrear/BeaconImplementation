@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>What_Was_The_Outcome_Of_The_Demo__c</fullName>
+    <inlineHelpText>Founding Partner question only</inlineHelpText>
+    <label>What Was The Outcome Of The Demo?</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Strong interest in paid subscription (regardless of FP trial)</fullName>
+                <default>false</default>
+                <label>Strong interest in paid subscription (regardless of FP trial)</label>
+            </value>
+            <value>
+                <fullName>Strong interest in founding partnership (trial dependent)</fullName>
+                <default>false</default>
+                <label>Strong interest in founding partnership (trial dependent)</label>
+            </value>
+            <value>
+                <fullName>Interest in founding partnership (dependent on internal conversations)</fullName>
+                <default>false</default>
+                <label>Interest in founding partnership (dependent on internal conversations)</label>
+            </value>
+            <value>
+                <fullName>Not interested in access now (timing/budget etc.)</fullName>
+                <default>false</default>
+                <label>Not interested in access now (timing/budget etc.)</label>
+            </value>
+            <value>
+                <fullName>Not interested</fullName>
+                <default>false</default>
+                <label>Not interested</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

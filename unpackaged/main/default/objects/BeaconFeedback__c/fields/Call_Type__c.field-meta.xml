@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Call_Type__c</fullName>
+    <label>Call Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>121 Training</fullName>
+                <default>false</default>
+                <label>121 Training</label>
+            </value>
+            <value>
+                <fullName>Webinar</fullName>
+                <default>false</default>
+                <label>Webinar</label>
+            </value>
+            <value>
+                <fullName>AAA Calls</fullName>
+                <default>false</default>
+                <label>AAA Calls</label>
+            </value>
+            <value>
+                <fullName>Intelligence Calls</fullName>
+                <default>false</default>
+                <label>Intelligence Calls</label>
+            </value>
+            <value>
+                <fullName>Catch up – Touchpoint</fullName>
+                <default>false</default>
+                <label>Catch up – Touchpoint</label>
+            </value>
+            <value>
+                <fullName>Introduction Call</fullName>
+                <default>false</default>
+                <label>Introduction Call</label>
+            </value>
+            <value>
+                <fullName>QBR</fullName>
+                <default>false</default>
+                <label>QBR</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Number_Of_Customers_On_Call</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(
+Number_Of_Customers_On_Call__c &gt; 200,
+Number_Of_Customers_On_Call__c &lt; 1
+)</errorConditionFormula>
+    <errorDisplayField>Number_Of_Customers_On_Call__c</errorDisplayField>
+    <errorMessage>Select a number between 1 and 200</errorMessage>
+</ValidationRule>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Has_Completed_The_Onboarding_Checklist__c</fullName>
+    <label>Has Completed The Onboarding Checklist?</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Logged in their account</fullName>
+                <default>false</default>
+                <label>Logged in their account</label>
+            </value>
+            <value>
+                <fullName>Conducted a search</fullName>
+                <default>false</default>
+                <label>Conducted a search</label>
+            </value>
+            <value>
+                <fullName>Saved Search</fullName>
+                <default>false</default>
+                <label>Saved Search</label>
+            </value>
+            <value>
+                <fullName>Detailed view of a drug page</fullName>
+                <default>false</default>
+                <label>Detailed view of a drug page</label>
+            </value>
+            <value>
+                <fullName>Detailed view of a trial page</fullName>
+                <default>false</default>
+                <label>Detailed view of a trial page</label>
+            </value>
+            <value>
+                <fullName>Deals search</fullName>
+                <default>false</default>
+                <label>Deals search</label>
+            </value>
+            <value>
+                <fullName>Company search</fullName>
+                <default>false</default>
+                <label>Company search</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

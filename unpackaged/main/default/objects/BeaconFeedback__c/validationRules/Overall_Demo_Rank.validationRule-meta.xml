@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Overall_Demo_Rank</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(
+					Overall_Demo_Rank__c &gt; 5,
+					Overall_Demo_Rank__c &lt; 1
+	)</errorConditionFormula>
+    <errorDisplayField>Overall_Demo_Rank__c</errorDisplayField>
+    <errorMessage>Select a number between 1 and 5</errorMessage>
+</ValidationRule>

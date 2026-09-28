@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>How_Useful_Is_Monthly_Digest_Content__c</fullName>
+    <externalId>false</externalId>
+    <inlineHelpText>On A Scale Of 1-5 How Useful Did They Find The Monthly Digest Content? 5 Being Extremely Useful And 1 Not Useful.</inlineHelpText>
+    <label>Rate Monthly Digest’s Usefulness (1-5)</label>
+    <precision>1</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>What_Are_The_User_Personas__c</fullName>
+    <label>What Are The User Personas?</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Research Scientist</fullName>
+                <default>false</default>
+                <label>Research Scientist</label>
+            </value>
+            <value>
+                <fullName>Translational</fullName>
+                <default>false</default>
+                <label>Translational</label>
+            </value>
+            <value>
+                <fullName>Clinical</fullName>
+                <default>false</default>
+                <label>Clinical</label>
+            </value>
+            <value>
+                <fullName>Competitive Intelligence (CI)</fullName>
+                <default>false</default>
+                <label>Competitive Intelligence (CI)</label>
+            </value>
+            <value>
+                <fullName>Business Development (BD)</fullName>
+                <default>false</default>
+                <label>Business Development (BD)</label>
+            </value>
+            <value>
+                <fullName>Scientific Strategy Leader</fullName>
+                <default>false</default>
+                <label>Scientific Strategy Leader</label>
+            </value>
+            <value>
+                <fullName>Senior Leadership</fullName>
+                <default>false</default>
+                <label>Senior Leadership</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

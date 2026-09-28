@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Speed_Of_Platform</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(
+					Speed_Of_Platform__c &gt; 5,
+					Speed_Of_Platform__c &lt; 1
+	)</errorConditionFormula>
+    <errorDisplayField>Speed_Of_Platform__c</errorDisplayField>
+    <errorMessage>Select a number between 1 and 5</errorMessage>
+</ValidationRule>

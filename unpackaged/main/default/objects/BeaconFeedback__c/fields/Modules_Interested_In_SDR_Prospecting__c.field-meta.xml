@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Modules_Interested_In_SDR_Prospecting__c</fullName>
+    <inlineHelpText>Modules Interested In (SDR Prospecting)</inlineHelpText>
+    <label>Modules Interested In (SDR Prospecting)</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>ADC</fullName>
+                <default>false</default>
+                <label>ADC</label>
+            </value>
+            <value>
+                <fullName>Bispecific</fullName>
+                <default>false</default>
+                <label>Bispecific</label>
+            </value>
+            <value>
+                <fullName>Cancer Vaccines</fullName>
+                <default>false</default>
+                <label>Cancer Vaccines</label>
+            </value>
+            <value>
+                <fullName>Cell Therapy</fullName>
+                <default>false</default>
+                <label>Cell Therapy</label>
+            </value>
+            <value>
+                <fullName>Checkpoint</fullName>
+                <default>false</default>
+                <label>Checkpoint</label>
+            </value>
+            <value>
+                <fullName>Cytokine</fullName>
+                <default>false</default>
+                <label>Cytokine</label>
+            </value>
+            <value>
+                <fullName>DDR</fullName>
+                <default>false</default>
+                <label>DDR</label>
+            </value>
+            <value>
+                <fullName>Gene Therapy</fullName>
+                <default>false</default>
+                <label>Gene Therapy</label>
+            </value>
+            <value>
+                <fullName>Immune Tolerance</fullName>
+                <default>false</default>
+                <label>Immune Tolerance</label>
+            </value>
+            <value>
+                <fullName>Microbiome</fullName>
+                <default>false</default>
+                <label>Microbiome</label>
+            </value>
+            <value>
+                <fullName>Neuroscience</fullName>
+                <default>false</default>
+                <label>Neuroscience</label>
+            </value>
+            <value>
+                <fullName>Oncology</fullName>
+                <default>false</default>
+                <label>Oncology</label>
+            </value>
+            <value>
+                <fullName>Oncolyic viruses</fullName>
+                <default>false</default>
+                <label>Oncolyic viruses</label>
+            </value>
+            <value>
+                <fullName>RNA</fullName>
+                <default>false</default>
+                <label>RNA</label>
+            </value>
+            <value>
+                <fullName>TPD</fullName>
+                <default>false</default>
+                <label>TPD</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

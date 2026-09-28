@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Satisfied_With_The_Accuracy_Of_Our_Data__c</fullName>
+    <inlineHelpText>Were They Satisfied With The Accuracy Of Our Data?</inlineHelpText>
+    <label>Satisfied With The Accuracy Of Our Data?</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Yes</fullName>
+                <default>false</default>
+                <label>Yes</label>
+            </value>
+            <value>
+                <fullName>No</fullName>
+                <default>false</default>
+                <label>No</label>
+            </value>
+            <value>
+                <fullName>Wasn't Mentioned</fullName>
+                <default>false</default>
+                <label>Wasn't Mentioned</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

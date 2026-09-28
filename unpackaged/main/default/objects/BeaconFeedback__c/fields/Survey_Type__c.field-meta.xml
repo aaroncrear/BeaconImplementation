@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Survey_Type__c</fullName>
+    <defaultValue>$RecordType.Name</defaultValue>
+    <label>Survey Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Intelligence</fullName>
+                <default>false</default>
+                <label>Intelligence</label>
+            </value>
+            <value>
+                <fullName>Onboarding Call 1 - Kick Off</fullName>
+                <default>false</default>
+                <label>Onboarding Call 1 - Kick Off</label>
+            </value>
+            <value>
+                <fullName>Onboarding Call 2 - Becoming an Expert</fullName>
+                <default>false</default>
+                <label>Onboarding Call 2 - Becoming an Expert</label>
+            </value>
+            <value>
+                <fullName>Sales Demo</fullName>
+                <default>false</default>
+                <label>Sales Demo</label>
+            </value>
+            <value>
+                <fullName>Sales Prospecting</fullName>
+                <default>false</default>
+                <label>Sales Prospecting</label>
+            </value>
+            <value>
+                <fullName>Your Input</fullName>
+                <default>false</default>
+                <label>Your Input</label>
+            </value>
+            <value>
+                <fullName>Customer Call</fullName>
+                <default>false</default>
+                <label>Customer Call</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

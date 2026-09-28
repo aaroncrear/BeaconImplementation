@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Any_Further_Feedback_Posted_To_Teams__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Used as a flag to check when the 'Any Further Feedback' field is filled in and the survey gets completed if the value has been sent to the MS Teams Channel.</description>
+    <label>Any Further Feedback Posted To Teams</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

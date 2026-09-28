@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Functionality_They_Least_Interested_In__c</fullName>
+    <label>Functionality They Least Interested In?</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Drugs</fullName>
+                <default>false</default>
+                <label>Drugs</label>
+            </value>
+            <value>
+                <fullName>Trials</fullName>
+                <default>false</default>
+                <label>Trials</label>
+            </value>
+            <value>
+                <fullName>Analysis Tab</fullName>
+                <default>false</default>
+                <label>Analysis Tab</label>
+            </value>
+            <value>
+                <fullName>Deals</fullName>
+                <default>false</default>
+                <label>Deals</label>
+            </value>
+            <value>
+                <fullName>Companies</fullName>
+                <default>false</default>
+                <label>Companies</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
