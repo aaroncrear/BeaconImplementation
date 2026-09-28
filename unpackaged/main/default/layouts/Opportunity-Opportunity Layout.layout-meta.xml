@@ -379,6 +379,14 @@
         <relatedList>RelatedContactRoleList</relatedList>
     </relatedLists>
     <relatedLists>
+        <fields>NAME</fields>
+        <fields>Beacon_Feedback_Name__c</fields>
+        <fields>RECORDTYPE</fields>
+        <fields>Survey_Completed__c</fields>
+        <fields>Due_Date__c</fields>
+        <relatedList>Beacon_Feedback__c.Opportunity__c</relatedList>
+    </relatedLists>
+    <relatedLists>
         <fields>Product2</fields>
         <fields>Quantity</fields>
         <fields>UnitPrice</fields>

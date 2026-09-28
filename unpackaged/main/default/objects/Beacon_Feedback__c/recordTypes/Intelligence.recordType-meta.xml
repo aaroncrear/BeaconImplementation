@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Your_Input</fullName>
-    <active>true</active>
-    <label>Your Input</label>
+    <fullName>Intelligence</fullName>
+    <active>false</active>
+    <description>Market research opportunities feedback</description>
+    <label>Intelligence</label>
     <picklistValues>
         <picklist>Agree_Curating_Module_Specific_Data__c</picklist>
         <values>
@@ -842,6 +843,10 @@
         <picklist>Survey_Type__c</picklist>
         <values>
             <fullName>Customer Call</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Intelligence</fullName>
             <default>false</default>
         </values>
         <values>
