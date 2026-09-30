@@ -9,10 +9,10 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignmentItems>
-            <assignToReference>$Record.Primary_Module__c</assignToReference>
+            <assignToReference>$Record.Beacon_Primary_Module__c</assignToReference>
             <operator>Assign</operator>
             <value>
-                <elementReference>Get_Parent_Campaign.Primary_Module__c</elementReference>
+                <elementReference>Get_Parent_Campaign.Beacon_Primary_Module__c</elementReference>
             </value>
         </assignmentItems>
     </assignments>

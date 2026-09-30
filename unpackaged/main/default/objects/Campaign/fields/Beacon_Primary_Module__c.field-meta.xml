@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Beacon_Primary_Module__c</fullName>
+    <description>Primary Beacon module for the campaign. Uses the Primary Module global value set so values stay in sync with Opportunity.Primary_Module__c and Campaign.Related_Modules__c. Replaces the local-value-set Campaign.Primary_Module__c.</description>
+    <label>Primary Module</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>Primary_Module</valueSetName>
+    </valueSet>
+</CustomField>
