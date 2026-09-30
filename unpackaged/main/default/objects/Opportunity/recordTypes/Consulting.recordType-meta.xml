@@ -300,6 +300,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>AI</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Allogeneic</fullName>
             <default>false</default>
         </values>

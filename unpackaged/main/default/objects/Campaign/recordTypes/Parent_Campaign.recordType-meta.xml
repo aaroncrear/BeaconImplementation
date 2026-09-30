@@ -259,6 +259,109 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>AI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Allogeneic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bispecific</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CVRM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cancer Vaccines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cell Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Checkpoint</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cytokine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DDR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gene Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>General</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Immune Tolerance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lung Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbiome</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuro-Degenerative</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neurology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuroscience</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncolytic Viruses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Psychiatric</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RNA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TPD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Targeted Radiopharmaceuticals</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Primary_Module_Legacy__c</picklist>
+        <values>
+            <fullName>ADC</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Bispecific</fullName>
             <default>false</default>
         </values>
@@ -351,6 +454,10 @@
         <picklist>Related_Modules__c</picklist>
         <values>
             <fullName>ADC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI</fullName>
             <default>false</default>
         </values>
         <values>
