@@ -142,10 +142,10 @@
             <fieldInstance>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
-                    <value>required</value>
+                    <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Type</fieldItem>
-                <identifier>RecordTypeField</identifier>
+                <fieldItem>Record.Line_of_Business__c</fieldItem>
+                <identifier>RecordLine_of_Business__cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -266,16 +266,6 @@
                 <identifier>RecordHierarchyNumberOfResponsesField</identifier>
             </fieldInstance>
         </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>readonly</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.HierarchyBudgetedCost</fieldItem>
-                <identifier>RecordHierarchyBudgetedCostField</identifier>
-            </fieldInstance>
-        </itemInstances>
         <name>Facet-9279069f-ca6a-407d-939a-e4d547997440</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -328,16 +318,6 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.HierarchyExpectedRevenue</fieldItem>
                 <identifier>RecordHierarchyExpectedRevenueField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>readonly</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.HierarchyActualCost</fieldItem>
-                <identifier>RecordHierarchyActualCostField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-c9fb6a0e-34c6-44e3-abac-09d2e0b79045</name>
@@ -616,6 +596,16 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
+                <fieldItem>Record.AM_Split_APAC__c</fieldItem>
+                <identifier>RecordAM_Split_APAC__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
                 <fieldItem>Record.SDR_Split_1__c</fieldItem>
                 <identifier>RecordSDR_Split_1_cField</identifier>
             </fieldInstance>
@@ -656,18 +646,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.SDR_Split_5__c</fieldItem>
-                <identifier>RecordSDR_Split_5_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.SDR_Split_6__c</fieldItem>
-                <identifier>RecordSDR_Split_6_cField</identifier>
+                <fieldItem>Record.SDR_Split_APAC__c</fieldItem>
+                <identifier>RecordSDR_Split_APAC__cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-1a310e25-2240-4f87-806b-0b10544a3f21</name>

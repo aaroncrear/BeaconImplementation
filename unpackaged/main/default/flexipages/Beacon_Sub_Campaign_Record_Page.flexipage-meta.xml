@@ -266,6 +266,33 @@
                 <identifier>RecordEndDateField</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Website__c</fieldItem>
+                <identifier>RecordWebsite_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Event_City__c</fieldItem>
+                <identifier>RecordEvent_City__cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.Type}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Event</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-8e156db4-c75c-4d87-9622-878817a326c6</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -286,8 +313,42 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Website__c</fieldItem>
-                <identifier>RecordWebsite_cField</identifier>
+                <fieldItem>Record.Attendance_Format__c</fieldItem>
+                <identifier>RecordAttendance_Format_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Event_Country__c</fieldItem>
+                <identifier>RecordEvent_Country__cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.Type}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Event</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Event_Region__c</fieldItem>
+                <identifier>RecordEvent_Region__cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.Type}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Event</rightValue>
+                    </criteria>
+                </visibilityRule>
             </fieldInstance>
         </itemInstances>
         <name>Facet-82c397fe-5587-4467-9a25-2fc9a0d46999</name>
@@ -378,16 +439,6 @@
                 <identifier>RecordAmountWonOpportunitiesField</identifier>
             </fieldInstance>
         </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.ActualCost</fieldItem>
-                <identifier>RecordActualCostField</identifier>
-            </fieldInstance>
-        </itemInstances>
         <name>Facet-37bb44c8-ea43-417d-b097-30017a26f846</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -448,16 +499,6 @@
                 <identifier>flexipage_blankSpace</identifier>
             </componentInstance>
         </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.BudgetedCost</fieldItem>
-                <identifier>RecordBudgetedCostField</identifier>
-            </fieldInstance>
-        </itemInstances>
         <name>Facet-uq2y16sn5c</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -483,6 +524,88 @@
             </componentInstance>
         </itemInstances>
         <name>Facet-655fcdfe-a6ae-4f5f-97ac-85fed5c4c73e</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.ActualCost</fieldItem>
+                <identifier>RecordActualCostField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Cost_for_travel__c</fieldItem>
+                <identifier>RecordCost_for_travel__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Registration__c</fieldItem>
+                <identifier>RecordRegistration__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-60ea4e12-4685-46be-861f-909636e26b7d</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.BudgetedCost</fieldItem>
+                <identifier>RecordBudgetedCostField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Hotel__c</fieldItem>
+                <identifier>RecordHotel__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-a4d3df46-8f84-437c-b100-67ab18a1245f</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-60ea4e12-4685-46be-861f-909636e26b7d</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>flexipage_column5</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-a4d3df46-8f84-437c-b100-67ab18a1245f</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>flexipage_column6</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-a78700c1-3a90-4141-92f1-53cbe24f1dcb</name>
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
@@ -603,6 +726,31 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection5</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>columns</name>
+                    <value>Facet-a78700c1-3a90-4141-92f1-53cbe24f1dcb</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>horizontalAlignment</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Campaign Costs</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:fieldSection</componentName>
+                <identifier>flexipage_fieldSection2</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.Type}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Event</rightValue>
+                    </criteria>
+                </visibilityRule>
             </componentInstance>
         </itemInstances>
         <itemInstances>

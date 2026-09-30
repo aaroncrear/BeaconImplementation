@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Auto_Renew__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Denotes that the Contract and Products (those renewable) are auto-renewed</description>
+    <inlineHelpText>Denotes that the Contract and Products (those renewable) are auto-renewed</inlineHelpText>
+    <label>Auto-Renew</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

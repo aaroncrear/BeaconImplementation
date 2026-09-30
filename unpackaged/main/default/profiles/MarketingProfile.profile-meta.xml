@@ -4548,7 +4548,7 @@
         <layout>Milestone1_Time__c-Time Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
-        <layout>Opportunity-Opportunity Layout</layout>
+        <layout>Opportunity-Beacon Consulting Opportunity Layout</layout>
         <recordType>Opportunity.Consulting</recordType>
     </layoutAssignments>
     <layoutAssignments>
@@ -4556,7 +4556,7 @@
         <recordType>Opportunity.Subscription_New</recordType>
     </layoutAssignments>
     <layoutAssignments>
-        <layout>Opportunity-Opportunity Layout</layout>
+        <layout>Opportunity-Beacon Subscription Renewal Opportunity Layout</layout>
         <recordType>Opportunity.Subscription_Renewal</recordType>
     </layoutAssignments>
     <layoutAssignments>
