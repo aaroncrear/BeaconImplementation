@@ -291,6 +291,16 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Campaign.AM_Split_APAC__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Campaign.Attendance_Format__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Campaign.Beacon_Module_Family__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -311,7 +321,37 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Campaign.Cost_for_travel__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Campaign.Event_City__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Campaign.Event_Country__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Campaign.Event_Region__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Campaign.Host__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Campaign.Hotel__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Campaign.Line_of_Business__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -337,6 +377,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Campaign.Product_Secondary__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Campaign.Registration__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -412,6 +457,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Campaign.SDR_Split_6__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Campaign.SDR_Split_APAC__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -576,6 +626,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Opportunity.Auto_Renew__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Opportunity.Beacon_Demo_on__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -707,6 +762,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.Rep_Notes__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.Sales_Cycle_Dyration_Days__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

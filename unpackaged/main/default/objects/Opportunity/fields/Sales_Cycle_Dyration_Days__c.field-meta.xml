@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Sales_Cycle_Dyration_Days__c</fullName>
+    <description>Number of days from Created Date to Close Date for closed Opps, Created Date to Today for open Opps</description>
+    <externalId>false</externalId>
+    <formula>IF(
+  IsClosed,
+  CloseDate - DATEVALUE(CreatedDate),
+  TODAY() - DATEVALUE(CreatedDate)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Number of days from Created Date to Close Date for closed Opps, Created Date to Today for open Opps</inlineHelpText>
+    <label>Sales Cycle Duration (Days)</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>
