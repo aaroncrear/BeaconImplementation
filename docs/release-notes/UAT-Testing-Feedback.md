@@ -211,8 +211,10 @@ Deployment Items).
 **Beacon Sub Campaign Record Page.**
 
 - **Event Details** section (still shown only when Type is Event or Webinar) now holds Start
-  Date, End Date, Attendance Format, and Website on the left, and Host, Event City, Event
-  Country, and Event Region on the right.
+  Date, End Date, Website, and Event City on the left, and Host, Attendance Format, Event
+  Country, and Event Region on the right. **Event City**, **Event Country**, and **Event
+  Region** have their own field-level visibility rules and appear only when Type is **Event**,
+  so a Webinar shows the section without the location fields.
 - A new **Campaign Costs** section was added, shown only when Type is **Event**. It holds
   Actual Cost, Cost for travel, and Registration on the left, and Budgeted Cost and Hotel on the
   right. Actual Cost and Budgeted Cost were moved here from **Campaign Statistics**, so all
@@ -346,12 +348,13 @@ sets:
     Module** global value set. Confirm its values match Opportunity > Primary Module, and that
     existing Campaigns still show their Primary Module value.
 24. Open a Sub Campaign with Type = **Event**. Confirm **Event Details** shows Start Date, End
-    Date, Attendance Format, and Website on the left, and Host, Event City, Event Country, and
+    Date, Website, and Event City on the left, and Host, Attendance Format, Event Country, and
     Event Region on the right. Confirm a **Campaign Costs** section shows Actual Cost, Cost for
     travel, and Registration on the left and Budgeted Cost and Hotel on the right. Confirm
     **Campaign Statistics** no longer shows Actual Cost or Budgeted Cost.
-25. Change that Sub Campaign's Type to **Webinar** and confirm Event Details still shows but
-    Campaign Costs is hidden. Change Type to any other value and confirm both sections are
+25. Change that Sub Campaign's Type to **Webinar** and confirm Event Details still shows Start
+    Date, End Date, Website, Host, and Attendance Format, but Event City, Event Country, and
+    Event Region are hidden, and Campaign Costs is hidden. Change Type to any other value and confirm both sections are
     hidden.
 26. Open a Parent Campaign. Confirm **Line of Business** appears in Campaign Overview where
     Type used to be, and that the record saves with it blank. Confirm Hierarchy Statistics no
@@ -444,7 +447,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/UAT-Testi
 | 41 | CustomField | Opportunity | Sales_Cycle_Dyration_Days__c | Sales Cycle Duration (Days) | Created | Number formula: Close Date minus Created Date when closed, otherwise Today minus Created Date. |
 | 42 | Layout | Opportunity | Opportunity-Beacon Consulting Opportunity Layout | Beacon Consulting Opportunity Layout | Created | Consulting record type layout; drops subscription-only fields and the CPQ section. |
 | 43 | Layout | Opportunity | Opportunity-Beacon Subscription Renewal Opportunity Layout | Beacon Subscription Renewal Opportunity Layout | Created | Subscription Renewal record type layout; drops Renewal Date and adds Auto-Renew and Sales Cycle Duration. |
-| 44 | FlexiPage | Campaign | Beacon_Sub_Campaign_Record_Page | Beacon Sub Campaign Record Page | Updated | Added event fields to Event Details; added a Campaign Costs section (Type = Event) and moved Actual/Budgeted Cost into it. |
+| 44 | FlexiPage | Campaign | Beacon_Sub_Campaign_Record_Page | Beacon Sub Campaign Record Page | Updated | Added event fields to Event Details (Event City, Event Country, and Event Region visible only when Type = Event); added a Campaign Costs section (Type = Event) and moved Actual/Budgeted Cost into it. |
 | 45 | Profile | N/A | Admin | System Administrator | Updated | Assigned the Consulting and Subscription Renewal Opportunity record types to their new Beacon layouts. |
 | 46 | Profile | N/A | Analytics Cloud Integration User | Analytics Cloud Integration User | Updated | Assigned the Consulting and Subscription Renewal Opportunity record types to their new Beacon layouts. |
 | 47 | Profile | N/A | Analytics Cloud Security User | Analytics Cloud Security User | Updated | Assigned the Consulting and Subscription Renewal Opportunity record types to their new Beacon layouts. |
