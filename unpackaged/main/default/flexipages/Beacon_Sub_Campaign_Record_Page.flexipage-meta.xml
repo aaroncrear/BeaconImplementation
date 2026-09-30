@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
     <flexiPageRegions>
         <itemInstances>
@@ -272,8 +272,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Attendance_Format__c</fieldItem>
-                <identifier>RecordAttendance_Format_cField</identifier>
+                <fieldItem>Record.Website__c</fieldItem>
+                <identifier>RecordWebsite_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -282,8 +282,15 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Website__c</fieldItem>
-                <identifier>RecordWebsite_cField</identifier>
+                <fieldItem>Record.Event_City__c</fieldItem>
+                <identifier>RecordEvent_City__cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.Type}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Event</rightValue>
+                    </criteria>
+                </visibilityRule>
             </fieldInstance>
         </itemInstances>
         <name>Facet-8e156db4-c75c-4d87-9622-878817a326c6</name>
@@ -306,8 +313,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Event_City__c</fieldItem>
-                <identifier>RecordEvent_City__cField</identifier>
+                <fieldItem>Record.Attendance_Format__c</fieldItem>
+                <identifier>RecordAttendance_Format_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -318,6 +325,13 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.Event_Country__c</fieldItem>
                 <identifier>RecordEvent_Country__cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.Type}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Event</rightValue>
+                    </criteria>
+                </visibilityRule>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -328,6 +342,13 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.Event_Region__c</fieldItem>
                 <identifier>RecordEvent_Region__cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.Type}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Event</rightValue>
+                    </criteria>
+                </visibilityRule>
             </fieldInstance>
         </itemInstances>
         <name>Facet-82c397fe-5587-4467-9a25-2fc9a0d46999</name>
