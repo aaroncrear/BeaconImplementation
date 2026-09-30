@@ -296,11 +296,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Campaign.Beacon_Primary_Module__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Campaign.Channels__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -332,6 +327,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Campaign.Module__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Campaign.Primary_Module__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

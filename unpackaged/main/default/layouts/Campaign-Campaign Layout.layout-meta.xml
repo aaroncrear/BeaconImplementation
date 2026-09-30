@@ -26,7 +26,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>Beacon_Primary_Module__c</field>
+                <field>Primary_Module__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>

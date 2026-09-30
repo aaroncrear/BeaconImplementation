@@ -100,8 +100,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Beacon_Primary_Module__c</fieldItem>
-                <identifier>RecordBeacon_Primary_Module_cField</identifier>
+                <fieldItem>Record.Primary_Module__c</fieldItem>
+                <identifier>RecordPrimary_Module_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
