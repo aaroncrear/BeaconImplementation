@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Project_Type__c</fullName>
+    <description>Type of project delivered. When Other is selected, Project Type - Other must be filled in.</description>
+    <inlineHelpText>Select Other and complete Project Type - Other if no value fits.</inlineHelpText>
+    <label>Project Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Bespoke data analysis</fullName>
+                <default>false</default>
+                <label>Bespoke data analysis</label>
+            </value>
+            <value>
+                <fullName>Competitor intelligence</fullName>
+                <default>false</default>
+                <label>Competitor intelligence</label>
+            </value>
+            <value>
+                <fullName>Landscape Report</fullName>
+                <default>false</default>
+                <label>Landscape Report</label>
+            </value>
+            <value>
+                <fullName>Launch Readiness / Go to market strategy</fullName>
+                <default>false</default>
+                <label>Launch Readiness / Go to market strategy</label>
+            </value>
+            <value>
+                <fullName>Market Sizing / Opportunity Sizing</fullName>
+                <default>false</default>
+                <label>Market Sizing / Opportunity Sizing</label>
+            </value>
+            <value>
+                <fullName>Market understanding</fullName>
+                <default>false</default>
+                <label>Market understanding</label>
+            </value>
+            <value>
+                <fullName>Message testing</fullName>
+                <default>false</default>
+                <label>Message testing</label>
+            </value>
+            <value>
+                <fullName>Positioning research</fullName>
+                <default>false</default>
+                <label>Positioning research</label>
+            </value>
+            <value>
+                <fullName>Product testing [TPP / MVP]</fullName>
+                <default>false</default>
+                <label>Product testing [TPP / MVP]</label>
+            </value>
+            <value>
+                <fullName>Sales materials testing (sales aid, adverts)</fullName>
+                <default>false</default>
+                <label>Sales materials testing (sales aid, adverts)</label>
+            </value>
+            <value>
+                <fullName>Scanner - Asset</fullName>
+                <default>false</default>
+                <label>Scanner - Asset</label>
+            </value>
+            <value>
+                <fullName>Scanner - Company</fullName>
+                <default>false</default>
+                <label>Scanner - Company</label>
+            </value>
+            <value>
+                <fullName>Scanner - Technology</fullName>
+                <default>false</default>
+                <label>Scanner - Technology</label>
+            </value>
+            <value>
+                <fullName>Thought leadership – Webinar</fullName>
+                <default>false</default>
+                <label>Thought leadership – Webinar</label>
+            </value>
+            <value>
+                <fullName>Thought leadership – White Paper</fullName>
+                <default>false</default>
+                <label>Thought leadership – White Paper</label>
+            </value>
+            <value>
+                <fullName>Value proposition testing</fullName>
+                <default>false</default>
+                <label>Value proposition testing</label>
+            </value>
+            <value>
+                <fullName>Workshops</fullName>
+                <default>false</default>
+                <label>Workshops</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

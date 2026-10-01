@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Project_Methodology__c</fullName>
+    <description>Research methodology used to deliver the project.</description>
+    <label>Project Methodology</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>PMR Qual</fullName>
+                <default>false</default>
+                <label>PMR Qual</label>
+            </value>
+            <value>
+                <fullName>PMR Quant</fullName>
+                <default>false</default>
+                <label>PMR Quant</label>
+            </value>
+            <value>
+                <fullName>Desk Research</fullName>
+                <default>false</default>
+                <label>Desk Research</label>
+            </value>
+            <value>
+                <fullName>Beacon analysis</fullName>
+                <default>false</default>
+                <label>Beacon analysis</label>
+            </value>
+            <value>
+                <fullName>Beacon bundle hours</fullName>
+                <default>false</default>
+                <label>Beacon bundle hours</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
