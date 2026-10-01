@@ -31,7 +31,7 @@
 ## Post Deployment Items
 
 - **Purge deleted objects.** Deleted custom objects stay in Setup > Object Manager > Deleted Objects for 15 days and still count against custom object limits. If the new Project Management app reuses any of these API names (such as `Project_Team_Member__c`), purge (Erase) the deleted objects first.
-- **Delete the record data first.** The deletion removes all Project Management data in the org. The Beacon HTCDEV org had 1 Project record at the time of the check. Export it first if it needs to be kept.
+- **Back up record data first.** The deletion removes all Project Management data in the org. The Beacon HTCDEV org had 1 Project record at the time of the check. Export it first if it needs to be kept.
 - **Lightning page in use.** If the deploy fails because a Lightning record page is still in use, remove its activation in Lightning App Builder and rerun the deploy.
 
 ## Component Manifest
