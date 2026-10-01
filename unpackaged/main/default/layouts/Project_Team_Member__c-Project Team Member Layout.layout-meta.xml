@@ -12,7 +12,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>Beacon_Project__c</field>
+                <field>Project__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>

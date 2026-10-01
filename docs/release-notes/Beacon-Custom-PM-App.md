@@ -28,8 +28,8 @@
   - Salesforce doesn't allow a master-detail to User, so **Project Team Member** is a lookup to User. It is required on the page layout.
   - A validation rule requires Hours to be greater than zero.
 - **Project Team Member (`Project_Team_Member__c`).**
-  - The existing object is kept and updated. Salesforce can't change the parent object (`referenceTo`) of an existing master-detail, so a new master-detail field, **`Beacon_Project__c`** (label "Project"), points at the new `Project__c`. The page layout, list view and the Project page's related list use the new field. Team Member (User) and Role are unchanged apart from added descriptions.
-  - The old `Project__c` master-detail (to `Milestone1_Project__c`) is deleted by the `manifest/destructive/project-management/` manifest. That manifest no longer deletes the Project Team Member object itself.
+  - The existing object is kept and updated. Its master-detail **`Project__c`** (label "Project") now points at the new `Project__c` object instead of `Milestone1_Project__c`. Team Member (User) and Role are unchanged apart from added descriptions.
+  - Salesforce can't change the parent object (`referenceTo`) of an existing master-detail. The old `Project__c` field must therefore be deleted manually and erased in the target org before deploying; this build then recreates it with the same API name (see Post Deployment Items). The `manifest/destructive/project-management/` manifest no longer deletes the Project Team Member object or any of its fields.
 - **Page layouts and Lightning pages.** Each object has a sectioned page layout and a Beacon Lightning record page (header, Details and Related tabs, activity sidebar).
   - The Lightning pages are activated as the org default desktop record page through each object's View action override.
   - The Project layout includes the Project Team Members, Project Time, activity and field history related lists.
@@ -54,9 +54,11 @@
 ## Post Deployment Items
 
 - **Deployment order:**
-  1. **Before deploying:** delete any existing Project Team Member records. They belong to the old Milestones projects, and Salesforce won't add a new master-detail field to an object that already has records.
-  2. **Deploy this branch.** This adds `Beacon_Project__c` next to the old `Project__c` master-detail.
-  3. **Then deploy the `manifest/destructive/project-management/` destructive change set.** It deletes the old Project Team Member `Project__c` field, the Milestones PM objects and tabs, and the old Project Task and Milestone Lightning pages. `Beacon_Project_Record_Page` was taken out of that manifest because this build reuses the name for the new Project page.
+  1. **Before deploying**, in the target org:
+     - Delete any existing Project Team Member records. Salesforce won't add a master-detail field to an object that already has records.
+     - Delete the old Project Team Member `Project__c` field (Setup > Object Manager > Project Team Member > Fields & Relationships). Then **Erase** it under Deleted Fields so the `Project__c` API name can be reused. Done manually in the Beacon sandbox; repeat in each later org (e.g. production).
+  2. **Deploy this branch.** This recreates `Project__c` as a master-detail to the new Project object.
+  3. **Then deploy the `manifest/destructive/project-management/` destructive change set.** It deletes the Milestones PM objects and tabs, and the old Project Task and Milestone Lightning pages. `Beacon_Project_Record_Page` was taken out of that manifest because this build reuses the name for the new Project page.
      `sf project deploy start --manifest manifest/destructive/project-management/package.xml --pre-destructive-changes manifest/destructive/project-management/destructiveChangesPre.xml --post-destructive-changes manifest/destructive/project-management/destructiveChanges.xml --target-org <alias>`
      In sandboxes, add `--purge-on-delete` so the deleted objects are erased right away.
 - **Assign permission sets:** assign the Beacon Consulting and Beacon Salesforce Admin permission sets to the relevant users, if they aren't already assigned.
@@ -98,21 +100,20 @@ Github Branch: [Beacon-Custom-PM-App](https://github.com/aaroncrear/BeaconImplem
 | 28 | Custom Field (MasterDetail) | Project_Time__c | Project__c | Project | Created | Project the time is logged against. |
 | 29 | Validation Rule | Project_Time__c | Hours_Must_Be_Positive | Hours Must Be Positive | Created | Hours must be greater than zero. |
 | 30 | List View | Project_Time__c | Project_Time__c.All | All | Created | List view showing all records. |
-| 31 | Custom Object | Project_Team_Member__c | Project_Team_Member__c | Project Team Member | Updated | Member of a project team, with their role. Detail of Project. Master-detail moved to the new Project object through the new Beacon_Project__c field. |
-| 32 | Custom Field (MasterDetail) | Project_Team_Member__c | Beacon_Project__c | Project | Created | Master-detail to the new Project (Project__c) object. Replaces the old Project__c field, whose parent can't be changed. |
-| 33 | Custom Field (MasterDetail) | Project_Team_Member__c | Project__c | Project | Deleted | Old master-detail to Milestone1_Project__c. Deleted by manifest/destructive/project-management/destructiveChanges.xml. |
-| 34 | Custom Field (Picklist) | Project_Team_Member__c | Role__c | Role | Updated | Role of the team member on the project. |
-| 35 | Custom Field (Lookup) | Project_Team_Member__c | Team_Member__c | Team Member | Updated | User on the project team. |
-| 36 | List View | Project_Team_Member__c | Project_Team_Member__c.All | All | Created | List view showing all records. |
-| 37 | Page Layout | Project__c | Project__c-Project Layout | Project Layout | Created | Page layout with every field grouped into sections. Includes Project Team Members and Project Time related lists. |
-| 38 | Page Layout | Project_Time__c | Project_Time__c-Project Time Layout | Project Time Layout | Created | Page layout with every field grouped into sections. |
-| 39 | Page Layout | Project_Team_Member__c | Project_Team_Member__c-Project Team Member Layout | Project Team Member Layout | Updated | Page layout with every field grouped into sections. |
-| 40 | Lightning Record Page | Project__c | Beacon_Project_Record_Page | Beacon Project Record Page | Created | Header and Details/Related tabs, with the activity panel in the sidebar. Set as the org default desktop record page through the object's View override. |
-| 41 | Lightning Record Page | Project_Time__c | Beacon_Project_Time_Record_Page | Beacon Project Time Record Page | Created | Header and Details/Related tabs, with the activity panel in the sidebar. Set as the org default desktop record page through the object's View override. |
-| 42 | Lightning Record Page | Project_Team_Member__c | Beacon_Project_Team_Member_Record_Page | Beacon Project Team Member Record Page | Created | Header and Details/Related tabs, with the activity panel in the sidebar. Set as the org default desktop record page through the object's View override. |
-| 43 | Custom Tab | Project__c | Project__c | Projects | Created | Object tab for Project. |
-| 44 | Custom Tab | Project_Time__c | Project_Time__c | Project Time | Created | Object tab for Project Time. |
-| 45 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Read, Create and Edit on Project, Project Time and Project Team Member. Read/Edit on all fields (read-only on formulas). Tabs visible. |
-| 46 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Full CRUD, View All and Modify All on Project, Project Time and Project Team Member. Read/Edit on all fields (read-only on formulas). Tabs visible. |
-| 47 | Destructive Manifest | N/A | manifest/destructive/project-management/destructiveChanges.xml | destructiveChanges.xml | Updated | No longer deletes the Project_Team_Member__c object. Now deletes only its old Project__c master-detail field, plus the Milestones PM objects. |
-| 48 | Destructive Manifest | N/A | manifest/destructive/project-management/destructiveChangesPre.xml | destructiveChangesPre.xml | Updated | Removed Beacon_Project_Record_Page, which is now the new Project record page. |
+| 31 | Custom Object | Project_Team_Member__c | Project_Team_Member__c | Project Team Member | Updated | Member of a project team, with their role. Detail of Project. Master-detail now points at the new Project object. |
+| 32 | Custom Field (MasterDetail) | Project_Team_Member__c | Project__c | Project | Updated | Master-detail changed from Milestone1_Project__c to the new Project (Project__c) object. Recreated with the same API name after the old field was deleted and erased manually. |
+| 33 | Custom Field (Picklist) | Project_Team_Member__c | Role__c | Role | Updated | Role of the team member on the project. |
+| 34 | Custom Field (Lookup) | Project_Team_Member__c | Team_Member__c | Team Member | Updated | User on the project team. |
+| 35 | List View | Project_Team_Member__c | Project_Team_Member__c.All | All | Created | List view showing all records. |
+| 36 | Page Layout | Project__c | Project__c-Project Layout | Project Layout | Created | Page layout with every field grouped into sections. Includes Project Team Members and Project Time related lists. |
+| 37 | Page Layout | Project_Time__c | Project_Time__c-Project Time Layout | Project Time Layout | Created | Page layout with every field grouped into sections. |
+| 38 | Page Layout | Project_Team_Member__c | Project_Team_Member__c-Project Team Member Layout | Project Team Member Layout | Updated | Page layout with every field grouped into sections. |
+| 39 | Lightning Record Page | Project__c | Beacon_Project_Record_Page | Beacon Project Record Page | Created | Header and Details/Related tabs, with the activity panel in the sidebar. Set as the org default desktop record page through the object's View override. |
+| 40 | Lightning Record Page | Project_Time__c | Beacon_Project_Time_Record_Page | Beacon Project Time Record Page | Created | Header and Details/Related tabs, with the activity panel in the sidebar. Set as the org default desktop record page through the object's View override. |
+| 41 | Lightning Record Page | Project_Team_Member__c | Beacon_Project_Team_Member_Record_Page | Beacon Project Team Member Record Page | Created | Header and Details/Related tabs, with the activity panel in the sidebar. Set as the org default desktop record page through the object's View override. |
+| 42 | Custom Tab | Project__c | Project__c | Projects | Created | Object tab for Project. |
+| 43 | Custom Tab | Project_Time__c | Project_Time__c | Project Time | Created | Object tab for Project Time. |
+| 44 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Read, Create and Edit on Project, Project Time and Project Team Member. Read/Edit on all fields (read-only on formulas). Tabs visible. |
+| 45 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Full CRUD, View All and Modify All on Project, Project Time and Project Team Member. Read/Edit on all fields (read-only on formulas). Tabs visible. |
+| 46 | Destructive Manifest | N/A | manifest/destructive/project-management/destructiveChanges.xml | destructiveChanges.xml | Updated | No longer deletes the Project_Team_Member__c object. |
+| 47 | Destructive Manifest | N/A | manifest/destructive/project-management/destructiveChangesPre.xml | destructiveChangesPre.xml | Updated | Removed Beacon_Project_Record_Page, which is now the new Project record page. |
