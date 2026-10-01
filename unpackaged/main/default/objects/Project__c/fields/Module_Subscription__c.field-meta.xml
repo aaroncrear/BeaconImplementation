@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Module_Subscription__c</fullName>
-    <description>Beacon modules the client subscribes to for this project. None and All are exclusive and cannot be combined with other values.</description>
-    <inlineHelpText>None and All cannot be selected with any other module.</inlineHelpText>
+    <description>Beacon modules the client subscribes to for this project. Uses the Primary Module global value set.</description>
+    <inlineHelpText>Select every module the client subscribes to for this project.</inlineHelpText>
     <label>Module Subscription</label>
     <required>false</required>
     <trackHistory>false</trackHistory>
@@ -10,99 +10,7 @@
     <type>MultiselectPicklist</type>
     <valueSet>
         <restricted>true</restricted>
-        <valueSetDefinition>
-            <sorted>false</sorted>
-            <value>
-                <fullName>None</fullName>
-                <default>false</default>
-                <label>None</label>
-            </value>
-            <value>
-                <fullName>All</fullName>
-                <default>false</default>
-                <label>All</label>
-            </value>
-            <value>
-                <fullName>ADC</fullName>
-                <default>false</default>
-                <label>ADC</label>
-            </value>
-            <value>
-                <fullName>Autoimmune</fullName>
-                <default>false</default>
-                <label>Autoimmune</label>
-            </value>
-            <value>
-                <fullName>Bispecific</fullName>
-                <default>false</default>
-                <label>Bispecific</label>
-            </value>
-            <value>
-                <fullName>Cancer Vaccine</fullName>
-                <default>false</default>
-                <label>Cancer Vaccine</label>
-            </value>
-            <value>
-                <fullName>Cell Therapy</fullName>
-                <default>false</default>
-                <label>Cell Therapy</label>
-            </value>
-            <value>
-                <fullName>Checkpoint</fullName>
-                <default>false</default>
-                <label>Checkpoint</label>
-            </value>
-            <value>
-                <fullName>CVRM</fullName>
-                <default>false</default>
-                <label>CVRM</label>
-            </value>
-            <value>
-                <fullName>Cytokine</fullName>
-                <default>false</default>
-                <label>Cytokine</label>
-            </value>
-            <value>
-                <fullName>DDR</fullName>
-                <default>false</default>
-                <label>DDR</label>
-            </value>
-            <value>
-                <fullName>Gene Therapy</fullName>
-                <default>false</default>
-                <label>Gene Therapy</label>
-            </value>
-            <value>
-                <fullName>Microbiome</fullName>
-                <default>false</default>
-                <label>Microbiome</label>
-            </value>
-            <value>
-                <fullName>Neuroscience</fullName>
-                <default>false</default>
-                <label>Neuroscience</label>
-            </value>
-            <value>
-                <fullName>Oncology</fullName>
-                <default>false</default>
-                <label>Oncology</label>
-            </value>
-            <value>
-                <fullName>Oncolytic viruses</fullName>
-                <default>false</default>
-                <label>Oncolytic viruses</label>
-            </value>
-            <value>
-                <fullName>RNA</fullName>
-                <default>false</default>
-                <label>RNA</label>
-            </value>
-            <value>
-                <fullName>TPD</fullName>
-                <default>false</default>
-                <label>TPD</label>
-            </value>
-        </valueSetDefinition>
+        <valueSetName>Primary_Module</valueSetName>
     </valueSet>
     <visibleLines>6</visibleLines>
 </CustomField>
