@@ -1,4 +1,4 @@
-# "claude/trusting-pasteur-37mn40" – Release Notes
+# "Lead-Routing" – Release Notes
 
 ## Requirements
 
@@ -331,7 +331,7 @@ Validation for Converted Leads* is on (see Post Deployment Items).
 
 ## Component Manifest
 
-Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/claude/trusting-pasteur-37mn40
+Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Lead-Routing
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
