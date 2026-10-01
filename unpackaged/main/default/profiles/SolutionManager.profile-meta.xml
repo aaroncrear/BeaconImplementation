@@ -4530,24 +4530,6 @@
         <recordType>Campaign.Sub_Campaign</recordType>
     </layoutAssignments>
     <layoutAssignments>
-        <layout>Milestone1_Expense__c-Expense Layout</layout>
-    </layoutAssignments>
-    <layoutAssignments>
-        <layout>Milestone1_Log__c-Log Layout</layout>
-    </layoutAssignments>
-    <layoutAssignments>
-        <layout>Milestone1_Milestone__c-Milestone Layout</layout>
-    </layoutAssignments>
-    <layoutAssignments>
-        <layout>Milestone1_Project__c-Project Layout</layout>
-    </layoutAssignments>
-    <layoutAssignments>
-        <layout>Milestone1_Task__c-Project Task Layout</layout>
-    </layoutAssignments>
-    <layoutAssignments>
-        <layout>Milestone1_Time__c-Time Layout</layout>
-    </layoutAssignments>
-    <layoutAssignments>
         <layout>Opportunity-Beacon Consulting Opportunity Layout</layout>
         <recordType>Opportunity.Consulting</recordType>
     </layoutAssignments>
@@ -4903,10 +4885,6 @@
         <recordType>Idea.InternalIdeasIdeaRecordType</recordType>
         <visible>false</visible>
     </recordTypeVisibilities>
-    <tabVisibilities>
-        <tab>Milestone1_Project__c</tab>
-        <visibility>Hidden</visibility>
-    </tabVisibilities>
     <tabVisibilities>
         <tab>standard-Account</tab>
         <visibility>DefaultOn</visibility>
