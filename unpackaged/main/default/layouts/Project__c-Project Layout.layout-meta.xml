@@ -176,11 +176,6 @@
         <relatedList>RelatedHistoryList</relatedList>
     </relatedLists>
     <relatedLists>
-        <fields>ENTITY_HISTORY.CREATED_DATE</fields>
-        <fields>ENTITY_HISTORY.FIELD</fields>
-        <fields>ENTITY_HISTORY.OLDVALUE</fields>
-        <fields>ENTITY_HISTORY.NEWVALUE</fields>
-        <fields>ENTITY_HISTORY.CREATED_BY</fields>
         <relatedList>RelatedEntityHistoryList</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
