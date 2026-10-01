@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomNotificationType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customNotifTypeName>Lead Routing Alert</customNotifTypeName>
+    <description>Bell and mobile notifications sent by the lead routing flows: new Lead assignments, hot (Ready to Convert) Leads, engagement on owned Leads and Contacts, new Contacts on an AM&apos;s Account, and new Opportunities.</description>
+    <desktop>true</desktop>
+    <masterLabel>Lead Routing Alert</masterLabel>
+    <mobile>true</mobile>
+</CustomNotificationType>

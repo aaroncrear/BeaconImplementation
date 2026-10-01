@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>APAC_SDR__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>APAC specialist SDR for this Parent Campaign. Lead routing assigns Leads from APAC (excluding India) on unassigned Accounts to this user.</description>
+    <inlineHelpText>Set on the Parent Campaign. Leads from APAC (excluding India) on new or unassigned Accounts are routed to this SDR.</inlineHelpText>
+    <label>APAC SDR</label>
+    <referenceTo>User</referenceTo>
+    <relationshipName>Campaigns_APAC_SDR</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

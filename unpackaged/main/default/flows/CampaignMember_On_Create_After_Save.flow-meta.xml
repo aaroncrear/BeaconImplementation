@@ -1,0 +1,1238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Tells the Lead owner about a new assignment, a hot Lead (Ready to Convert) or new engagement.</description>
+        <name>Notify_Lead_Owner</name>
+        <label>Notify Lead Owner</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>customNotificationAction</actionName>
+        <actionType>customNotificationAction</actionType>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>customNotifTypeId</name>
+            <value>
+                <elementReference>Get_Notification_Type.Id</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientIds</name>
+            <value>
+                <elementReference>colLeadRecipients</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>title</name>
+            <value>
+                <elementReference>formLeadNotifyTitle</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>body</name>
+            <value>
+                <elementReference>formLeadNotifyBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>targetId</name>
+            <value>
+                <elementReference>Get_Lead.Id</elementReference>
+            </value>
+        </inputParameters>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <actionCalls>
+        <description>Tells the owner a new Opportunity was created from a hand-raiser.</description>
+        <name>Notify_Opportunity_Owner</name>
+        <label>Notify Opportunity Owner</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>customNotificationAction</actionName>
+        <actionType>customNotificationAction</actionType>
+        <connector>
+            <targetReference>Add_Contact_Recipient</targetReference>
+        </connector>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>customNotifTypeId</name>
+            <value>
+                <elementReference>Get_Notification_Type.Id</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientIds</name>
+            <value>
+                <elementReference>colOpportunityRecipients</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>title</name>
+            <value>
+                <elementReference>formOpportunityNotifyTitle</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>body</name>
+            <value>
+                <elementReference>formOpportunityNotifyBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>targetId</name>
+            <value>
+                <elementReference>varNewOpportunityId</elementReference>
+            </value>
+        </inputParameters>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <actionCalls>
+        <description>Tells the Contact owner about the engagement.</description>
+        <name>Notify_Contact_Owner</name>
+        <label>Notify Contact Owner</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>customNotificationAction</actionName>
+        <actionType>customNotificationAction</actionType>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>customNotifTypeId</name>
+            <value>
+                <elementReference>Get_Notification_Type.Id</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientIds</name>
+            <value>
+                <elementReference>colContactRecipients</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>title</name>
+            <value>
+                <elementReference>formContactNotifyTitle</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>body</name>
+            <value>
+                <elementReference>formContactNotifyBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>targetId</name>
+            <value>
+                <elementReference>Get_Contact.Id</elementReference>
+            </value>
+        </inputParameters>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Adds the Lead owner to the notification recipients.</description>
+        <name>Add_Lead_Recipient</name>
+        <label>Add Lead Recipient</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>colLeadRecipients</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>formLeadOwnerId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Notify_Lead_Owner</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Adds the Opportunity owner to the notification recipients.</description>
+        <name>Add_Opportunity_Recipient</name>
+        <label>Add Opportunity Recipient</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>colOpportunityRecipients</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>formOpportunityOwnerId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Notify_Opportunity_Owner</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Adds the Contact owner to the notification recipients.</description>
+        <name>Add_Contact_Recipient</name>
+        <label>Add Contact Recipient</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>colContactRecipients</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Get_Contact.OwnerId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Notify_Contact_Owner</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>Stops when the On/Off Switch has Run Flows unchecked.</description>
+        <name>Flows_Enabled</name>
+        <label>Flows Enabled?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Flows Switched Off</defaultConnectorLabel>
+        <rules>
+            <name>Run_Flows</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Setup.On_Off_Switch__c.Run_Flows__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Member_Campaign</targetReference>
+            </connector>
+            <label>Run Flows</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Branches on whether the member is a Lead or a Contact.</description>
+        <name>Lead_or_Contact</name>
+        <label>Lead or Contact?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Neither</defaultConnectorLabel>
+        <rules>
+            <name>Is_Lead</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.LeadId</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Lead</targetReference>
+            </connector>
+            <label>Lead</label>
+        </rules>
+        <rules>
+            <name>Is_Contact</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.ContactId</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Contact</targetReference>
+            </connector>
+            <label>Contact</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Only open, non-blacklisted Leads that are not Do Not Engage are routed or notified.</description>
+        <name>Lead_Is_Open</name>
+        <label>Lead Is Open?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Closed or Do Not Engage</defaultConnectorLabel>
+        <rules>
+            <name>Open_Lead</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Lead.IsConverted</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Lead.Blacklisted__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Lead.Status</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>Do Not Engage</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Route_Lead_Decision</targetReference>
+            </connector>
+            <label>Open Lead</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Routes a new Lead not yet owned by a sales rep, or re-routes a Lead not converted within 21 days that engaged with a different module.</description>
+        <name>Route_Lead_Decision</name>
+        <label>Route Lead?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Needs_Ready_to_Convert</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Keep Current Owner</defaultConnectorLabel>
+        <rules>
+            <name>Route</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formRouteLead</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Route_Lead</targetReference>
+            </connector>
+            <label>Route</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Hand-raiser engagement on a Lead that is not already Ready to Convert, Qualified or Unqualified.</description>
+        <name>Needs_Ready_to_Convert</name>
+        <label>Needs Ready to Convert?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Lead_Owner_Is_User</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No Status Change</defaultConnectorLabel>
+        <rules>
+            <name>Set_Ready_to_Convert</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formNeedsReadyToConvert</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Lead_Status</targetReference>
+            </connector>
+            <label>Set Ready to Convert</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Notifications can only go to users, not queues.</description>
+        <name>Lead_Owner_Is_User</name>
+        <label>Lead Owner Is a User?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Owner Is Queue</defaultConnectorLabel>
+        <rules>
+            <name>Owner_Is_User</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formLeadOwnerId</leftValueReference>
+                <operator>StartsWith</operator>
+                <rightValue>
+                    <stringValue>005</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Add_Lead_Recipient</targetReference>
+            </connector>
+            <label>Owner Is User</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Demo Request, Active Enquiry or In Platform Demo Request from a Contact with an Account creates an Opportunity.</description>
+        <name>Contact_Hand_Raiser</name>
+        <label>Contact Hand-Raiser?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Add_Contact_Recipient</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Other Engagement</defaultConnectorLabel>
+        <rules>
+            <name>Is_Hand_Raiser</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formIsHandRaiser</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Contact.AccountId</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Contact.Blacklisted__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Open_Opportunity</targetReference>
+            </connector>
+            <label>Hand-Raiser</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Avoids creating a duplicate Opportunity.</description>
+        <name>Open_Opportunity_Exists</name>
+        <label>Open Opportunity Exists?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Route_Opportunity</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No Open Opportunity</defaultConnectorLabel>
+        <rules>
+            <name>Has_Open_Opportunity</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Open_Opportunity.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Add_Contact_Recipient</targetReference>
+            </connector>
+            <label>Has Open Opportunity</label>
+        </rules>
+    </decisions>
+    <description>Lead routing entry point (Flow A). Runs when a Lead or Contact is added to a Campaign, e.g. by the HubSpot sync. Leads: new Leads not yet owned by a sales rep are routed by the Lead Routing Engine; Leads not converted within 21 days of their last routing are re-routed when they engage with a different Primary Module. Demo Request, Active Enquiry and In Platform Demo Request set the Lead Status to Ready to Convert. Contacts: a hand-raiser creates a Request for Information Opportunity (unless the Contact already has an open one), owned by the Account Team AM. Owners are notified with the Lead Routing Alert. Skipped when the On/Off Switch Run Flows is unchecked.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Parent Campaign Id, or the member Campaign Id when it has no parent.</description>
+        <name>formRoutingCampaignId</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE({!Get_Member_Campaign.ParentId}, {!Get_Member_Campaign.Id})</expression>
+    </formulas>
+    <formulas>
+        <description>Campaign Type of the member Campaign, falling back to the Parent Campaign Type.</description>
+        <name>formCampaignType</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE(TEXT({!Get_Member_Campaign.Type}), TEXT({!Get_Routing_Campaign.Type}))</expression>
+    </formulas>
+    <formulas>
+        <description>Primary Module of the member Campaign, falling back to the Parent Campaign.</description>
+        <name>formModule</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE(TEXT({!Get_Member_Campaign.Primary_Module__c}), TEXT({!Get_Routing_Campaign.Primary_Module__c}))</expression>
+    </formulas>
+    <formulas>
+        <description>True for Demo Request, Active Enquiry and In Platform Demo Request Campaigns.</description>
+        <name>formIsHandRaiser</name>
+        <dataType>Boolean</dataType>
+        <expression>OR({!formCampaignType} = &quot;Demo Request&quot;, {!formCampaignType} = &quot;Active Enquiry&quot;, {!formCampaignType} = &quot;In Platform Demo Request&quot;)</expression>
+    </formulas>
+    <formulas>
+        <description>True when the Lead is owned by an active user in a sales (AM, SDR or sales management) role.</description>
+        <name>formOwnerIsRep</name>
+        <dataType>Boolean</dataType>
+        <expression>AND(NOT(ISBLANK({!Get_Lead_Owner.Id})), {!Get_Lead_Owner.IsActive},
+  CONTAINS(&quot;|AM_Accounts|AM_New_Business|SDR_Accounts|SDR_New_Business|Manager_Accounts|Manager_New_Business|Head_of_Accounts|Head_of_New_Business|Director_of_Sales|&quot;, &quot;|&quot; &amp; {!Get_Lead_Owner_Role.DeveloperName} &amp; &quot;|&quot;),
+  NOT(ISBLANK({!Get_Lead_Owner_Role.DeveloperName})))</expression>
+    </formulas>
+    <formulas>
+        <description>Route when the Lead has never been routed and is not owned by a sales rep, or re-route when it was last routed (or created) 21 or more days ago and the Campaign has a different Primary Module.</description>
+        <name>formRouteLead</name>
+        <dataType>Boolean</dataType>
+        <expression>OR(
+  AND(ISBLANK({!Get_Lead.Last_Routed_Date__c}), NOT({!formOwnerIsRep})),
+  AND(
+    {!$Flow.CurrentDateTime} - BLANKVALUE({!Get_Lead.Last_Routed_Date__c}, {!Get_Lead.CreatedDate}) &gt;= 21,
+    NOT(ISBLANK({!formModule})),
+    {!formModule} &lt;&gt; BLANKVALUE({!Get_Lead.Last_Routed_Module__c}, &quot;&quot;)
+  )
+)</expression>
+    </formulas>
+    <formulas>
+        <description>Linked Account name, or the Lead Company when no Account is linked.</description>
+        <name>formLeadCompanyName</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE({!Get_Lead_Account.Name}, {!Get_Lead.Company})</expression>
+    </formulas>
+    <formulas>
+        <description>Owner after routing: the routed rep, or the current owner when not routed or no rep was found.</description>
+        <name>formLeadOwnerId</name>
+        <dataType>String</dataType>
+        <expression>IF(AND({!formRouteLead}, NOT(ISBLANK({!Route_Lead.varOwnerId}))), {!Route_Lead.varOwnerId}, {!Get_Lead.OwnerId})</expression>
+    </formulas>
+    <formulas>
+        <description>True when routing gave the Lead a new owner.</description>
+        <name>formLeadReassigned</name>
+        <dataType>Boolean</dataType>
+        <expression>AND({!formRouteLead}, NOT(ISBLANK({!Route_Lead.varOwnerId})), {!Route_Lead.varOwnerId} &lt;&gt; {!Get_Lead.OwnerId})</expression>
+    </formulas>
+    <formulas>
+        <description>Hand-raiser on a Lead not already Ready to Convert, Qualified or Unqualified.</description>
+        <name>formNeedsReadyToConvert</name>
+        <dataType>Boolean</dataType>
+        <expression>AND({!formIsHandRaiser},
+  NOT(OR(TEXT({!Get_Lead.Status}) = &quot;Ready to Convert&quot;, TEXT({!Get_Lead.Status}) = &quot;Qualified&quot;, TEXT({!Get_Lead.Status}) = &quot;Unqualified&quot;)))</expression>
+    </formulas>
+    <formulas>
+        <description>Ready to Convert for hand-raisers, otherwise the current Status.</description>
+        <name>formLeadStatus</name>
+        <dataType>String</dataType>
+        <expression>IF({!formNeedsReadyToConvert}, &quot;Ready to Convert&quot;, TEXT({!Get_Lead.Status}))</expression>
+    </formulas>
+    <formulas>
+        <description>Now when a rep was found, otherwise the previous value.</description>
+        <name>formLastRoutedDate</name>
+        <dataType>DateTime</dataType>
+        <expression>IF(ISBLANK({!Route_Lead.varOwnerId}), {!Get_Lead.Last_Routed_Date__c}, {!$Flow.CurrentDateTime})</expression>
+    </formulas>
+    <formulas>
+        <description>Campaign module when a rep was found, otherwise the previous value.</description>
+        <name>formLastRoutedModule</name>
+        <dataType>String</dataType>
+        <expression>IF(ISBLANK({!Route_Lead.varOwnerId}), {!Get_Lead.Last_Routed_Module__c}, {!formModule})</expression>
+    </formulas>
+    <formulas>
+        <description>Notification title for the Lead owner.</description>
+        <name>formLeadNotifyTitle</name>
+        <dataType>String</dataType>
+        <expression>IF({!formLeadReassigned},
+  IF({!formIsHandRaiser}, &quot;New hot Lead assigned - Ready to Convert: &quot;, &quot;New Lead assigned: &quot;),
+  IF({!formIsHandRaiser}, &quot;Hot Lead - Ready to Convert: &quot;, &quot;Lead engagement: &quot;)) &amp; {!Get_Lead.Name}</expression>
+    </formulas>
+    <formulas>
+        <description>Notification body for the Lead owner.</description>
+        <name>formLeadNotifyBody</name>
+        <dataType>String</dataType>
+        <expression>{!Get_Lead.Name} &amp; &quot; (&quot; &amp; {!formLeadCompanyName} &amp; &quot;) engaged with &quot; &amp; {!Get_Member_Campaign.Name} &amp; IF(ISBLANK({!formCampaignType}), &quot;&quot;, &quot; (&quot; &amp; {!formCampaignType} &amp; &quot;)&quot;) &amp; &quot;.&quot;
+ &amp; IF({!formLeadReassigned}, &quot; Routing: &quot; &amp; {!Route_Lead.varRoutingReason} &amp; &quot;.&quot;, &quot;&quot;)
+ &amp; IF({!formIsHandRaiser}, &quot; Convert the Lead and create an Opportunity.&quot;, &quot;&quot;)</expression>
+    </formulas>
+    <formulas>
+        <description>Account name, Campaign Type and date.</description>
+        <name>formOpportunityName</name>
+        <dataType>String</dataType>
+        <expression>LEFT({!Get_Contact_Account.Name} &amp; &quot; - &quot; &amp; BLANKVALUE({!formCampaignType}, &quot;Enquiry&quot;) &amp; &quot; - &quot; &amp; TEXT({!$Flow.CurrentDate}), 120)</expression>
+    </formulas>
+    <formulas>
+        <description>Placeholder close date 30 days out, for the rep to update.</description>
+        <name>formCloseDate</name>
+        <dataType>Date</dataType>
+        <expression>{!$Flow.CurrentDate} + 30</expression>
+    </formulas>
+    <formulas>
+        <description>Routed AM, or the Contact owner when no rep was found.</description>
+        <name>formOpportunityOwnerId</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE({!Route_Opportunity.varOwnerId}, {!Get_Contact.OwnerId})</expression>
+    </formulas>
+    <formulas>
+        <description>Notification title for the Opportunity owner.</description>
+        <name>formOpportunityNotifyTitle</name>
+        <dataType>String</dataType>
+        <expression>&quot;New Opportunity - Request for Information: &quot; &amp; {!Get_Contact_Account.Name}</expression>
+    </formulas>
+    <formulas>
+        <description>Notification body for the Opportunity owner.</description>
+        <name>formOpportunityNotifyBody</name>
+        <dataType>String</dataType>
+        <expression>{!Get_Contact.Name} &amp; &quot; submitted &quot; &amp; BLANKVALUE({!formCampaignType}, &quot;an enquiry&quot;) &amp; &quot; via &quot; &amp; {!Get_Member_Campaign.Name} &amp; &quot;. Routing: &quot; &amp; BLANKVALUE({!Route_Opportunity.varRoutingReason}, &quot;Contact owner (no rep found)&quot;)</expression>
+    </formulas>
+    <formulas>
+        <description>Notification title for the Contact owner.</description>
+        <name>formContactNotifyTitle</name>
+        <dataType>String</dataType>
+        <expression>IF({!formIsHandRaiser}, &quot;Hot Contact: &quot;, &quot;Contact engagement: &quot;) &amp; {!Get_Contact.Name}</expression>
+    </formulas>
+    <formulas>
+        <description>Notification body for the Contact owner.</description>
+        <name>formContactNotifyBody</name>
+        <dataType>String</dataType>
+        <expression>{!Get_Contact.Name} &amp; &quot; engaged with &quot; &amp; {!Get_Member_Campaign.Name} &amp; IF(ISBLANK({!formCampaignType}), &quot;&quot;, &quot; (&quot; &amp; {!formCampaignType} &amp; &quot;)&quot;) &amp; &quot;.&quot;
+ &amp; IF(NOT(ISBLANK({!varNewOpportunityId})), &quot; A Request for Information Opportunity was created.&quot;,
+   IF(AND({!formIsHandRaiser}, NOT(ISBLANK({!Get_Open_Opportunity.Id}))), &quot; The Contact already has an open Opportunity.&quot;, &quot;&quot;))</expression>
+    </formulas>
+    <interviewLabel>CampaignMember - On Create - After Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>CampaignMember - On Create - After Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <description>Creates a Request for Information Opportunity with the Contact as primary contact and the Campaign as primary campaign source.</description>
+        <name>Create_Opportunity</name>
+        <label>Create Opportunity</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignRecordIdToReference>varNewOpportunityId</assignRecordIdToReference>
+        <connector>
+            <targetReference>Add_Opportunity_Recipient</targetReference>
+        </connector>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>AccountId</field>
+            <value>
+                <elementReference>Get_Contact.AccountId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>CampaignId</field>
+            <value>
+                <elementReference>$Record.CampaignId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>CloseDate</field>
+            <value>
+                <elementReference>formCloseDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>ContactId</field>
+            <value>
+                <elementReference>Get_Contact.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <elementReference>formOpportunityName</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>formOpportunityOwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Primary_Module__c</field>
+            <value>
+                <elementReference>formModule</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>RecordTypeId</field>
+            <value>
+                <elementReference>Get_Subscription_New_Record_Type.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>StageName</field>
+            <value>
+                <stringValue>Request for Information</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Opportunity</object>
+    </recordCreates>
+    <recordLookups>
+        <description>Gets the Campaign the member was added to.</description>
+        <name>Get_Member_Campaign</name>
+        <label>Get Member Campaign</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Routing_Campaign</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.CampaignId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Campaign</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+        <queriedFields>Type</queriedFields>
+        <queriedFields>ParentId</queriedFields>
+        <queriedFields>Primary_Module__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Parent Campaign (or the Campaign itself when it has no parent), which holds the SDR/AM letter-split and APAC rep fields.</description>
+        <name>Get_Routing_Campaign</name>
+        <label>Get Routing Campaign</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Notification_Type</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>formRoutingCampaignId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Campaign</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+        <queriedFields>Type</queriedFields>
+        <queriedFields>ParentId</queriedFields>
+        <queriedFields>Primary_Module__c</queriedFields>
+        <queriedFields>SDR_1__c</queriedFields>
+        <queriedFields>SDR_2__c</queriedFields>
+        <queriedFields>SDR_3__c</queriedFields>
+        <queriedFields>SDR_4__c</queriedFields>
+        <queriedFields>SDR_5__c</queriedFields>
+        <queriedFields>SDR_6__c</queriedFields>
+        <queriedFields>SDR_Split_1__c</queriedFields>
+        <queriedFields>SDR_Split_2__c</queriedFields>
+        <queriedFields>SDR_Split_3__c</queriedFields>
+        <queriedFields>SDR_Split_4__c</queriedFields>
+        <queriedFields>SDR_Split_5__c</queriedFields>
+        <queriedFields>SDR_Split_6__c</queriedFields>
+        <queriedFields>AM_1__c</queriedFields>
+        <queriedFields>AM_2__c</queriedFields>
+        <queriedFields>AM_3__c</queriedFields>
+        <queriedFields>AM_Split_1__c</queriedFields>
+        <queriedFields>AM_Split_2__c</queriedFields>
+        <queriedFields>AM_Split_3__c</queriedFields>
+        <queriedFields>APAC_SDR__c</queriedFields>
+        <queriedFields>APAC_AM__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Lead Routing Alert custom notification type.</description>
+        <name>Get_Notification_Type</name>
+        <label>Get Notification Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Lead_or_Contact</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Lead_Routing_Alert</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>CustomNotificationType</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Lead that engaged.</description>
+        <name>Get_Lead</name>
+        <label>Get Lead</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Lead_Account</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.LeadId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Lead</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+        <queriedFields>Company</queriedFields>
+        <queriedFields>Country</queriedFields>
+        <queriedFields>Region__c</queriedFields>
+        <queriedFields>Status</queriedFields>
+        <queriedFields>OwnerId</queriedFields>
+        <queriedFields>Account__c</queriedFields>
+        <queriedFields>IsConverted</queriedFields>
+        <queriedFields>Blacklisted__c</queriedFields>
+        <queriedFields>CreatedDate</queriedFields>
+        <queriedFields>Last_Routed_Date__c</queriedFields>
+        <queriedFields>Last_Routed_Module__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Account linked to the Lead, for the letter split on Account name.</description>
+        <name>Get_Lead_Account</name>
+        <label>Get Lead Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Lead_Owner</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Lead.Account__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Lead owner when it is a user (nothing is found for a queue).</description>
+        <name>Get_Lead_Owner</name>
+        <label>Get Lead Owner</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Lead_Owner_Role</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Lead.OwnerId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>User</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>IsActive</queriedFields>
+        <queriedFields>UserRoleId</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the role of the Lead owner, to tell whether a sales rep already owns the Lead.</description>
+        <name>Get_Lead_Owner_Role</name>
+        <label>Get Lead Owner Role</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Lead_Is_Open</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Lead_Owner.UserRoleId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>UserRole</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>DeveloperName</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Contact that engaged.</description>
+        <name>Get_Contact</name>
+        <label>Get Contact</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Contact_Account</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.ContactId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Contact</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+        <queriedFields>AccountId</queriedFields>
+        <queriedFields>OwnerId</queriedFields>
+        <queriedFields>MailingCountry</queriedFields>
+        <queriedFields>Region__c</queriedFields>
+        <queriedFields>Blacklisted__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Contact Account, for the Opportunity name and letter split.</description>
+        <name>Get_Contact_Account</name>
+        <label>Get Contact Account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Contact_Hand_Raiser</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Contact.AccountId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Checks whether the Contact is already the primary contact on an open Opportunity.</description>
+        <name>Get_Open_Opportunity</name>
+        <label>Get Open Opportunity</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Open_Opportunity_Exists</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>ContactId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Contact.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>IsClosed</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Opportunity</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Subscription New Opportunity record type.</description>
+        <name>Get_Subscription_New_Record_Type</name>
+        <label>Get Subscription New Record Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Create_Opportunity</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Opportunity</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Subscription_New</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Sets the new owner, routing reason, routing date and module, and Ready to Convert for hand-raisers. Keeps the current owner when no rep was found.</description>
+        <name>Update_Routed_Lead</name>
+        <label>Update Routed Lead</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Lead_Owner_Is_User</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Lead.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Last_Routed_Date__c</field>
+            <value>
+                <elementReference>formLastRoutedDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Last_Routed_Module__c</field>
+            <value>
+                <elementReference>formLastRoutedModule</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>formLeadOwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Routing_Reason__c</field>
+            <value>
+                <elementReference>Route_Lead.varRoutingReason</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <elementReference>formLeadStatus</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Lead</object>
+    </recordUpdates>
+    <recordUpdates>
+        <description>Sets the Lead Status to Ready to Convert.</description>
+        <name>Update_Lead_Status</name>
+        <label>Update Lead Status</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Lead_Owner_Is_User</targetReference>
+        </connector>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Lead.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Ready to Convert</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Lead</object>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Flows_Enabled</targetReference>
+        </connector>
+        <object>CampaignMember</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <subflows>
+        <description>Asks the Lead Routing Engine for the SDR who should own the Lead.</description>
+        <name>Route_Lead</name>
+        <label>Route Lead</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Update_Routed_Lead</targetReference>
+        </connector>
+        <flowName>Lead_Routing_Engine</flowName>
+        <inputAssignments>
+            <name>recRoutingCampaign</name>
+            <value>
+                <elementReference>Get_Routing_Campaign</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varAccountId</name>
+            <value>
+                <elementReference>Get_Lead.Account__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varCampaignType</name>
+            <value>
+                <elementReference>formCampaignType</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varCompanyName</name>
+            <value>
+                <elementReference>formLeadCompanyName</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varCountry</name>
+            <value>
+                <elementReference>Get_Lead.Country</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varRegion</name>
+            <value>
+                <elementReference>Get_Lead.Region__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varRepType</name>
+            <value>
+                <stringValue>SDR</stringValue>
+            </value>
+        </inputAssignments>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </subflows>
+    <subflows>
+        <description>Asks the Lead Routing Engine for the AM who should own the Opportunity.</description>
+        <name>Route_Opportunity</name>
+        <label>Route Opportunity</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Subscription_New_Record_Type</targetReference>
+        </connector>
+        <flowName>Lead_Routing_Engine</flowName>
+        <inputAssignments>
+            <name>recRoutingCampaign</name>
+            <value>
+                <elementReference>Get_Routing_Campaign</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varAccountId</name>
+            <value>
+                <elementReference>Get_Contact.AccountId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varCampaignType</name>
+            <value>
+                <elementReference>formCampaignType</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varCompanyName</name>
+            <value>
+                <elementReference>Get_Contact_Account.Name</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varCountry</name>
+            <value>
+                <elementReference>Get_Contact.MailingCountry</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varRegion</name>
+            <value>
+                <elementReference>Get_Contact.Region__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varRepType</name>
+            <value>
+                <stringValue>AM</stringValue>
+            </value>
+        </inputAssignments>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </subflows>
+    <subflows>
+        <description>Emails the admin team the fault message when an element in this flow fails.</description>
+        <name>Fault_Path_Subflow</name>
+        <label>Fault Path Subflow</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>Fault_Path_Subflow</flowName>
+        <inputAssignments>
+            <name>varFaultMessage</name>
+            <value>
+                <elementReference>$Flow.FaultMessage</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <variables>
+        <description>Contact owner, for the notification.</description>
+        <name>colContactRecipients</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Lead owner, for the notification.</description>
+        <name>colLeadRecipients</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Opportunity owner, for the notification.</description>
+        <name>colOpportunityRecipients</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Id of the Opportunity created for a hand-raiser Contact.</description>
+        <name>varNewOpportunityId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

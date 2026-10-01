@@ -26,6 +26,12 @@
         <converted>false</converted>
     </standardValue>
     <standardValue>
+        <fullName>Ready to Convert</fullName>
+        <default>false</default>
+        <label>Ready to Convert</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
         <fullName>Qualified</fullName>
         <default>false</default>
         <label>Qualified</label>

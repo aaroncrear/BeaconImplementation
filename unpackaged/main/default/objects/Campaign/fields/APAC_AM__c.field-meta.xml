@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>APAC_AM__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>APAC specialist Account Manager for this Parent Campaign. Lead routing makes this user the owner of Opportunities auto-created for APAC (excluding India) Contacts on unassigned Accounts.</description>
+    <inlineHelpText>Set on the Parent Campaign. Opportunities auto-created for APAC (excluding India) Contacts on unassigned Accounts are assigned to this AM.</inlineHelpText>
+    <label>APAC AM</label>
+    <referenceTo>User</referenceTo>
+    <relationshipName>Campaigns_APAC_AM</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

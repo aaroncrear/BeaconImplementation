@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Last_Routed_Module__c</fullName>
+    <description>Set by lead routing automation to the Primary Module of the Campaign that last routed the Lead. Used for the 21-day re-route rule, which re-routes only when the Lead engages with a different module.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Primary Module of the Campaign that last routed this Lead. Set automatically.</inlineHelpText>
+    <label>Last Routed Module</label>
+    <length>255</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

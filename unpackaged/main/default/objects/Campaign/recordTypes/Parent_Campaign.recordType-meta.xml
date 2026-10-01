@@ -586,6 +586,10 @@
     <picklistValues>
         <picklist>Type</picklist>
         <values>
+            <fullName>Active Enquiry</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Content Download</fullName>
             <default>false</default>
         </values>
@@ -596,6 +600,10 @@
         <values>
             <fullName>Event</fullName>
             <default>true</default>
+        </values>
+        <values>
+            <fullName>In Platform Demo Request</fullName>
+            <default>false</default>
         </values>
         <values>
             <fullName>Onsite Enquiry</fullName>

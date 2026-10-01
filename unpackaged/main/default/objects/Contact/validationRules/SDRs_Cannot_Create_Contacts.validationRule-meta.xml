@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SDRs_Cannot_Create_Contacts</fullName>
+    <active>true</active>
+    <description>SDRs can only create Leads, never Contacts. Blocks Contact creation by users in an SDR role (role API name starting with SDR_). Lead conversion is not blocked as long as the org setting &quot;Require Validation for Converted Leads&quot; is off. Skipped when the On/Off Switch Run Validation Rules is unchecked.</description>
+    <errorConditionFormula>AND(
+    $Setup.On_Off_Switch__c.Run_Validation_Rules__c,
+    ISNEW(),
+    BEGINS($UserRole.DeveloperName, &quot;SDR_&quot;)
+)</errorConditionFormula>
+    <errorMessage>SDRs can&apos;t create Contacts. Create a Lead instead. It becomes a Contact when it&apos;s converted.</errorMessage>
+</ValidationRule>

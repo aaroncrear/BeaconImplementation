@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Sets the output owner and routing reason.</description>
+        <name>Assign_Routing_Result</name>
+        <label>Assign Routing Result</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varOwnerId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formFinalOwnerId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varRoutingReason</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formFinalReason</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>Decides who should own a Lead (or an auto-created Opportunity) from a marketing engagement. Called by CampaignMember - On Create - After Save. Order: 1) Account Team (In Platform Demo Request goes to the Account Manager, otherwise the requested rep type, falling back to the other team role); 2) APAC (excluding India) goes to the APAC SDR/AM on the Parent Campaign; 3) letter split on the first letter of the Account name against the Parent Campaign SDR/AM split fields (no match or non-letter goes to rep 1). Returns a blank owner when no active rep is found. Returns the owner and a routing reason; it does not update any records.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Owner from the Account Team. Blank when the Account has no AM or SDR on its team (unassigned Account).</description>
+        <name>formTeamOwnerId</name>
+        <dataType>String</dataType>
+        <expression>IF(AND({!varCampaignType} = &quot;In Platform Demo Request&quot;, NOT(ISBLANK({!Get_Account_Team_AM.UserId}))), {!Get_Account_Team_AM.UserId},
+IF({!varRepType} = &quot;AM&quot;, BLANKVALUE({!Get_Account_Team_AM.UserId}, {!Get_Account_Team_SDR.UserId}), BLANKVALUE({!Get_Account_Team_SDR.UserId}, {!Get_Account_Team_AM.UserId})))</expression>
+    </formulas>
+    <formulas>
+        <description>Routing reason when the owner comes from the Account Team.</description>
+        <name>formTeamReason</name>
+        <dataType>String</dataType>
+        <expression>IF(AND({!varCampaignType} = &quot;In Platform Demo Request&quot;, NOT(ISBLANK({!Get_Account_Team_AM.UserId}))), &quot;Account Team - Account Manager (In Platform Demo Request)&quot;,
+IF({!varRepType} = &quot;AM&quot;,
+  IF(NOT(ISBLANK({!Get_Account_Team_AM.UserId})), &quot;Account Team - Account Manager&quot;, &quot;Account Team - SDR (no Account Manager on team)&quot;),
+  IF(NOT(ISBLANK({!Get_Account_Team_SDR.UserId})), &quot;Account Team - SDR&quot;, &quot;Account Team - Account Manager (no SDR on team)&quot;)))</expression>
+    </formulas>
+    <formulas>
+        <description>True when the individual is from APAC, excluding India: Region is Asia or Oceania, or Country is an APAC country name or ISO code.</description>
+        <name>formIsAPAC</name>
+        <dataType>Boolean</dataType>
+        <expression>AND(
+  NOT(OR(UPPER(TRIM({!varCountry})) = &quot;INDIA&quot;, UPPER(TRIM({!varCountry})) = &quot;IN&quot;)),
+  OR(
+    {!varRegion} = &quot;Asia&quot;,
+    {!varRegion} = &quot;Oceania&quot;,
+    AND(NOT(ISBLANK({!varCountry})), CONTAINS(&quot;|AUSTRALIA|AU|BANGLADESH|BD|BRUNEI|BN|CAMBODIA|KH|CHINA|CN|FIJI|FJ|HONG KONG|HK|INDONESIA|ID|JAPAN|JP|SOUTH KOREA|KOREA|KOREA, REPUBLIC OF|KR|LAOS|LA|MACAU|MACAO|MO|MALAYSIA|MY|MONGOLIA|MN|MYANMAR|MM|NEPAL|NP|NEW ZEALAND|NZ|PAKISTAN|PK|PAPUA NEW GUINEA|PG|PHILIPPINES|PH|SINGAPORE|SG|SRI LANKA|LK|TAIWAN|TW|THAILAND|TH|VIETNAM|VIET NAM|VN|&quot;, &quot;|&quot; &amp; UPPER(TRIM({!varCountry})) &amp; &quot;|&quot;))
+  )
+)</expression>
+    </formulas>
+    <formulas>
+        <description>APAC specialist from the Parent Campaign for the requested rep type.</description>
+        <name>formAPACOwnerId</name>
+        <dataType>String</dataType>
+        <expression>IF({!varRepType} = &quot;AM&quot;, {!recRoutingCampaign.APAC_AM__c}, {!recRoutingCampaign.APAC_SDR__c})</expression>
+    </formulas>
+    <formulas>
+        <description>First letter of the Account name (or Company), upper case.</description>
+        <name>formFirstLetter</name>
+        <dataType>String</dataType>
+        <expression>UPPER(LEFT(TRIM({!varCompanyName}), 1))</expression>
+    </formulas>
+    <formulas>
+        <description>Letter-split slot whose comma-separated split list (e.g. M,N,O,P) contains the first letter. No match, a non-letter or a blank name falls back to rep 1, shown as &quot;(default)&quot;.</description>
+        <name>formSplitSlot</name>
+        <dataType>String</dataType>
+        <expression>IF(ISBLANK({!formFirstLetter}), IF({!varRepType} = &quot;AM&quot;, &quot;AM 1 (default)&quot;, &quot;SDR 1 (default)&quot;),
+IF({!varRepType} = &quot;AM&quot;,
+  IF(AND(NOT(ISBLANK({!recRoutingCampaign.AM_Split_1__c})), NOT(ISBLANK({!recRoutingCampaign.AM_1__c})), CONTAINS(&quot;,&quot; &amp; SUBSTITUTE(UPPER({!recRoutingCampaign.AM_Split_1__c}), &quot; &quot;, &quot;&quot;) &amp; &quot;,&quot;, &quot;,&quot; &amp; {!formFirstLetter} &amp; &quot;,&quot;)), &quot;AM 1&quot;, IF(AND(NOT(ISBLANK({!recRoutingCampaign.AM_Split_2__c})), NOT(ISBLANK({!recRoutingCampaign.AM_2__c})), CONTAINS(&quot;,&quot; &amp; SUBSTITUTE(UPPER({!recRoutingCampaign.AM_Split_2__c}), &quot; &quot;, &quot;&quot;) &amp; &quot;,&quot;, &quot;,&quot; &amp; {!formFirstLetter} &amp; &quot;,&quot;)), &quot;AM 2&quot;, IF(AND(NOT(ISBLANK({!recRoutingCampaign.AM_Split_3__c})), NOT(ISBLANK({!recRoutingCampaign.AM_3__c})), CONTAINS(&quot;,&quot; &amp; SUBSTITUTE(UPPER({!recRoutingCampaign.AM_Split_3__c}), &quot; &quot;, &quot;&quot;) &amp; &quot;,&quot;, &quot;,&quot; &amp; {!formFirstLetter} &amp; &quot;,&quot;)), &quot;AM 3&quot;, &quot;AM 1 (default)&quot;))),
+  IF(AND(NOT(ISBLANK({!recRoutingCampaign.SDR_Split_1__c})), NOT(ISBLANK({!recRoutingCampaign.SDR_1__c})), CONTAINS(&quot;,&quot; &amp; SUBSTITUTE(UPPER({!recRoutingCampaign.SDR_Split_1__c}), &quot; &quot;, &quot;&quot;) &amp; &quot;,&quot;, &quot;,&quot; &amp; {!formFirstLetter} &amp; &quot;,&quot;)), &quot;SDR 1&quot;, IF(AND(NOT(ISBLANK({!recRoutingCampaign.SDR_Split_2__c})), NOT(ISBLANK({!recRoutingCampaign.SDR_2__c})), CONTAINS(&quot;,&quot; &amp; SUBSTITUTE(UPPER({!recRoutingCampaign.SDR_Split_2__c}), &quot; &quot;, &quot;&quot;) &amp; &quot;,&quot;, &quot;,&quot; &amp; {!formFirstLetter} &amp; &quot;,&quot;)), &quot;SDR 2&quot;, IF(AND(NOT(ISBLANK({!recRoutingCampaign.SDR_Split_3__c})), NOT(ISBLANK({!recRoutingCampaign.SDR_3__c})), CONTAINS(&quot;,&quot; &amp; SUBSTITUTE(UPPER({!recRoutingCampaign.SDR_Split_3__c}), &quot; &quot;, &quot;&quot;) &amp; &quot;,&quot;, &quot;,&quot; &amp; {!formFirstLetter} &amp; &quot;,&quot;)), &quot;SDR 3&quot;, IF(AND(NOT(ISBLANK({!recRoutingCampaign.SDR_Split_4__c})), NOT(ISBLANK({!recRoutingCampaign.SDR_4__c})), CONTAINS(&quot;,&quot; &amp; SUBSTITUTE(UPPER({!recRoutingCampaign.SDR_Split_4__c}), &quot; &quot;, &quot;&quot;) &amp; &quot;,&quot;, &quot;,&quot; &amp; {!formFirstLetter} &amp; &quot;,&quot;)), &quot;SDR 4&quot;, IF(AND(NOT(ISBLANK({!recRoutingCampaign.SDR_Split_5__c})), NOT(ISBLANK({!recRoutingCampaign.SDR_5__c})), CONTAINS(&quot;,&quot; &amp; SUBSTITUTE(UPPER({!recRoutingCampaign.SDR_Split_5__c}), &quot; &quot;, &quot;&quot;) &amp; &quot;,&quot;, &quot;,&quot; &amp; {!formFirstLetter} &amp; &quot;,&quot;)), &quot;SDR 5&quot;, IF(AND(NOT(ISBLANK({!recRoutingCampaign.SDR_Split_6__c})), NOT(ISBLANK({!recRoutingCampaign.SDR_6__c})), CONTAINS(&quot;,&quot; &amp; SUBSTITUTE(UPPER({!recRoutingCampaign.SDR_Split_6__c}), &quot; &quot;, &quot;&quot;) &amp; &quot;,&quot;, &quot;,&quot; &amp; {!formFirstLetter} &amp; &quot;,&quot;)), &quot;SDR 6&quot;, &quot;SDR 1 (default)&quot;))))))))</expression>
+    </formulas>
+    <formulas>
+        <description>User in the chosen letter-split slot on the Parent Campaign.</description>
+        <name>formSplitOwnerId</name>
+        <dataType>String</dataType>
+        <expression>CASE({!formSplitSlot},
+  &quot;AM 1&quot;, {!recRoutingCampaign.AM_1__c},
+  &quot;AM 1 (default)&quot;, {!recRoutingCampaign.AM_1__c},
+  &quot;AM 2&quot;, {!recRoutingCampaign.AM_2__c},
+  &quot;AM 3&quot;, {!recRoutingCampaign.AM_3__c},
+  &quot;SDR 1&quot;, {!recRoutingCampaign.SDR_1__c},
+  &quot;SDR 1 (default)&quot;, {!recRoutingCampaign.SDR_1__c},
+  &quot;SDR 2&quot;, {!recRoutingCampaign.SDR_2__c},
+  &quot;SDR 3&quot;, {!recRoutingCampaign.SDR_3__c},
+  &quot;SDR 4&quot;, {!recRoutingCampaign.SDR_4__c},
+  &quot;SDR 5&quot;, {!recRoutingCampaign.SDR_5__c},
+  &quot;SDR 6&quot;, {!recRoutingCampaign.SDR_6__c},
+  &quot;&quot;)</expression>
+    </formulas>
+    <formulas>
+        <description>Proposed owner: Account Team, then APAC specialist, then letter split.</description>
+        <name>formOwnerId</name>
+        <dataType>String</dataType>
+        <expression>IF(NOT(ISBLANK({!formTeamOwnerId})), {!formTeamOwnerId},
+IF(AND({!formIsAPAC}, NOT(ISBLANK({!formAPACOwnerId}))), {!formAPACOwnerId},
+{!formSplitOwnerId}))</expression>
+    </formulas>
+    <formulas>
+        <description>Routing reason for the proposed owner.</description>
+        <name>formOwnerReason</name>
+        <dataType>String</dataType>
+        <expression>IF(NOT(ISBLANK({!formTeamOwnerId})), {!formTeamReason},
+IF(AND({!formIsAPAC}, NOT(ISBLANK({!formAPACOwnerId}))), &quot;APAC specialist &quot; &amp; {!varRepType} &amp; &quot; on Parent Campaign&quot;,
+&quot;Letter split (&quot; &amp; BLANKVALUE({!formFirstLetter}, &quot;blank&quot;) &amp; &quot;) - &quot; &amp; {!formSplitSlot} &amp; IF({!formIsAPAC}, &quot; (APAC, but no APAC &quot; &amp; {!varRepType} &amp; &quot; set on Parent Campaign)&quot;, &quot;&quot;)))</expression>
+    </formulas>
+    <formulas>
+        <description>Proposed owner if they are an active user, otherwise blank.</description>
+        <name>formFinalOwnerId</name>
+        <dataType>String</dataType>
+        <expression>IF(ISBLANK({!Get_Assigned_User.Id}), &quot;&quot;, {!Get_Assigned_User.Id})</expression>
+    </formulas>
+    <formulas>
+        <description>Routing reason, noting when no active rep was found.</description>
+        <name>formFinalReason</name>
+        <dataType>String</dataType>
+        <expression>LEFT(
+IF(NOT(ISBLANK({!Get_Assigned_User.Id})), {!formOwnerReason},
+IF(ISBLANK({!formOwnerId}), &quot;Not routed: Account unassigned and no rep found on Parent Campaign for &quot; &amp; {!formOwnerReason},
+&quot;Not routed: rep is inactive - &quot; &amp; {!formOwnerReason})), 255)</expression>
+    </formulas>
+    <interviewLabel>Lead Routing Engine {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Lead Routing Engine</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Gets the oldest Account Team member on the Account with the Account Manager role.</description>
+        <name>Get_Account_Team_AM</name>
+        <label>Get Account Team AM</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Account_Team_SDR</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>varAccountId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>TeamMemberRole</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Account Manager</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>AccountTeamMember</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>UserId</queriedFields>
+        <sortField>CreatedDate</sortField>
+        <sortOrder>Asc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the oldest Account Team member on the Account with the Sales Development Representative role.</description>
+        <name>Get_Account_Team_SDR</name>
+        <label>Get Account Team SDR</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Assigned_User</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>varAccountId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>TeamMemberRole</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Sales Development Representative</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>AccountTeamMember</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>UserId</queriedFields>
+        <sortField>CreatedDate</sortField>
+        <sortOrder>Asc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Checks the chosen rep is an active user. Inactive users cannot own records, so no owner is returned if this finds nothing.</description>
+        <name>Get_Assigned_User</name>
+        <label>Get Assigned User</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Assign_Routing_Result</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>formOwnerId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>IsActive</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>User</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Account_Team_AM</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Parent Campaign (or the Campaign itself when it has no parent). Must include the SDR/AM, split and APAC fields.</description>
+        <name>recRoutingCampaign</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Campaign</objectType>
+    </variables>
+    <variables>
+        <description>Account the individual belongs to (Lead Account lookup or Contact Account). Blank for an unmatched Lead.</description>
+        <name>varAccountId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Campaign Type of the engagement, e.g. In Platform Demo Request.</description>
+        <name>varCampaignType</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Name used for the letter split: Account name, or Lead Company when no Account is linked.</description>
+        <name>varCompanyName</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Country of the individual.</description>
+        <name>varCountry</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Output: the user to assign. Blank when no active rep was found.</description>
+        <name>varOwnerId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <description>Region of the individual (Region picklist).</description>
+        <name>varRegion</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>SDR to route a Lead, AM to route an Opportunity.</description>
+        <name>varRepType</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Output: why this owner was chosen.</description>
+        <name>varRoutingReason</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+</Flow>

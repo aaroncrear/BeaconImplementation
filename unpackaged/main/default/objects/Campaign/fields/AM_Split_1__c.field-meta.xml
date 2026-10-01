@@ -3,8 +3,9 @@
     <fullName>AM_Split_1__c</fullName>
     <description>AM Split 1</description>
     <externalId>false</externalId>
+    <inlineHelpText>Comma-separated first letters of the Account name this rep covers, e.g. M,N,O,P. Used by lead routing.</inlineHelpText>
     <label>AM Split 1</label>
-    <length>20</length>
+    <length>255</length>
     <required>false</required>
     <trackHistory>false</trackHistory>
     <type>Text</type>
