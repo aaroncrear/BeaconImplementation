@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Project__c</fullName>
-    <description>Project the team member is assigned to.</description>
+    <fullName>Beacon_Project__c</fullName>
+    <description>Project the team member is assigned to. Master-detail to the Beacon Project (Project__c) object. Replaces the old Project__c field, which pointed at Milestone1_Project__c and cannot be re-pointed.</description>
     <label>Project</label>
     <referenceTo>Project__c</referenceTo>
     <relationshipLabel>Project Team Members</relationshipLabel>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
-        <members>Beacon_Project_Record_Page</members>
         <members>Beacon_Project_Task_Record_Page</members>
         <members>Beason_Milestone_Record_Page</members>
         <name>FlexiPage</name>
