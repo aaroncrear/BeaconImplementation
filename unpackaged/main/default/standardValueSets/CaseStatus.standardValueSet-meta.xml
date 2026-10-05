@@ -10,6 +10,7 @@
     <standardValue>
         <fullName>In Progress</fullName>
         <default>false</default>
+        <description>Case is being actively worked.</description>
         <label>In Progress</label>
         <closed>false</closed>
     </standardValue>
@@ -34,12 +35,14 @@
     <standardValue>
         <fullName>Cancelled</fullName>
         <default>false</default>
+        <description>Closed status: the request was withdrawn or will not be completed.</description>
         <label>Cancelled</label>
         <closed>true</closed>
     </standardValue>
     <standardValue>
         <fullName>Completed</fullName>
         <default>false</default>
+        <description>Closed status: the request has been fulfilled.</description>
         <label>Completed</label>
         <closed>true</closed>
     </standardValue>

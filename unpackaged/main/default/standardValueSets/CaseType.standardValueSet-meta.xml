@@ -19,21 +19,25 @@
     <standardValue>
         <fullName>Company Pipeline QC</fullName>
         <default>false</default>
+        <description>ResOps Request: quality check of a company pipeline.</description>
         <label>Company Pipeline QC</label>
     </standardValue>
     <standardValue>
         <fullName>Targeted QC-Provide Further Information</fullName>
         <default>false</default>
+        <description>ResOps Request: targeted quality check needing further information from the requester.</description>
         <label>Targeted QC-Provide Further Information</label>
     </standardValue>
     <standardValue>
         <fullName>Use Case - Provide Further Information</fullName>
         <default>false</default>
+        <description>ResOps Request: use case needing further information from the requester.</description>
         <label>Use Case - Provide Further Information</label>
     </standardValue>
     <standardValue>
         <fullName>Contract Cleanup</fullName>
         <default>false</default>
+        <description>ResOps Request: contract data cleanup.</description>
         <label>Contract Cleanup</label>
     </standardValue>
 </StandardValueSet>

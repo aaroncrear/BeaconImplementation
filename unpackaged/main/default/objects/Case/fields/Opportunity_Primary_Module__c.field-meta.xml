@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Opportunity_Primary_Module__c</fullName>
+    <description>Text value of the Primary Module picklist on the related Opportunity. Blank when the case has no Opportunity or the Opportunity has no Primary Module.</description>
+    <externalId>false</externalId>
+    <formula>TEXT(Opportunity__r.Primary_Module__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Primary Module</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
