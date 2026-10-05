@@ -9,7 +9,7 @@ The ResOps team needs a way for users to raise requests against an Opportunity a
 3. A **ResOps Request** action on Opportunity that defaults the Case's Opportunity to the record it's launched from and the Account to that Opportunity's Account.
 4. The action added to the **Beacon Subscription Renewal Opportunity Layout** and the **Opportunity Layout**.
 5. **Beacon - Baseline - Standard Field Access** updated to give Read, Create and Edit on Case, plus Read and Edit on the standard Case fields, set field by field (no View All Fields).
-6. Case **Status** values **In Progress**, **Cancelled** and **Completed** added, with Cancelled and Completed as closed statuses, and the picklist ordered New, On Hold, Escalated, Closed, Cancelled, Completed.
+6. Case **Status** values **In Progress**, **Cancelled** and **Completed** added, with Cancelled and Completed as closed statuses, and the picklist ordered New, In Progress, On Hold, Escalated, Closed, Cancelled, Completed.
 7. A new **ResOps Request** support process with New, In Progress, Cancelled and Completed.
 8. Case **Type** values **Company Pipeline QC**, **Targeted QC-Provide Further Information**, **Use Case - Provide Further Information** and **Contract Cleanup** added, and made the only Type values available on the ResOps Request record type.
 9. A new **Due Date Required** date field on Case, readable and editable by every persona "Object, Tab, FLS" permission set.
@@ -19,7 +19,7 @@ The ResOps team needs a way for users to raise requests against an Opportunity a
 
 ## Release Notes
 
-**Case Status values.** The `CaseStatus` standard value set now holds New, In Progress, On Hold, Escalated, Closed, Cancelled and Completed. Closed, Cancelled and Completed are closed statuses, and New stays the default. The requirement listed the order without In Progress, so it sits directly after New to follow the natural workflow (New → In Progress → done).
+**Case Status values.** The `CaseStatus` standard value set now holds New, In Progress, On Hold, Escalated, Closed, Cancelled and Completed. Closed, Cancelled and Completed are closed statuses, and New stays the default. In Progress sits directly after New, as confirmed with the business, to follow the natural workflow (New → In Progress → done).
 
 **ResOps Request support process.** The new `ResOps Request` business process offers only New (default), In Progress, Cancelled and Completed. It gives ResOps cases two closed outcomes (Cancelled, Completed) without the generic Closed status.
 
