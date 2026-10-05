@@ -19,6 +19,10 @@
                 <behavior>Required</behavior>
                 <field>Type</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Priority</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
