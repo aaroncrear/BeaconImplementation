@@ -480,7 +480,7 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Case.Due_Date_Required__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -940,6 +940,10 @@
     </recordTypeVisibilities>
     <recordTypeVisibilities>
         <recordType>Campaign.Sub_Campaign</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>Case.ResOps_Request</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
 </PermissionSet>

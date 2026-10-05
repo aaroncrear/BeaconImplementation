@@ -2057,10 +2057,6 @@
         <recordType>Opportunity.Subscription_Renewal</recordType>
     </layoutAssignments>
     <layoutAssignments>
-        <layout>Case-ResOps Request Case Layout</layout>
-        <recordType>Case.ResOps_Request</recordType>
-    </layoutAssignments>
-    <layoutAssignments>
         <layout>OpportunityTeamMember-Opportunity Team Member Layout</layout>
     </layoutAssignments>
     <layoutAssignments>

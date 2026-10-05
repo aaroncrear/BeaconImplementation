@@ -654,8 +654,4 @@
         <viewAllFields>false</viewAllFields>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
-    <recordTypeVisibilities>
-        <recordType>Case.ResOps_Request</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
 </PermissionSet>
