@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ResOps_Request</fullName>
+    <active>true</active>
+    <businessProcess>ResOps Request</businessProcess>
+    <description>Requests raised to the ResOps team from an Opportunity.</description>
+    <label>ResOps Request</label>
+    <picklistValues>
+        <picklist>Type</picklist>
+        <values>
+            <fullName>Company Pipeline QC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contract Cleanup</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Targeted QC-Provide Further Information</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Use Case - Provide Further Information</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

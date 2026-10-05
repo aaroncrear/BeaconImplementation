@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sorted>false</sorted>
+    <standardValue>
+        <fullName>Problem</fullName>
+        <default>false</default>
+        <label>Problem</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Feature Request</fullName>
+        <default>false</default>
+        <label>Feature Request</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Question</fullName>
+        <default>false</default>
+        <label>Question</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Company Pipeline QC</fullName>
+        <default>false</default>
+        <label>Company Pipeline QC</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Targeted QC-Provide Further Information</fullName>
+        <default>false</default>
+        <label>Targeted QC-Provide Further Information</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Use Case - Provide Further Information</fullName>
+        <default>false</default>
+        <label>Use Case - Provide Further Information</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Contract Cleanup</fullName>
+        <default>false</default>
+        <label>Contract Cleanup</label>
+    </standardValue>
+</StandardValueSet>
