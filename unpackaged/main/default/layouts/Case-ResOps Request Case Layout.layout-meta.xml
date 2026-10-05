@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Layout xmlns="http://soap.sforce.com/2006/04/metadata">
     <emailDefault>false</emailDefault>
+    <excludeButtons>OpenSlackRecordChannel</excludeButtons>
     <layoutSections>
         <customLabel>false</customLabel>
         <detailHeading>false</detailHeading>
@@ -20,12 +21,16 @@
                 <field>Type</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Edit</behavior>
-                <field>Priority</field>
+                <behavior>Readonly</behavior>
+                <field>Opportunity_Primary_Module__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>Origin</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Priority</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
@@ -40,10 +45,6 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>Opportunity__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>Opportunity_Primary_Module__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>
@@ -82,9 +83,9 @@
         <detailHeading>false</detailHeading>
         <editHeading>false</editHeading>
         <label>Custom Links</label>
-        <layoutColumns/>
-        <layoutColumns/>
-        <layoutColumns/>
+        <layoutColumns />
+        <layoutColumns />
+        <layoutColumns />
         <style>CustomLinks</style>
     </layoutSections>
     <layoutSections>
@@ -233,9 +234,6 @@
         <fields>TASK.LAST_UPDATE</fields>
         <relatedList>RelatedHistoryList</relatedList>
     </relatedLists>
-    <relatedLists>
-        <relatedList>RelatedAttachmentList</relatedList>
-    </relatedLists>
     <relatedObjects>Opportunity__c</relatedObjects>
     <relatedObjects>AccountId</relatedObjects>
     <runAssignmentRulesDefault>false</runAssignmentRulesDefault>
@@ -245,4 +243,10 @@
     <showKnowledgeComponent>false</showKnowledgeComponent>
     <showRunAssignmentRulesCheckbox>true</showRunAssignmentRulesCheckbox>
     <showSubmitAndAttachButton>true</showSubmitAndAttachButton>
+    <summaryLayout>
+        <masterLabel>00hS900000Ynt9U</masterLabel>
+        <sizeX>4</sizeX>
+        <sizeY>0</sizeY>
+        <summaryLayoutStyle>Default</summaryLayoutStyle>
+    </summaryLayout>
 </Layout>
