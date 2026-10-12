@@ -6,6 +6,7 @@
   - Beacon Consulting - Object, Tab, FLS (`Beacon_Consulting_Object_Tab_FLS`)
   - Beacon Salesforce Admin - Object, Tab, FLS (`Beacon_Salesforce_Admin_Object_Tab_FLS`)
 - The access called out was `PermissionSetFieldPermissions.Milestone1_Milestone__c.Kickoff__c`. The access to remove also covers the rest of the Milestone objects and their related objects.
+- Keep Project Team Member (`Project_Team_Member__c`). The new Project Management app uses it, so its access must stay and the object must not be deleted.
 
 ## Release Notes
 
@@ -18,6 +19,7 @@
 - **What was left out:**
   - `Milestone1_Log__c`, `Milestone1_Settings__c` and `Project_Snapshot__c` aren't in the package because neither permission set grants access to them in the org.
   - `Project_Team_Member__c` isn't in the package because the new Project Management app on `Beacon-Custom-PM-App` uses it.
+- **Kept `Project_Team_Member__c` out of the destructive deploy.** It was removed from `manifest/destructive/project-management/destructiveChanges.xml`, so the Milestone cleanup no longer deletes it. In the Beacon HTCDEV org, its `Project__c` master-detail field points to the new `Project__c` object, not to `Milestone1_Project__c`. So deleting the Milestone objects doesn't affect it.
 - **No changes to `unpackaged/`.** The source permission sets are already correct.
 
 ## Acceptance Criteria
@@ -33,12 +35,12 @@
 7. Confirm the other access did not change. In both permission sets, Account, Contact, Lead, Opportunity, Campaign, `Project__c`, `Project_Time__c` and `Project_Team_Member__c` should have the same object and field access as before.
 8. Run this query in the sandbox and confirm it returns 0 rows:
    `SELECT Parent.Name, Field FROM FieldPermissions WHERE Parent.Name IN ('Beacon_Consulting_Object_Tab_FLS','Beacon_Salesforce_Admin_Object_Tab_FLS') AND SobjectType IN ('Milestone1_Expense__c','Milestone1_Milestone__c','Milestone1_Project__c','Milestone1_Task__c','Milestone1_Time__c')`
-9. Log in as a user who has one of these permission sets and no other Milestone access. Confirm the Project tab and Milestone records can't be opened.
+9. Run the destructive deploy from `claude/peaceful-davinci-ocwwbe`. Confirm that Project Team Member still appears in Setup > Object Manager, along with its fields, records and permission set access.
+10. Log in as a user who has one of these permission sets and no other Milestone access. Confirm the Project tab and Milestone records can't be opened.
 
 ## Post Deployment Items
 
 - **Deploy this before the destructive deploy.** Deploy the revoke package before the `manifest/destructive/project-management/` destructive deploy from `claude/peaceful-davinci-ocwwbe`. If the Milestone objects are deleted first, this package will fail on missing fields. In that case it isn't needed, because deleting the objects also removes their permissions.
-- **Check `Project_Team_Member__c` in the destructive manifest.** `destructiveChanges.xml` still lists `Project_Team_Member__c`, but the new Project Management app (`Beacon-Custom-PM-App`) uses that object. Remove it from `destructiveChanges.xml` before running the destructive deploy, or the new object will be deleted.
 
 ## Component Manifest
 
@@ -49,3 +51,4 @@ Github Branch: [claude/admiring-hamilton-ovtct6](https://github.com/aaroncrear/B
 | 1 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Revokes all object, field and tab access to the 5 Milestone1 objects, including `Milestone1_Milestone__c.Kickoff__c`. Deployed from `manifest/destructive/project-management/revoke-access/`. |
 | 2 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Revokes all object, field and tab access to the 5 Milestone1 objects, including `Milestone1_Milestone__c.Kickoff__c`. Deployed from `manifest/destructive/project-management/revoke-access/`. |
 | 3 | Deployment Manifest | N/A | manifest/destructive/project-management/revoke-access/package.xml | package.xml | Created | Package manifest for the two permission set revoke files. |
+| 4 | Deployment Manifest | N/A | manifest/destructive/project-management/destructiveChanges.xml | destructiveChanges.xml | Updated | Removed `Project_Team_Member__c` so the destructive deploy keeps the Project Team Member object. |

@@ -9,7 +9,6 @@
         <members>Milestone1_Task__c</members>
         <members>Milestone1_Time__c</members>
         <members>Project_Snapshot__c</members>
-        <members>Project_Team_Member__c</members>
         <name>CustomObject</name>
     </types>
     <version>67.0</version>
