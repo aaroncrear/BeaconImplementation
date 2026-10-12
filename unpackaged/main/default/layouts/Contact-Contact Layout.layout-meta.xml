@@ -20,7 +20,7 @@
                 <field>Name</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Edit</behavior>
+                <behavior>Required</behavior>
                 <field>Title</field>
             </layoutItems>
             <layoutItems>
@@ -51,6 +51,10 @@
                 <behavior>Edit</behavior>
                 <field>ReportsToId</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Required</behavior>
+                <field>CurrencyIsoCode</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
@@ -78,7 +82,7 @@
                 <field>LeadSource</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Edit</behavior>
+                <behavior>Required</behavior>
                 <field>Lead_Type__c</field>
             </layoutItems>
             <layoutItems>
