@@ -10,6 +10,8 @@ level access." It must grant:
 - **Read, Create, Update** access to Account, Contact, and Opportunity.
 - The same tab and field level access, per object, as the existing
   **Beacon Sales - Object, Tab, FLS** permission set.
+- Read only access to Lead fields, to match Read only access to the Lead object.
+- Read only access to the Account Plan and Action Plan objects and their fields.
 
 ## Release Notes
 
@@ -26,24 +28,33 @@ matches Sales exactly for the five objects in scope.
 | Opportunity | ✔ | ✔ | ✔ | |
 | Lead | ✔ | | | |
 | Campaign | ✔ | | | |
+| Account Plan | ✔ | | | |
+| Account Plan Objective | ✔ | | | |
+| Account Plan Objective Measure | ✔ | | | |
+| Account Plan Objective Measure Relationship (`AccountPlanObjMeasRela`) | ✔ | | | |
+| Action Plan | ✔ | | | |
+| Action Plan Template | ✔ | | | |
 
 **Tab settings.** These are the same as Sales: the standard Account, Contact, Opportunity, Lead,
 and Campaign tabs are set to `Visible`.
 
-**Field Level Security.** All 124 field permissions on Account (17), Contact (13),
-Opportunity (34), Lead (16), and Campaign (44) were copied from the Sales permission set without
-changes. The Read and Edit values match Sales field by field.
+**Field Level Security.** All field permissions on Account (17), Contact (13), Opportunity (34),
+and Campaign (44) were copied from the Sales permission set without changes. The Read and Edit
+values match Sales field by field.
 
-**Out of scope.** The Sales permission set also covers Account Plan, Account Plan Objective,
-Account Plan Objective Measure, Account Plan Objective Measure Relationship, Action Plan, and
-Action Plan Template. The request did not ask for those objects, so they were left out of the
-Finance permission set, along with their field permissions.
+Lead (16 fields) was copied from Sales too, but every Lead field is **Read only**, to match the
+Read only access on the Lead object. In Sales, 9 of these fields have Edit access because Sales
+can create and edit Leads: `Account__c`, `Department__c`, `Lead_Type__c`, `NAICS_Code__c`,
+`NAICS_Description__c`, `Region__c`, `Second_Email__c`, `United_States_Time_Zone__c`, and
+`Unqualified_Reason__c`. Those 9 were set to Read only for Finance.
 
-**Lead field access note.** In Sales, Lead is Create/Read/Edit, so 9 Lead fields have Edit FLS
-(`Account__c`, `Department__c`, `Lead_Type__c`, `NAICS_Code__c`, `NAICS_Description__c`,
-`Region__c`, `Second_Email__c`, `United_States_Time_Zone__c`, `Unqualified_Reason__c`). The
-request asked for the same FLS, so those values were kept. Finance has Read only on the Lead
-object, though, so in practice Finance users can't edit these fields. They only get Read access.
+**Account Plan and Action Plan.** Object access was added for Account Plan, Account Plan
+Objective, Account Plan Objective Measure, Account Plan Objective Measure Relationship, Action
+Plan, and Action Plan Template. Each one is **Read only** (Create, Edit, and Delete are off). The
+same 34 fields that Sales covers on these objects were added: Account Plan (20), Account Plan
+Objective (5), Account Plan Objective Measure (3), and Action Plan (6). All of them are
+**Read only**. Sales doesn't set tab visibility for these objects, so none was added for
+Finance.
 
 The permission set uses the `Salesforce` license, like the other Beacon persona permission sets.
 
@@ -56,10 +67,16 @@ The permission set uses the `Salesforce` license, like the other Beacon persona 
 3. Under **Object Settings**, check each object:
    - Account, Contact, Opportunity: Read, Create, and Edit checked. Delete, View All, and Modify
      All unchecked.
-   - Lead, Campaign: only Read checked.
+   - Lead, Campaign, Account Plan, Account Plan Objective, Account Plan Objective Measure,
+     Account Plan Objective Measure Relationship, Action Plan, Action Plan Template: only Read
+     checked.
    - Tab Settings for all five objects: **Visible**.
-4. For each of the five objects, compare the Field Permissions with **Beacon Sales - Object, Tab,
-   FLS**. Read and Edit should match field for field.
+4. Check the Field Permissions:
+   - Account, Contact, Opportunity, Campaign: Read and Edit match **Beacon Sales - Object, Tab,
+     FLS** field for field.
+   - Lead: all 16 fields have Read checked and Edit unchecked.
+   - Account Plan (20 fields), Account Plan Objective (5), Account Plan Objective Measure (3),
+     Action Plan (6): all fields have Read checked and Edit unchecked.
 5. Assign the permission set to a test Finance user who has no other Beacon object permission
    sets. Log in as that user and check that:
    - The Account, Contact, Opportunity, Lead, and Campaign tabs appear in the App Launcher.
@@ -67,6 +84,8 @@ The permission set uses the `Salesforce` license, like the other Beacon persona 
      them.
    - The user can view Leads and Campaigns, but sees no New or Edit buttons and can't delete
      them.
+   - The user can open an existing Account Plan and Action Plan (for example from the related
+     list on an Account) and view their fields, but can't create, edit, or delete them.
 
 ## Post Deployment Items
 
@@ -79,4 +98,4 @@ Github Branch: [claude/beacon-finance-permission-set-2h8i1x](https://github.com/
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Permission Set | N/A | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Created | Read on Lead and Campaign; Create/Read/Edit on Account, Contact, and Opportunity; tab and field access copied from Beacon Sales - Object, Tab, FLS for those objects. |
+| 1 | Permission Set | N/A | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Created | Create/Read/Edit on Account, Contact, and Opportunity; Read only on Lead, Campaign, Account Plan (and its Objective, Objective Measure, and Objective Measure Relationship objects), Action Plan, and Action Plan Template. Tab and field access copied from Beacon Sales - Object, Tab, FLS, with all Lead, Account Plan, and Action Plan fields set to Read only. |
