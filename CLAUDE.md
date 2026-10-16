@@ -22,3 +22,9 @@ Required sections, in order:
    `#`, `Component Type`, `Object`, `API Name`, `Label`, `Created/Updated/Deleted`, `Description`.
 
 Add one row per component changed — don't leave unused blank rows.
+
+## Branch Naming
+
+Always name feature branches exactly as the user instructs — use the user's
+exact wording, spelling, and casing. Do not substitute auto-generated or
+session-assigned branch names.
