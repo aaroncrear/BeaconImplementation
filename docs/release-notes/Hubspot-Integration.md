@@ -27,14 +27,14 @@ object permissions only for `Account`, `Campaign`, `Contact`, `Lead`, and `Oppor
 Each has Read, Create, Edit, Delete, View All, and Modify All, as HubSpot requires. All
 other object permissions (608) were removed from the file.
 
-**System permissions trimmed.** Sixteen system permissions came over in the retrieved file.
-Most of them were switched on along with Modify All Data, such as Transfer Any Record,
-Manage Quotas, Override Forecasts, View All Forecasts, Import Leads, Convert Leads, and
-Password Never Expires. Only these four are kept:
-
-- `ViewSetup` – View Setup and Configuration, required by HubSpot.
-- `ModifyMetadata` – required by HubSpot for the Embed window and deal sync.
-- `EditTask` and `EditEvent` – let HubSpot sync activities as Salesforce Tasks and Events.
+**System permissions unchanged.** This build changes object permissions only. The 16
+system permissions in the permission set are kept exactly as configured in the org:
+Convert Leads, Edit Events, Edit Tasks, Import Leads, Manage Categories, Manage Quotas,
+Modify Metadata, Override Forecasts, Password Never Expires, Import Solutions, Transfer
+Record, Transfer Leads, Use Team Reassignment Wizards, View All Forecasts, View Roles and
+Role Hierarchy, and View Setup and Configuration. View All Data, Modify All Data, and
+Download AppExchange Packages were already removed in the org before the file was
+retrieved.
 
 **What was not added, and why.**
 
@@ -55,10 +55,9 @@ Password Never Expires. Only these four are kept:
    Confirm that only Accounts, Campaigns, Contacts, Leads, and Opportunities show access,
    and that each has Read, Create, Edit, Delete, View All, and Modify All.
 2. Open any other object (for example Cases or Products) and confirm it has no access.
-3. Open **System Permissions** and confirm that only View Setup and Configuration, Modify
-   Metadata, Edit Tasks, and Edit Events are enabled. Confirm that View All Data, Modify
-   All Data, Download AppExchange Packages, Customize Application, Manage Users, and
-   Transfer Record are all unchecked.
+3. Open **System Permissions** and confirm that View All Data, Modify All Data, Download
+   AppExchange Packages, Customize Application, and Manage Users are all unchecked, and
+   that View Setup and Configuration and Modify Metadata are checked.
 4. In the Developer Console, run this query and confirm it returns exactly 5 rows (Account,
    Campaign, Contact, Lead, Opportunity):
    `SELECT SobjectType FROM ObjectPermissions WHERE Parent.Name = 'Beacon_Hubspot_Integration'`
@@ -93,4 +92,4 @@ Github Branch: [Hubspot-Integration](https://github.com/aaroncrear/BeaconImpleme
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|-------------|
-| 1 | Permission Set | N/A | Beacon_Hubspot_Integration | Beacon - Hubspot Integration | Created | Integration user permission set on the Salesforce API Integration licence. Holds Modify All on Account, Campaign, Contact, Lead, and Opportunity only, plus View Setup and Configuration, Modify Metadata, Edit Tasks, and Edit Events. |
+| 1 | Permission Set | N/A | Beacon_Hubspot_Integration | Beacon - Hubspot Integration | Created | Integration user permission set on the Salesforce API Integration licence. Object permissions limited to Modify All on Account, Campaign, Contact, Lead, and Opportunity; 608 other object permissions removed. System permissions unchanged from the org. |
