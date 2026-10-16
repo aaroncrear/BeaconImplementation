@@ -27,14 +27,16 @@ object permissions only for `Account`, `Campaign`, `Contact`, `Lead`, and `Oppor
 Each has Read, Create, Edit, Delete, View All, and Modify All, as HubSpot requires. All
 other object permissions (608) were removed from the file.
 
-**System permissions unchanged.** This build changes object permissions only. The 16
-system permissions in the permission set are kept exactly as configured in the org:
-Convert Leads, Edit Events, Edit Tasks, Import Leads, Manage Categories, Manage Quotas,
-Modify Metadata, Override Forecasts, Password Never Expires, Import Solutions, Transfer
-Record, Transfer Leads, Use Team Reassignment Wizards, View All Forecasts, View Roles and
-Role Hierarchy, and View Setup and Configuration. View All Data, Modify All Data, and
-Download AppExchange Packages were already removed in the org before the file was
-retrieved.
+**System permissions.** This build is about object permissions, and system permissions are
+kept as configured in the org with two exceptions. **Import Solutions** depends on Create,
+Read, Edit and Delete on Solutions, so the deployment failed once Solution was removed.
+Import Solutions and the related **Manage Categories** were removed rather than giving
+the integration user access to Solutions, which HubSpot doesn't use. The remaining 14 are
+unchanged: Convert Leads, Edit Events, Edit Tasks, Import Leads, Manage Quotas, Modify
+Metadata, Override Forecasts, Password Never Expires, Transfer Record, Transfer Leads, Use
+Team Reassignment Wizards, View All Forecasts, View Roles and Role Hierarchy, and View
+Setup and Configuration. View All Data, Modify All Data, and Download AppExchange Packages
+were already removed in the org before the file was retrieved.
 
 **What was not added, and why.**
 
@@ -92,4 +94,4 @@ Github Branch: [Hubspot-Integration](https://github.com/aaroncrear/BeaconImpleme
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|-------------|
-| 1 | Permission Set | N/A | Beacon_Hubspot_Integration | Beacon - Hubspot Integration | Created | Integration user permission set on the Salesforce API Integration licence. Object permissions limited to Modify All on Account, Campaign, Contact, Lead, and Opportunity; 608 other object permissions removed. System permissions unchanged from the org. |
+| 1 | Permission Set | N/A | Beacon_Hubspot_Integration | Beacon - Hubspot Integration | Created | Integration user permission set on the Salesforce API Integration licence. Object permissions limited to Modify All on Account, Campaign, Contact, Lead, and Opportunity; 608 other object permissions removed. Import Solutions and Manage Categories system permissions removed; other system permissions unchanged. |
