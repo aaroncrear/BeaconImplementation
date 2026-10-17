@@ -1,8 +1,13 @@
 @IsTest
 private class LeadUploadControllerTest {
+    private static final String PARTNER_QUEUE = 'Test_Lead_Upload_Partner_Queue';
+    private static final String DEFAULT_QUEUE = 'Test_Lead_Upload_Default_Queue';
+
     // Runs each test as the current user with the Beacon - Lead Upload permission set, which
-    // grants FLS on the Lead Upload fields that user-mode DML needs.
+    // grants the Lead Upload FLS that user-mode queries need. Routing starts switched off so
+    // tests don't depend on the org's Lead Upload Setting record; routing tests override it.
     private static User uploader() {
+        LeadUploadRouting.settingOverride = new Lead_Upload_Setting__mdt(Default_Queue__c = null, Share_With_Uploader__c = false);
         PermissionSet permissionSet = [SELECT Id FROM PermissionSet WHERE Name = 'Beacon_Lead_Upload' LIMIT 1];
         List<PermissionSetAssignment> existing = [
             SELECT Id FROM PermissionSetAssignment
@@ -12,6 +17,22 @@ private class LeadUploadControllerTest {
             insert new PermissionSetAssignment(AssigneeId = UserInfo.getUserId(), PermissionSetId = permissionSet.Id);
         }
         return new User(Id = UserInfo.getUserId());
+    }
+
+    // Setup objects: call before System.runAs to avoid mixed DML.
+    private static Id createLeadQueue(String developerName) {
+        Group queue = new Group(Name = developerName, DeveloperName = developerName, Type = 'Queue');
+        insert queue;
+        insert new QueueSobject(QueueId = queue.Id, SobjectType = 'Lead');
+        return queue.Id;
+    }
+
+    private static List<Map<String, String>> validRows(Integer count) {
+        List<Map<String, String>> rows = new List<Map<String, String>>();
+        for (Integer i = 0; i < count; i++) {
+            rows.add(validRow(i));
+        }
+        return rows;
     }
 
     private static Map<String, String> validRow(Integer i) {
@@ -65,7 +86,8 @@ private class LeadUploadControllerTest {
 
             Lead_Upload__c upload = [
                 SELECT Status__c, Total_Rows__c, Success_Count__c, Error_Count__c, Completed_Date__c,
-                    (SELECT NumberOfEmployees, AnnualRevenue FROM Leads)
+                    Assigned_Queue__c, Partner_Account__c,
+                    (SELECT NumberOfEmployees, AnnualRevenue, OwnerId, Partner_Account__c FROM Leads)
                 FROM Lead_Upload__c WHERE Id = :uploadId
             ];
             Assert.areEqual(rows.size(), upload.Success_Count__c);
@@ -74,6 +96,9 @@ private class LeadUploadControllerTest {
             Assert.areEqual(rows.size(), upload.Leads.size());
             Assert.areEqual(1250, upload.Leads[0].NumberOfEmployees);
             Assert.areEqual(2500000, upload.Leads[0].AnnualRevenue);
+            Assert.isNull(upload.Assigned_Queue__c, 'No queue configured');
+            Assert.areEqual(UserInfo.getUserId(), upload.Leads[0].OwnerId, 'Uploader keeps Leads when no queue is configured');
+            Assert.isNull(upload.Leads[0].Partner_Account__c, 'Internal uploader has no partner account');
         }
     }
 
@@ -153,6 +178,77 @@ private class LeadUploadControllerTest {
             } catch (AuraHandledException e) {
                 Assert.isTrue(e.getMessage().contains('already finished'), e.getMessage());
             }
+        }
+    }
+
+    @IsTest
+    static void partnerQueueOnAccountRoutesLeads() {
+        User runAs = uploader();
+        Id partnerQueueId = createLeadQueue(PARTNER_QUEUE);
+        createLeadQueue(DEFAULT_QUEUE);
+        System.runAs(runAs) {
+            Account partner = new Account(Name = 'Lead Upload Partner', Lead_Upload_Queue__c = PARTNER_QUEUE);
+            insert partner;
+            LeadUploadRouting.partnerAccountIdOverride = partner.Id;
+            LeadUploadRouting.externalUserOverride = true;
+            LeadUploadRouting.settingOverride = new Lead_Upload_Setting__mdt(Default_Queue__c = DEFAULT_QUEUE, Share_With_Uploader__c = true);
+
+            Test.startTest();
+            Id uploadId = LeadUploadController.startUpload('partner.csv', 2);
+            List<LeadUploadController.RowResult> results =
+                LeadUploadController.uploadLeads(uploadId, JSON.serialize(validRows(2)), 2, null);
+            LeadUploadController.completeUpload(uploadId, null);
+            Test.stopTest();
+
+            for (LeadUploadController.RowResult result : results) {
+                Assert.isTrue(result.success, 'Row ' + result.rowNumber + ' failed: ' + result.message);
+            }
+            Lead_Upload__c upload = [
+                SELECT Assigned_Queue__c, Partner_Account__c, (SELECT OwnerId, Partner_Account__c FROM Leads)
+                FROM Lead_Upload__c WHERE Id = :uploadId
+            ];
+            Assert.areEqual(PARTNER_QUEUE, upload.Assigned_Queue__c, 'Partner queue wins over the default');
+            Assert.areEqual(partner.Id, upload.Partner_Account__c);
+            Assert.areEqual(2, upload.Leads.size());
+            for (Lead lead : upload.Leads) {
+                Assert.areEqual(partnerQueueId, lead.OwnerId, 'Lead should be owned by the partner queue');
+                Assert.areEqual(partner.Id, lead.Partner_Account__c);
+            }
+        }
+    }
+
+    @IsTest
+    static void defaultQueueUsedWhenPartnerHasNone() {
+        User runAs = uploader();
+        Id defaultQueueId = createLeadQueue(DEFAULT_QUEUE);
+        System.runAs(runAs) {
+            Account partner = new Account(Name = 'Lead Upload Partner Without Queue');
+            insert partner;
+            LeadUploadRouting.partnerAccountIdOverride = partner.Id;
+            LeadUploadRouting.settingOverride = new Lead_Upload_Setting__mdt(Default_Queue__c = DEFAULT_QUEUE, Share_With_Uploader__c = false);
+
+            Id uploadId = LeadUploadController.startUpload('partner.csv', 1);
+            LeadUploadController.uploadLeads(uploadId, JSON.serialize(validRows(1)), 2, null);
+
+            Lead lead = [SELECT OwnerId, Partner_Account__c FROM Lead WHERE Lead_Upload__c = :uploadId];
+            Assert.areEqual(defaultQueueId, lead.OwnerId, 'Lead should go to the default queue');
+            Assert.areEqual(partner.Id, lead.Partner_Account__c);
+        }
+    }
+
+    @IsTest
+    static void missingQueueBlocksUpload() {
+        System.runAs(uploader()) {
+            Account partner = new Account(Name = 'Misconfigured Partner', Lead_Upload_Queue__c = 'No_Such_Queue');
+            insert partner;
+            LeadUploadRouting.partnerAccountIdOverride = partner.Id;
+            try {
+                LeadUploadController.startUpload('partner.csv', 1);
+                Assert.fail('An upload routed to a missing queue should be blocked');
+            } catch (AuraHandledException e) {
+                Assert.isTrue(e.getMessage().contains('No_Such_Queue'), e.getMessage());
+            }
+            Assert.areEqual(0, [SELECT COUNT() FROM Lead_Upload__c], 'No upload record when routing fails');
         }
     }
 }

@@ -314,7 +314,7 @@ export default class LeadUploader extends LightningElement {
 
 function downloadCsv(fileName, csv) {
     const link = document.createElement('a');
-    link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('﻿' + csv);
+    link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\ufeff' + csv);
     link.download = /\.csv$/i.test(fileName) ? fileName : `${fileName}.csv`;
     link.click();
 }

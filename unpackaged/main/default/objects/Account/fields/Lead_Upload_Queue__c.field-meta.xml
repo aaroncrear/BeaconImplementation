@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Lead_Upload_Queue__c</fullName>
+    <description>Partner accounts only. API name (Developer Name) of the Lead queue that receives Leads this partner's users upload through the Lead Uploader. Leave blank to use the Default Queue on the Lead Upload Setting custom metadata. The queue must exist and support Leads, or the partner's uploads are blocked.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Queue API name (e.g. Partner_Leads) that Leads uploaded by this partner are assigned to. Blank = the default partner queue.</inlineHelpText>
+    <label>Lead Upload Queue</label>
+    <length>80</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

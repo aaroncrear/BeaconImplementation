@@ -177,6 +177,10 @@
                 <behavior>Readonly</behavior>
                 <field>Lead_Upload__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>Partner_Account__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
