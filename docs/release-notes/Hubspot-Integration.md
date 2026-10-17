@@ -38,6 +38,16 @@ Team Reassignment Wizards, View All Forecasts, View Roles and Role Hierarchy, an
 Setup and Configuration. View All Data, Modify All Data, and Download AppExchange Packages
 were already removed in the org before the file was retrieved.
 
+**Beacon Integration User profile.** The profile was retrieved from the org so it is
+included with the integration build. Its 218 tab settings were removed from the file. On
+deployment Salesforce rejected `standard-PricebookEntry` ("not a valid tab"), because some
+standard tabs can be retrieved but not deployed. This profile is API Only, so its users
+never see tabs, and a profile deployment leaves any tab setting that isn't in the file
+unchanged in the org. Removing the tab settings therefore changes nothing in the org and
+avoids the same error on other tabs. Everything else in the profile (API Enabled, API Only
+User, field permissions, layout assignments, record type and app visibility) is as
+retrieved.
+
 **What was not added, and why.**
 
 - **API Enabled** is not in the permission set. On the Salesforce Integration user licence
@@ -95,3 +105,4 @@ Github Branch: [Hubspot-Integration](https://github.com/aaroncrear/BeaconImpleme
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|-------------|
 | 1 | Permission Set | N/A | Beacon_Hubspot_Integration | Beacon - Hubspot Integration | Created | Integration user permission set on the Salesforce API Integration licence. Object permissions limited to Modify All on Account, Campaign, Contact, Lead, and Opportunity; 608 other object permissions removed. Import Solutions and Manage Categories system permissions removed; other system permissions unchanged. |
+| 2 | Profile | N/A | Beacon Integration User | Beacon Integration User | Updated | Salesforce Integration licence profile for integration users (API Enabled, API Only User). Tab settings removed from the file so the profile deploys; no change in the org. |
