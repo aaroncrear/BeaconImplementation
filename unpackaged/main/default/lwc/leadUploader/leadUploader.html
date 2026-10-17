@@ -1,0 +1,104 @@
+<template>
+    <lightning-card title={cardTitle} icon-name="standard:lead">
+        <lightning-button
+            slot="actions"
+            label="Download Template"
+            icon-name="utility:download"
+            onclick={handleDownloadTemplate}
+            disabled={hasLoadError}
+        ></lightning-button>
+
+        <div class="slds-p-horizontal_medium">
+            <template lwc:if={loadError}>
+                <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">{loadError}</div>
+            </template>
+            <template lwc:else>
+                <p class="slds-m-bottom_small">
+                    Upload a CSV file of up to {maxRows} Leads. Use the template for the column headers.
+                    Required columns: {requiredFieldLabels}.
+                </p>
+
+                <lightning-input
+                    type="file"
+                    label="Lead CSV file"
+                    accept=".csv"
+                    onchange={handleFileChange}
+                    disabled={isFileInputDisabled}
+                ></lightning-input>
+
+                <template lwc:if={hasFile}>
+                    <p class="slds-m-top_small">
+                        <strong>{fileName}</strong> &middot; {rowCount} rows
+                    </p>
+
+                    <template lwc:if={hasFileErrors}>
+                        <div class="slds-notify slds-notify_alert slds-alert_error slds-m-top_small" role="alert">
+                            <ul class="slds-list_dotted">
+                                <template for:each={fileErrors} for:item="fileError">
+                                    <li key={fileError}>{fileError}</li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+
+                    <template lwc:if={hasIgnoredHeaders}>
+                        <div class="slds-notify slds-notify_alert slds-alert_warning slds-m-top_small" role="status">
+                            These columns don't match a Lead field and will be ignored: {ignoredHeaderText}
+                        </div>
+                    </template>
+
+                    <template lwc:if={columnMap.length}>
+                        <h3 class="slds-text-heading_small slds-m-top_medium slds-m-bottom_x-small">{previewLabel}</h3>
+                        <div class="preview">
+                            <lightning-datatable
+                                key-field="key"
+                                data={previewData}
+                                columns={previewColumns}
+                                hide-checkbox-column
+                                column-widths-mode="auto"
+                            ></lightning-datatable>
+                        </div>
+                    </template>
+                </template>
+
+                <template lwc:if={isUploading}>
+                    <div class="slds-m-top_medium">
+                        <p class="slds-m-bottom_x-small">Uploading&hellip; {processedRows} of {rowCount} rows processed</p>
+                        <lightning-progress-bar value={progress} size="large"></lightning-progress-bar>
+                    </div>
+                </template>
+
+                <template lwc:if={result}>
+                    <div class={resultVariant} role="status">
+                        <span>{result.message}</span>
+                    </div>
+                </template>
+
+                <div class="slds-m-top_medium slds-m-bottom_small">
+                    <lightning-button
+                        variant="brand"
+                        label="Upload Leads"
+                        onclick={handleUpload}
+                        disabled={isUploadDisabled}
+                    ></lightning-button>
+                    <template lwc:if={hasErrorRows}>
+                        <lightning-button
+                            class="slds-m-left_x-small"
+                            label="Download Errors"
+                            icon-name="utility:download"
+                            onclick={handleDownloadErrors}
+                            disabled={isUploading}
+                        ></lightning-button>
+                    </template>
+                    <template lwc:if={result}>
+                        <lightning-button
+                            class="slds-m-left_x-small"
+                            label="Start Over"
+                            onclick={handleReset}
+                        ></lightning-button>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>
