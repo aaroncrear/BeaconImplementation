@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>User_Persona__c</fullName>
+    <description>Beacon user persona assigned from the Title. Groups are checked in order (Competitor Intelligence, Translational, Business Development, Clinical Research, Research, Senior Leadership) and the first group with a matching keyword wins. Blank when no keyword matches. Custom field created specifically for the HubSpot integration, outside of the HubSpot managed package.</description>
+    <externalId>false</externalId>
+    <formula>IF( OR(
+CONTAINS( LOWER( Title ), "competit" ),
+CONTAINS( LOWER( Title ), "intelligence" ),
+CONTAINS( LOWER( Title ), "landscape" ),
+CONTAINS( LOWER( Title ), "forecast" ),
+CONTAINS( LOWER( Title ), "insights" ),
+CONTAINS( LOWER( Title ), "analyst" ),
+CONTAINS( LOWER( Title ), "analytics" ),
+CONTAINS( LOWER( Title ), "benchmarking" )
+), "Competitor Intelligence",
+IF( OR(
+CONTAINS( LOWER( Title ), "translation" ),
+CONTAINS( LOWER( Title ), "biomarker" ),
+CONTAINS( LOWER( Title ), "precision medicine" ),
+CONTAINS( LOWER( Title ), "patient selection" ),
+CONTAINS( LOWER( Title ), "companion diagnostic" )
+), "Translational",
+IF( OR(
+CONTAINS( LOWER( Title ), "business development" ),
+CONTAINS( LOWER( Title ), "alliance" ),
+CONTAINS( LOWER( Title ), "licensing" ),
+CONTAINS( LOWER( Title ), "partner" ),
+CONTAINS( LOWER( Title ), "corporate development" ),
+CONTAINS( LOWER( Title ), "search and evaluation" ),
+CONTAINS( LOWER( Title ), "search &amp; evaluation" ),
+CONTAINS( LOWER( Title ), "external innovation" ),
+CONTAINS( LOWER( Title ), "deal" ),
+CONTAINS( LOWER( Title ), "transaction" ),
+CONTAINS( LOWER( Title ), "m&amp;a" ),
+CONTAINS( LOWER( Title ), "acquisitions" ),
+CONTAINS( LOWER( Title ), "investor relations" ),
+CONTAINS( Title, "BD" )
+), "Business Development",
+IF( OR(
+CONTAINS( LOWER( Title ), "clinical" ),
+CONTAINS( LOWER( Title ), "medical" ),
+CONTAINS( LOWER( Title ), "physician" ),
+CONTAINS( LOWER( Title ), "investigator" ),
+CONTAINS( LOWER( Title ), "study manager" ),
+CONTAINS( LOWER( Title ), "study director" ),
+CONTAINS( LOWER( Title ), "patient recruitment" ),
+CONTAINS( Title, "CRA" ),
+CONTAINS( Title, "CRC" )
+), "Clinical Research",
+IF( OR(
+CONTAINS( LOWER( Title ), "research" ),
+CONTAINS( LOWER( Title ), "scientist" ),
+CONTAINS( LOWER( Title ), "scientific" ),
+CONTAINS( LOWER( Title ), "fellow" ),
+CONTAINS( LOWER( Title ), "postdoc" ),
+CONTAINS( LOWER( Title ), "postgraduate" ),
+CONTAINS( LOWER( Title ), "professor" ),
+CONTAINS( LOWER( Title ), "lecturer" ),
+CONTAINS( LOWER( Title ), "engineer" ),
+CONTAINS( LOWER( Title ), "biology" ),
+CONTAINS( LOWER( Title ), "biologist" ),
+CONTAINS( LOWER( Title ), "immunology" ),
+CONTAINS( LOWER( Title ), "immunologist" ),
+CONTAINS( LOWER( Title ), "chemist" ),
+CONTAINS( LOWER( Title ), "pharmacology" ),
+CONTAINS( LOWER( Title ), "pharmacologist" ),
+CONTAINS( LOWER( Title ), "discovery" ),
+CONTAINS( LOWER( Title ), "preclinical" ),
+CONTAINS( LOWER( Title ), "laboratory" ),
+CONTAINS( LOWER( Title ), "r&amp;d" ),
+CONTAINS( LOWER( Title ), "innovation" ),
+CONTAINS( " " &amp; LOWER( Title ), " lab" )
+), "Research",
+IF( OR(
+CONTAINS( LOWER( Title ), "chief" ),
+CONTAINS( LOWER( Title ), "executive" ),
+CONTAINS( LOWER( Title ), "president" ),
+CONTAINS( LOWER( Title ), "head" ),
+CONTAINS( LOWER( Title ), "leader" ),
+CONTAINS( LOWER( Title ), "director" ),
+CONTAINS( LOWER( Title ), "founder" ),
+CONTAINS( LOWER( Title ), "founding" ),
+CONTAINS( LOWER( Title ), "owner" ),
+CONTAINS( LOWER( Title ), "chair" ),
+CONTAINS( LOWER( Title ), "board" ),
+CONTAINS( LOWER( Title ), "general counsel" ),
+CONTAINS( Title, "VP" ),
+CONTAINS( Title, "CFO" ),
+CONTAINS( Title, "CHRO" ),
+CONTAINS( Title, "CIO" ),
+CONTAINS( Title, "CMO" ),
+CONTAINS( Title, "COO" ),
+CONTAINS( Title, "CPO" ),
+CONTAINS( Title, "CRO" ),
+CONTAINS( Title, "CSO" ),
+CONTAINS( Title, "CEO" )
+), "Senior Leadership",
+""
+))))))</formula>
+    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+    <label>User Persona</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

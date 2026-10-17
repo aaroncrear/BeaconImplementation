@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ABM_Flag__c</fullName>
+    <description>Manual checkbox set by Beacon. Flagged on the parent Salesforce account and applied to child accounts (approach to be confirmed). Custom field created specifically for the HubSpot integration, outside of the HubSpot managed package.</description>
+    <defaultValue>false</defaultValue>
+    <externalId>false</externalId>
+    <label>ABM Flag</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>
