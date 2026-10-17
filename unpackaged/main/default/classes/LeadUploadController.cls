@@ -4,13 +4,8 @@
  *
  * The component parses the file in the browser and sends it here in batches of up to 200
  * rows, so each batch is its own transaction and stays well inside governor limits (Lead
- * flows included).
- *
- * Security: the uploader's object access and field-level security are checked on every Lead
- * field taken from the file, and Lead Upload records are read in user mode, so users only see
- * their own uploads. Owner, partner and counter fields are set by the server in system mode,
- * because partner users can't assign records to a queue and shouldn't be able to edit them.
- * LeadUploadRouting decides who owns the Leads.
+ * flows included). Every query and DML statement runs in user mode, so the uploader's object
+ * access, field-level security and sharing all apply.
  *
  * Call order: startUpload -> uploadLeads (once per batch) -> completeUpload.
  */
@@ -93,28 +88,15 @@ public with sharing class LeadUploadController {
         if (totalRows > MAX_ROWS) {
             throw newAuraException('The file has ' + totalRows + ' rows. The limit is ' + MAX_ROWS + '.');
         }
-        if (!Schema.SObjectType.Lead.isCreateable() || !Schema.SObjectType.Lead_Upload__c.isCreateable()) {
-            throw newAuraException('You do not have permission to upload Leads.');
-        }
-
-        LeadUploadRouting.Route route;
-        try {
-            route = LeadUploadRouting.resolve(UserInfo.getUserId());
-        } catch (LeadUploadRouting.RoutingException e) {
-            throw newAuraException(e.getMessage());
-        }
-
         Lead_Upload__c upload = new Lead_Upload__c(
             File_Name__c = String.isBlank(fileName) ? null : fileName.left(255),
             Total_Rows__c = totalRows,
             Success_Count__c = 0,
             Error_Count__c = 0,
-            Status__c = STATUS_IN_PROGRESS,
-            Partner_Account__c = route.partnerAccountId,
-            Assigned_Queue__c = route.queueName
+            Status__c = STATUS_IN_PROGRESS
         );
         try {
-            insert as system upload;
+            insert as user upload;
         } catch (Exception e) {
             throw newAuraException('The upload could not be started: ' + e.getMessage());
         }
@@ -128,9 +110,6 @@ public with sharing class LeadUploadController {
      */
     @AuraEnabled
     public static List<RowResult> uploadLeads(Id uploadId, String rowsJson, Integer firstRowNumber, String defaultLeadSource) {
-        if (!Schema.SObjectType.Lead.isCreateable()) {
-            throw newAuraException('You do not have permission to create Leads.');
-        }
         Lead_Upload__c upload = getUpload(uploadId);
         if (upload.Status__c != STATUS_IN_PROGRESS) {
             throw newAuraException('This upload has already finished.');
@@ -150,13 +129,6 @@ public with sharing class LeadUploadController {
         }
         Integer startRow = firstRowNumber == null ? 1 : firstRowNumber;
 
-        LeadUploadRouting.Route route;
-        try {
-            route = LeadUploadRouting.forUpload(upload, UserInfo.getUserId());
-        } catch (LeadUploadRouting.RoutingException e) {
-            throw newAuraException(e.getMessage());
-        }
-
         Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.Lead.fields.getMap();
         Set<String> allowedFields = new Set<String>(UPLOAD_FIELDS);
 
@@ -167,7 +139,9 @@ public with sharing class LeadUploadController {
         for (Integer i = 0; i < rows.size(); i++) {
             Integer rowNumber = startRow + i;
             try {
-                leadsToInsert.add(buildLead(rows[i], fieldMap, allowedFields, defaultLeadSource));
+                Lead lead = buildLead(rows[i], fieldMap, allowedFields, defaultLeadSource);
+                lead.Lead_Upload__c = upload.Id;
+                leadsToInsert.add(lead);
                 insertRowNumbers.add(rowNumber);
             } catch (RowException e) {
                 results.add(new RowResult(rowNumber, false, null, e.getMessage()));
@@ -175,38 +149,14 @@ public with sharing class LeadUploadController {
         }
 
         if (!leadsToInsert.isEmpty()) {
-            // Enforce field-level security on the values that came from the file. getUploadFields
-            // only offers creatable fields, so anything removed here means the request was altered
-            // or the user's access changed mid-upload.
-            SObjectAccessDecision decision = Security.stripInaccessible(AccessType.CREATABLE, leadsToInsert);
-            Set<String> removedFields = decision.getRemovedFields().get('Lead');
-            if (removedFields != null && !removedFields.isEmpty()) {
-                throw newAuraException('You do not have access to these Lead fields: ' + String.join(new List<String>(removedFields), ', '));
-            }
-            leadsToInsert = (List<Lead>) decision.getRecords();
-
-            // Server-controlled fields, added after the FLS check.
-            for (Lead lead : leadsToInsert) {
-                lead.Lead_Upload__c = upload.Id;
-                lead.Partner_Account__c = route.partnerAccountId;
-                if (route.queueId != null) {
-                    lead.OwnerId = route.queueId;
-                }
-            }
-
-            List<Id> createdLeadIds = new List<Id>();
-            List<Database.SaveResult> saveResults = Database.insert(leadsToInsert, false, AccessLevel.SYSTEM_MODE);
+            List<Database.SaveResult> saveResults = Database.insert(leadsToInsert, false, AccessLevel.USER_MODE);
             for (Integer i = 0; i < saveResults.size(); i++) {
                 Database.SaveResult saveResult = saveResults[i];
                 if (saveResult.isSuccess()) {
-                    createdLeadIds.add(saveResult.getId());
                     results.add(new RowResult(insertRowNumbers[i], true, saveResult.getId(), null));
                 } else {
                     results.add(new RowResult(insertRowNumbers[i], false, null, describeErrors(saveResult.getErrors())));
                 }
-            }
-            if (route.shareWithUploader && !createdLeadIds.isEmpty()) {
-                LeadUploadRouting.shareWithUploader(createdLeadIds, UserInfo.getUserId());
             }
         }
 
@@ -218,7 +168,7 @@ public with sharing class LeadUploadController {
         }
         upload.Success_Count__c = (upload.Success_Count__c == null ? 0 : upload.Success_Count__c) + successCount;
         upload.Error_Count__c = (upload.Error_Count__c == null ? 0 : upload.Error_Count__c) + (results.size() - successCount);
-        update as system upload;
+        update as user upload;
 
         return results;
     }
@@ -245,7 +195,7 @@ public with sharing class LeadUploadController {
             upload.Status__c = STATUS_COMPLETED_WITH_ERRORS;
         }
         upload.Completed_Date__c = System.now();
-        update as system upload;
+        update as user upload;
 
         if (String.isNotBlank(errorCsv)) {
             ContentVersion errorFile = new ContentVersion(
@@ -261,7 +211,7 @@ public with sharing class LeadUploadController {
 
     private static Lead_Upload__c getUpload(Id uploadId) {
         List<Lead_Upload__c> uploads = [
-            SELECT Id, Name, Status__c, Total_Rows__c, Success_Count__c, Error_Count__c, Partner_Account__c, Assigned_Queue__c
+            SELECT Id, Name, Status__c, Total_Rows__c, Success_Count__c, Error_Count__c
             FROM Lead_Upload__c
             WHERE Id = :uploadId
             WITH USER_MODE

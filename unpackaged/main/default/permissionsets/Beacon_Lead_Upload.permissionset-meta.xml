@@ -4,7 +4,7 @@
         <apexClass>LeadUploadController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
-    <description>Lets a user upload Lead lists of up to 2,000 rows with the Lead Uploader component. Grants Lead Read/Create, Edit on the Lead fields the upload can fill, Read on the upload tracking fields, Lead Upload Read/Create and access to the LeadUploadController Apex class. No user license is set, so it can be assigned to Experience Cloud (Partner) users as well as internal users.</description>
+    <description>Lets a user upload Lead lists of up to 2,000 rows with the Lead Uploader component. Grants Lead Read/Create, Edit on the fields the upload can fill, access to the Lead Upload object and the LeadUploadController Apex class. No user license is set, so it can be assigned to Experience Cloud (Partner) users as well as internal users.</description>
     <fieldPermissions>
         <editable>true</editable>
         <field>Lead.Address</field>
@@ -31,13 +31,13 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.Lead_Upload__c</field>
+        <editable>true</editable>
+        <field>Lead.LeadSource</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Lead.LeadSource</field>
+        <field>Lead.Lead_Upload__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -48,11 +48,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Lead.NumberOfEmployees</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.Partner_Account__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -71,42 +66,32 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead_Upload__c.Assigned_Queue__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Lead_Upload__c.Completed_Date__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Lead_Upload__c.Error_Count__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Lead_Upload__c.File_Name__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead_Upload__c.Partner_Account__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Lead_Upload__c.Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Lead_Upload__c.Success_Count__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Lead_Upload__c.Total_Rows__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -125,7 +110,7 @@
     <objectPermissions>
         <allowCreate>true</allowCreate>
         <allowDelete>false</allowDelete>
-        <allowEdit>false</allowEdit>
+        <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
         <object>Lead_Upload__c</object>
