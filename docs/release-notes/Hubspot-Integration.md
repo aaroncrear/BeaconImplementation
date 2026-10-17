@@ -48,6 +48,13 @@ avoids the same error on other tabs. Everything else in the profile (API Enabled
 User, field permissions, layout assignments, record type and app visibility) is as
 retrieved.
 
+**Beacon - Hubspot User permission set.** A new, empty permission set,
+`Beacon_Hubspot_User`, on the Salesforce licence for Beacon users who work with HubSpot.
+It will hold any access to customizations built outside the HubSpot managed package, so
+that this access stays separate from the package's own permission sets and from the
+integration user's `Beacon_Hubspot_Integration`. It grants no permissions yet. Permissions
+will be added as the HubSpot customizations are built.
+
 **What was not added, and why.**
 
 - **API Enabled** is not in the permission set. On the Salesforce Integration user licence
@@ -76,6 +83,9 @@ retrieved.
 5. Create a user on the **Beacon Integration User** profile and assign this permission
    set. In HubSpot, connect to Salesforce while logged in as that user. Confirm the
    connection succeeds and that a test Contact and Lead sync in both directions.
+6. In Setup, open **Permission Sets** and confirm **Beacon - Hubspot User** exists, with
+   API Name `Beacon_Hubspot_User`, License **Salesforce**, and the description "Holds
+   customization made outside of the Hubspot managed package."
 
 ## Post Deployment Items
 
@@ -106,3 +116,4 @@ Github Branch: [Hubspot-Integration](https://github.com/aaroncrear/BeaconImpleme
 |---|----------------|--------|----------|-------|-------------------------|-------------|
 | 1 | Permission Set | N/A | Beacon_Hubspot_Integration | Beacon - Hubspot Integration | Created | Integration user permission set on the Salesforce API Integration licence. Object permissions limited to Modify All on Account, Campaign, Contact, Lead, and Opportunity; 608 other object permissions removed. Import Solutions and Manage Categories system permissions removed; other system permissions unchanged. |
 | 2 | Profile | N/A | Beacon Integration User | Beacon Integration User | Updated | Salesforce Integration licence profile for integration users (API Enabled, API Only User). Tab settings removed from the file so the profile deploys; no change in the org. |
+| 3 | Permission Set | N/A | Beacon_Hubspot_User | Beacon - Hubspot User | Created | Salesforce licence permission set for Beacon users. Holds customization made outside of the HubSpot managed package. Contains no permissions yet. |
