@@ -690,6 +690,16 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
+                <fieldItem>Record.AM_APAC__c</fieldItem>
+                <identifier>RecordAM_APAC__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
                 <fieldItem>Record.SDR_1__c</fieldItem>
                 <identifier>RecordSDR_1_cField</identifier>
             </fieldInstance>
@@ -730,18 +740,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.SDR_5__c</fieldItem>
-                <identifier>RecordSDR_5_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.SDR_6__c</fieldItem>
-                <identifier>RecordSDR_6_cField</identifier>
+                <fieldItem>Record.SDR_APAC__c</fieldItem>
+                <identifier>RecordSDR_APAC__cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-bbf67b65-a949-41fd-9379-5dadea3d4642</name>

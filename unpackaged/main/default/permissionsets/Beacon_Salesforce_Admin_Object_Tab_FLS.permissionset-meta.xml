@@ -351,6 +351,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Campaign.AM_APAC__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Campaign.AM_Split_1__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -652,6 +657,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Campaign.SDR_6__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Campaign.SDR_APAC__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

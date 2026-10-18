@@ -8,6 +8,12 @@
         <converted>false</converted>
     </standardValue>
     <standardValue>
+        <fullName>Unqualified</fullName>
+        <default>false</default>
+        <label>Unqualified</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
         <fullName>New</fullName>
         <default>true</default>
         <label>New</label>
@@ -26,15 +32,15 @@
         <converted>false</converted>
     </standardValue>
     <standardValue>
+        <fullName>Ready to Convert</fullName>
+        <default>false</default>
+        <label>Ready to Convert</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
         <fullName>Qualified</fullName>
         <default>false</default>
         <label>Qualified</label>
         <converted>true</converted>
-    </standardValue>
-    <standardValue>
-        <fullName>Unqualified</fullName>
-        <default>false</default>
-        <label>Unqualified</label>
-        <converted>false</converted>
     </standardValue>
 </StandardValueSet>
