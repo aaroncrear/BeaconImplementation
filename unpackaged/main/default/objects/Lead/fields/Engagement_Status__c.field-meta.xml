@@ -15,7 +15,7 @@ IF( ISPICKVAL( Account__r.Type, "Customer" ),
     IMAGE("/resource/Customer", "Customer", 20, 81),
 IF( ISPICKVAL( Account__r.Type, "Prospect" ),
     IMAGE("/resource/Prospect", "Prospect", 20, 76),
-    ""
+    IMAGE("/resource/Prospect", "Prospect", 20, 76)
 ))))))</formula>
     <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
     <label>Engagement Status</label>
