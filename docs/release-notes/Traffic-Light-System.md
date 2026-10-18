@@ -12,7 +12,7 @@ Users need to see a record's engagement status at a glance, as a colored flag ic
   3. Do Not Call is checked → **Do Not Call** flag.
   4. Email Opt Out is checked → **Do Not Email** flag.
   5. The Account's Type is Customer → **Customer** flag.
-  6. The Account's Type is Prospect → **Prospect** flag.
+  6. None of the above → **Prospect** flag. On Accounts, Contacts and Leads, Prospect is the default: it shows whenever no other status applies, including when the Account's Type is blank or any value other than Customer. On Opportunities, the Prospect flag shows only when the Account's Type is Prospect.
 - On Leads and Contacts, use the standard **Do Not Call** (`DoNotCall`) and **Email Opt Out** (`HasOptedOutOfEmail`) fields.
 - For the Account Type, Leads use the custom **Account** lookup. Contacts and Opportunities use the standard **Account** field.
 - Add the field as the last field on each object's custom compact layout.
@@ -50,7 +50,9 @@ The cache control is set to **Public**. This lets Salesforce cache the images, s
 
 A Text formula field, **Engagement Status** (`Engagement_Status__c`), was added to **Account**, **Contact**, **Lead** and **Opportunity**. Its description is "Used to display colored icons for engagement status using Static Resources."
 
-Each formula is a chain of `IF()` checks in the required order, so the first matching status wins. For example, a blacklisted record always shows the Blacklisted flag, even if it is also opted out. When no status matches, the field is blank.
+Each formula is a chain of `IF()` checks in the required order, so the first matching status wins. For example, a blacklisted record always shows the Blacklisted flag, even if it is also opted out.
+
+On **Account**, **Contact** and **Lead**, the **Prospect** flag is the default. When no other status matches, the field shows Prospect, so these records never show a blank Engagement Status. This includes a blank or non-Customer Account Type, and a Contact or Lead with no Account. The formula no longer checks for Type = Prospect, because the default already covers it. On **Opportunity**, the field still shows Prospect only when the Account's Type is Prospect, and is blank when no status matches.
 
 Each object reads these fields:
 
@@ -76,11 +78,11 @@ IF( HasOptedOutOfEmail,
     IMAGE("/resource/Do_Not_Email", "Do Not Email", 20, 101),
 IF( ISPICKVAL( Account__r.Type, "Customer" ),
     IMAGE("/resource/Customer", "Customer", 20, 81),
-IF( ISPICKVAL( Account__r.Type, "Prospect" ),
-    IMAGE("/resource/Prospect", "Prospect", 20, 76),
-    ""
-))))))
+    IMAGE("/resource/Prospect", "Prospect", 20, 76)
+)))))
 ```
+
+The Prospect flag is the last argument of the final `IF()`, so it shows when every earlier check is false.
 
 Each `IMAGE()` call sets an exact height and width. This shows every icon at 20 pixels high with its correct proportions. Each also sets alternate text, which screen readers read aloud and which shows if the image cannot load.
 
@@ -132,26 +134,28 @@ Formula fields cannot be edited, so only read access is granted.
 6. **Account:** on one Account, work through each status and confirm the icon in the highlights panel. Uncheck everything before each step unless it says otherwise.
    1. Set **Type** to **Customer**. Confirm the green **Customer** flag.
    2. Set **Type** to **Prospect**. Confirm the green **Prospect** flag.
-   3. Set **Type** to any other value, or leave it blank. Confirm the field is blank.
+   3. Set **Type** to any other value, then leave it blank. In both cases, confirm the green **Prospect** flag, because Prospect is the default when no other status applies.
    4. Check **Email Opt Out**. Confirm the orange **Do Not Email** flag.
    5. Check **Do Not Call** only. Confirm the orange **Do Not Call** flag.
    6. Check both **Do Not Call** and **Email Opt Out**. Confirm the red **Do Not Contact** flag.
    7. With both still checked, and **Type** set to **Customer**, check **Blacklisted**. Confirm the black **Blacklisted** flag, because Blacklisted is checked first.
-7. **Contact:** on a Contact whose Account has **Type** = Customer, repeat step 6 using the Contact's **Blacklisted**, **Do Not Call** and **Email Opt Out** fields. Confirm the Customer and Prospect flags follow the Account's Type. Then remove the Account from the Contact and confirm the field is blank when no other status applies.
-8. **Lead:** on a Lead, set the custom **Account** lookup to an Account with **Type** = Customer, then Prospect. Confirm the Customer and Prospect flags. Repeat the checkbox steps from step 6 using the Lead's **Blacklisted**, **Do Not Call** and **Email Opt Out** fields.
-9. **Opportunity:** on an Opportunity, confirm the Customer and Prospect flags follow the Account's **Type**. Check **Blacklisted**, **Do Not Call** and **Email Opt Out** on the related Account, and confirm the Opportunity's icon updates to match once the flow syncs them.
+7. **Contact:** on a Contact whose Account has **Type** = Customer, repeat step 6 using the Contact's **Blacklisted**, **Do Not Call** and **Email Opt Out** fields. Confirm the Customer and Prospect flags follow the Account's Type. Then remove the Account from the Contact and confirm the green **Prospect** flag when no other status applies.
+8. **Lead:** on a Lead, set the custom **Account** lookup to an Account with **Type** = Customer, then Prospect. Confirm the Customer and Prospect flags. Set the lookup to an Account with any other Type, then clear the lookup. In both cases, confirm the green **Prospect** flag. Repeat the checkbox steps from step 6 using the Lead's **Blacklisted**, **Do Not Call** and **Email Opt Out** fields.
+9. **Opportunity:** on an Opportunity, confirm the Customer and Prospect flags follow the Account's **Type**, and the field is blank when the Account's Type is any other value and no other status applies. Check **Blacklisted**, **Do Not Call** and **Email Opt Out** on the related Account, and confirm the Opportunity's icon updates to match once the flow syncs them.
 10. On each object, add **Engagement Status** to a list view and to a report. Confirm the icons show at the same 20-pixel height as on the record, sharp and readable.
 11. Open a Lead and confirm **Engagement Status** shows in the highlights panel, with **Phone** and **Mobile** shown as one field with a dropdown.
 12. Open each compact layout in **Object Manager → Compact Layouts** and confirm **Engagement Status** is the last field. For Opportunity, check both **New Awesome Compact Layout** and **Opportunity Compact Layout**.
 
 ## Post Deployment Items
 
-- Confirm the Account **Type** picklist has values whose API names are exactly `Customer` and `Prospect`. The formulas match those exact API names. If the org uses different values, such as `Customer - Direct`, update the formulas to match.
+- Confirm the Account **Type** picklist has values whose API names are exactly `Customer` and `Prospect`. The formulas match those exact API names. If the org uses different values, such as `Customer - Direct`, update the formulas to match. On Accounts, Contacts and Leads, a Customer value that does not match will show the Prospect flag instead.
 - To show the icon in the Contact highlights panel, assign the **Contact Compact Layout** as the primary compact layout in **Object Manager → Contact → Compact Layouts → Compact Layout Assignment**. It is currently the System Default. Skip this if Contacts should keep the System Default.
 
 ## Component Manifest
 
 Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Traffic-Light-System
+
+Prospect default update (rows 7–9): https://github.com/aaroncrear/BeaconImplementation/tree/claude/festive-volta-ut0pgb
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
@@ -161,9 +165,9 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Traffic-L
 | 4 | StaticResource | N/A | Do_Not_Email | Do_Not_Email | Created | Orange flag icon with the text "Do Not Email". Used in formula fields to display icons on records, list views and reports. |
 | 5 | StaticResource | N/A | Customer | Customer | Created | Green flag icon with the text "Customer". Used in formula fields to display icons on records, list views and reports. |
 | 6 | StaticResource | N/A | Prospect | Prospect | Created | Green flag icon with the text "Prospect". Used in formula fields to display icons on records, list views and reports. |
-| 7 | CustomField | Account | Engagement_Status__c | Engagement Status | Created | Text formula showing the engagement status icon, based on Blacklisted__c, Do_Not_Call__c, Email_Opt_Out__c and Type. |
-| 8 | CustomField | Contact | Engagement_Status__c | Engagement Status | Created | Text formula showing the engagement status icon, based on Blacklisted__c, DoNotCall, HasOptedOutOfEmail and Account.Type. |
-| 9 | CustomField | Lead | Engagement_Status__c | Engagement Status | Created | Text formula showing the engagement status icon, based on Blacklisted__c, DoNotCall, HasOptedOutOfEmail and Account__r.Type. |
+| 7 | CustomField | Account | Engagement_Status__c | Engagement Status | Created/Updated | Text formula showing the engagement status icon, based on Blacklisted__c, Do_Not_Call__c, Email_Opt_Out__c and Type. Updated to show the Prospect flag by default when no other status applies. |
+| 8 | CustomField | Contact | Engagement_Status__c | Engagement Status | Created/Updated | Text formula showing the engagement status icon, based on Blacklisted__c, DoNotCall, HasOptedOutOfEmail and Account.Type. Updated to show the Prospect flag by default when no other status applies. |
+| 9 | CustomField | Lead | Engagement_Status__c | Engagement Status | Created/Updated | Text formula showing the engagement status icon, based on Blacklisted__c, DoNotCall, HasOptedOutOfEmail and Account__r.Type. Updated to show the Prospect flag by default when no other status applies. |
 | 10 | CustomField | Opportunity | Engagement_Status__c | Engagement Status | Created | Text formula showing the engagement status icon, based on Blacklisted__c, Do_Not_Call__c, Email_Opt_Out__c and Account.Type. |
 | 11 | CompactLayout | Account | Account_Compact_Layout | Account Compact Layout | Updated | Added Engagement_Status__c as the last field. |
 | 12 | CompactLayout | Contact | Contact_Compact_Layout | Contact Compact Layout | Updated | Added Engagement_Status__c as the last field. |
