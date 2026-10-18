@@ -12,7 +12,8 @@ Users need to see a record's engagement status at a glance, as a colored flag ic
   3. Do Not Call is checked → **Do Not Call** flag.
   4. Email Opt Out is checked → **Do Not Email** flag.
   5. The Account's Type is Customer → **Customer** flag.
-  6. None of the above → **Prospect** flag. On Accounts, Contacts and Leads, Prospect is the default: it shows whenever no other status applies, including when the Account's Type is blank or any value other than Customer. On Opportunities, the Prospect flag shows only when the Account's Type is Prospect.
+  6. The Account's Type is Prospect → **Prospect** flag.
+  7. On Accounts, Contacts and Leads only: none of the above → **Prospect** flag. This covers records where no other criteria are met, such as a blank or other Account Type, or a Contact or Lead with no Account. On Opportunities, the field stays blank when no criteria are met.
 - On Leads and Contacts, use the standard **Do Not Call** (`DoNotCall`) and **Email Opt Out** (`HasOptedOutOfEmail`) fields.
 - For the Account Type, Leads use the custom **Account** lookup. Contacts and Opportunities use the standard **Account** field.
 - Add the field as the last field on each object's custom compact layout.
@@ -52,7 +53,7 @@ A Text formula field, **Engagement Status** (`Engagement_Status__c`), was added 
 
 Each formula is a chain of `IF()` checks in the required order, so the first matching status wins. For example, a blacklisted record always shows the Blacklisted flag, even if it is also opted out.
 
-On **Account**, **Contact** and **Lead**, the **Prospect** flag is the default. When no other status matches, the field shows Prospect, so these records never show a blank Engagement Status. This includes a blank or non-Customer Account Type, and a Contact or Lead with no Account. The formula no longer checks for Type = Prospect, because the default already covers it. On **Opportunity**, the field still shows Prospect only when the Account's Type is Prospect, and is blank when no status matches.
+On **Account**, **Contact** and **Lead**, the **Prospect** flag is also the fallback. The Type = Prospect check stays in place, and a final default was added after it, so when no criteria are met the field shows Prospect instead of being blank. This covers a blank or other Account Type, and a Contact or Lead with no Account. On **Opportunity**, the field is still blank when no status matches.
 
 Each object reads these fields:
 
@@ -78,11 +79,13 @@ IF( HasOptedOutOfEmail,
     IMAGE("/resource/Do_Not_Email", "Do Not Email", 20, 101),
 IF( ISPICKVAL( Account__r.Type, "Customer" ),
     IMAGE("/resource/Customer", "Customer", 20, 81),
+IF( ISPICKVAL( Account__r.Type, "Prospect" ),
+    IMAGE("/resource/Prospect", "Prospect", 20, 76),
     IMAGE("/resource/Prospect", "Prospect", 20, 76)
-)))))
+))))))
 ```
 
-The Prospect flag is the last argument of the final `IF()`, so it shows when every earlier check is false.
+The last argument of the final `IF()` is the Prospect flag, so it shows when no criteria are met.
 
 Each `IMAGE()` call sets an exact height and width. This shows every icon at 20 pixels high with its correct proportions. Each also sets alternate text, which screen readers read aloud and which shows if the image cannot load.
 
