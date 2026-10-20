@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Key_Job_Title__c</fullName>
+    <description>Checked when the Title contains a Beacon key job title keyword (case-insensitive; VP, EVP and SVP in capitals). Used by Data Universe Tier. Custom field created specifically for the HubSpot integration, outside of the HubSpot managed package.</description>
+    <externalId>false</externalId>
+    <formula>OR(
+CONTAINS( LOWER( Title ), "access" ),
+CONTAINS( LOWER( Title ), "acquisition" ),
+CONTAINS( LOWER( Title ), "affairs" ),
+CONTAINS( LOWER( Title ), "alliance" ),
+CONTAINS( LOWER( Title ), "analy" ),
+CONTAINS( LOWER( Title ), "antibody" ),
+CONTAINS( LOWER( Title ), "biochemist" ),
+CONTAINS( LOWER( Title ), "biolog" ),
+CONTAINS( LOWER( Title ), "biomarker" ),
+CONTAINS( LOWER( Title ), "business dev" ),
+CONTAINS( LOWER( Title ), "chair" ),
+CONTAINS( LOWER( Title ), "chemistry" ),
+CONTAINS( LOWER( Title ), "chief" ),
+CONTAINS( LOWER( Title ), "clinical" ),
+CONTAINS( LOWER( Title ), "collaboration" ),
+CONTAINS( LOWER( Title ), "commercial" ),
+CONTAINS( LOWER( Title ), "competitive" ),
+CONTAINS( LOWER( Title ), "competitor" ),
+CONTAINS( LOWER( Title ), "corporate dev" ),
+CONTAINS( LOWER( Title ), "director" ),
+CONTAINS( LOWER( Title ), "discovery" ),
+CONTAINS( LOWER( Title ), "drug" ),
+CONTAINS( LOWER( Title ), "engineering" ),
+CONTAINS( LOWER( Title ), "founder" ),
+CONTAINS( LOWER( Title ), "founding" ),
+CONTAINS( LOWER( Title ), "general manager" ),
+CONTAINS( LOWER( Title ), "head of" ),
+CONTAINS( LOWER( Title ), "immuno" ),
+CONTAINS( LOWER( Title ), "innovation" ),
+CONTAINS( LOWER( Title ), "insights" ),
+CONTAINS( LOWER( Title ), "intelligence" ),
+CONTAINS( LOWER( Title ), "investor" ),
+CONTAINS( LOWER( Title ), "m&amp;a" ),
+CONTAINS( LOWER( Title ), "medical" ),
+CONTAINS( LOWER( Title ), "medicinal" ),
+CONTAINS( LOWER( Title ), "merger" ),
+CONTAINS( LOWER( Title ), "microbio" ),
+CONTAINS( LOWER( Title ), "molecular" ),
+CONTAINS( LOWER( Title ), "oncology" ),
+CONTAINS( LOWER( Title ), "operations" ),
+CONTAINS( LOWER( Title ), "partnership" ),
+CONTAINS( LOWER( Title ), "pathology" ),
+CONTAINS( LOWER( Title ), "pharma" ),
+CONTAINS( LOWER( Title ), "portfolio" ),
+CONTAINS( LOWER( Title ), "precision" ),
+CONTAINS( LOWER( Title ), "preclinical" ),
+CONTAINS( LOWER( Title ), "president" ),
+CONTAINS( LOWER( Title ), "product develop" ),
+CONTAINS( LOWER( Title ), "r&amp;d" ),
+CONTAINS( LOWER( Title ), "research &amp; dev" ),
+CONTAINS( LOWER( Title ), "research and dev" ),
+CONTAINS( LOWER( Title ), "research cluster head" ),
+CONTAINS( LOWER( Title ), "scientific" ),
+CONTAINS( LOWER( Title ), "scientist" ),
+CONTAINS( LOWER( Title ), "strategist" ),
+CONTAINS( LOWER( Title ), "strategy" ),
+CONTAINS( LOWER( Title ), "technician" ),
+CONTAINS( LOWER( Title ), "therapeutic" ),
+CONTAINS( LOWER( Title ), "therapy" ),
+CONTAINS( LOWER( Title ), "translational" ),
+CONTAINS( LOWER( Title ), "vendor" ),
+CONTAINS( LOWER( Title ), "vitro" ),
+CONTAINS( LOWER( Title ), "vivo" ),
+CONTAINS( Title, "VP" )
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Key Job Title</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

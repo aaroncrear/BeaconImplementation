@@ -37,6 +37,36 @@ Translational, because that group is checked before Senior Leadership.
 | Research | research, scientist, scientific, researcher, fellow, postdoc, postgraduate, professor, lecturer, engineer, microbiologist, microbiology, biology, biologist, immunology, immunologist, chemistry, chemist, pharmacology, pharmacologist, discovery, preclinical, laboratory, lab, R&D, innovation |
 | Senior Leadership | chief, executive, VP, vice president, SVP, EVP, AVP, head, leader, director, managing director, founder, founding, owner, president, chair, board, board member, board director, CFO, CHRO, CIO, CMO, COO, CPO, CRO, CSO, CEO, general counsel, partner, regional head, global head |
 
+**Data Universe Tier.** Lead and Contact get a tier (1-5) set from the individual's job
+title and their Account. Tiers are checked in order and the first tier whose conditions
+are all true is assigned. Key Job Title and previous campaign activity are checked on the
+individual; Segment and Number of Drugs (Active Drug Count) come from the Account.
+
+| Tier | Key Job Title | Segment | Number of Drugs (Account) | Active in previous campaigns |
+|------|---------------|---------|---------------------------|------------------------------|
+| 1 | Yes | All | 4+ | Yes or No |
+| 2 | Yes | Top 200 Pharma, Emerging Pharma, Mid Market Pharma, Other Pharma | Any | Yes or No |
+| 3 | Yes | Contract Org (the requirement's "Service Provider") | Any | Yes or No |
+| 4 | Yes | Other | Any | Yes or No |
+| 5 | No | Any | Any | Yes – **deferred by the stakeholders, not in this build** |
+
+Key Job Title uses "contains" logic against this list: Access, Acquisition, Affairs,
+Alliance, Analy, Antibody, Bioanalytical, Biochemist, Biolog, Biomarker, Business Dev,
+Chair, Chemistry, Chief, Clinical, Co-founder, Collaboration, Commercial, Competitive,
+Competitive Analysis, Competitive Intelligence, Competitor, Corporate Dev, Director,
+Discovery, Drug, Drug Develop, Drug Developer, Drug Safety Officer, Engineering, EVP,
+External Alliances, Founder, Founding, General Manager, Head of, Head of Immuno Oncology,
+Immuno, Innovation, Insights, Intelligence, Investor, M&A, Market Intelligence, Medical,
+Medical Officer, Medicinal, Merger, Microbio, Molecular, Oncology, Operations, Partnership,
+Pathology, Pharma, Portfolio, Precision, Preclinical, President, Principal Scientist,
+Product Develop, R&D, Research & Dev, Research and Dev, Research Cluster Head, Research
+Scientist, Scientific, Scientist, Senior Scientist, Strategist, Strategy, Strategy Analyst,
+SVP, Technician, Therapeutic, Therapy, Translational, Vendor, Vice President, Vitro, Vivo,
+VP.
+
+If someone doesn't meet the criteria for any tier, Tier is left blank. The tier should be
+calculated with formulas rather than automation where possible.
+
 Field access:
 
 - **Beacon - Hubspot User:** read access to all the new fields.
@@ -89,7 +119,7 @@ that this access stays separate from the package's own permission sets and from 
 integration user's `Beacon_Hubspot_Integration`. It grants no permissions yet. Permissions
 will be added as the HubSpot customizations are built.
 
-**HubSpot custom fields.** Ten fields were created. Every description ends with "Custom
+**HubSpot custom fields.** Fourteen fields were created. Every description ends with "Custom
 field created specifically for the HubSpot integration, outside of the HubSpot managed
 package." so admins can tell them apart from the package's own fields.
 
@@ -108,6 +138,49 @@ package." so admins can tell them apart from the package's own fields.
   New modules only need to be added once, in the global value set.
 - `Lead.User_Persona__c` and `Contact.User_Persona__c` – Text formula on Title. The two
   formulas are identical.
+
+**Data Universe Tier built as formulas.** The tier is two formula fields on Lead and on
+Contact instead of a subflow called from Lead, Contact, Account and Campaign Member
+automation:
+
+- `Key_Job_Title__c` – checkbox formula, checked when the Title contains any key job title
+  keyword. Words are matched case-insensitively. VP is matched in capitals only, so it
+  doesn't match inside ordinary words; it also covers EVP and SVP. Keywords that a shorter
+  keyword already matches are left out with the same result: "Analy" covers Bioanalytical,
+  Competitive Analysis and Strategy Analyst; "Founder" covers Co-founder; "Competitive"
+  covers Competitive Analysis and Competitive Intelligence; "Drug" covers Drug Develop,
+  Drug Developer and Drug Safety Officer; "Alliance" covers External Alliances; "Head of"
+  covers Head of Immuno Oncology; "Intelligence" covers Market Intelligence; "Medical"
+  covers Medical Officer; "Scientist" covers Principal, Research and Senior Scientist;
+  "Strategy" covers Strategy Analyst; "President" covers Vice President.
+- `Data_Universe_Tier__c` – Number formula returning 1-4, or blank when the person meets
+  no tier's criteria. It reads Active Drug Count and Segment from the Lead's `Account__c`
+  lookup or the Contact's Account. Logic:
+  1. No key job title → blank.
+  2. Active Drug Count is 4 or more (blank counts as 0) → **1**.
+  3. Segment is Top 200 Pharma, Emerging Pharma, Mid Market Pharma or Other Pharma → **2**.
+  4. Segment is Contract Org (CDMO, CMO, CRO) → **3**. The stakeholders confirmed
+     "Service Provider" means Contract Org, because the Segment formula has no Service
+     Provider value.
+  5. Segment is Other → **4**. The Segment formula returns Other for any LS Company Type
+     not listed above, including a blank one.
+  6. Anything else → **blank**. This covers Leads or Contacts with a key job title but no
+     Account, which therefore have no Segment.
+
+Why formulas: a formula reads the Account's current values every time the record is
+viewed, reported on or synced. When an Account's Active Drug Count or LS Company Type
+changes, the tier on every related Lead and Contact changes immediately, with no
+automation to fan out updates. Flow-based fan-out to large pharma accounts with
+thousands of people risks hitting Salesforce limits. Segment is itself a formula, and
+formula changes don't fire Account flows. The existing Lead and Contact flows are
+before-save flows, which can't call subflows. The trade-off is that the tier isn't
+stored, so field history can't track it and its changes can't trigger automation. HubSpot
+can still read and sync it.
+
+**Tier 5 deferred.** Tier 5 (no key job title, but active in previous campaigns) needs
+campaign membership, which a formula can't read. The stakeholders have deferred it until
+"active in previous campaigns" is defined. When it is, the plan is a checkbox on Lead and
+Contact maintained by a Campaign Member flow, and one extra condition in the tier formula.
 
 **How the User Persona formula works.** The formula checks the groups in the order of the
 requirements table (Competitor Intelligence, Translational, Business Development, Clinical
@@ -133,8 +206,8 @@ keyword. It returns blank when the title is empty or no keyword matches. Design 
   Director" returns Clinical Research and "Director of Research" returns Research, because
   those groups are checked before Senior Leadership.
 
-**Field access.** `Beacon_Hubspot_User` has read access to all ten fields.
-`Beacon_Hubspot_Integration` has read access to all ten fields and edit access to
+**Field access.** `Beacon_Hubspot_User` has read access to all fourteen fields.
+`Beacon_Hubspot_Integration` has read access to all fourteen fields and edit access to
 HubSpot Lead Score and Module Interest on Lead and Contact, the two fields HubSpot writes
 to. The formula fields are read-only by definition. No page layouts were changed.
 
@@ -147,7 +220,7 @@ to. The formula fields are read-only by definition. No page layouts were changed
   because enabling them brings back org-wide Modify All Data. A System Administrator
   installs and upgrades the HubSpot package instead (see Post Deployment Items).
 - **Field-level security for standard and other existing fields** is not included yet.
-  Apart from the ten new HubSpot fields, the integration permission set has object access
+  Apart from the fourteen new HubSpot fields, the integration permission set has object access
   only, so the integration user can see only fields that aren't controlled by field-level
   security. Field access for the other synced fields, including `Task.Type` (which HubSpot
   requires to be visible), will be added once the field mapping is agreed.
@@ -202,6 +275,23 @@ to. The formula fields are read-only by definition. No page layouts were changed
     | CEO | Senior Leadership |
     | Office Manager | (blank) |
     | (no title) | (blank) |
+12. Test **Key Job Title** and **Data Universe Tier** on a Lead (with Account set) and on a
+    Contact. Set the Account's Active Drug Count and LS Company Type, then the person's
+    Title, and check the results:
+
+    | Title | Account Active Drug Count | Account Segment | Key Job Title | Data Universe Tier |
+    |-------|---------------------------|-----------------|---------------|--------------------|
+    | Senior Scientist | 5 | Contract Org | Checked | 1 |
+    | SVP Strategy | (blank) | Top 200 Pharma | Checked | 2 |
+    | Head of Immuno Oncology | 2 | Other Pharma | Checked | 2 |
+    | Bioanalytical Manager | 0 | Contract Org | Checked | 3 |
+    | Co-founder | (blank) | Other | Checked | 4 |
+    | Drug Safety Officer | (no Account) | (none) | Checked | (blank) |
+    | Office Manager | 10 | Top 200 Pharma | Unchecked | (blank) |
+    | (no title) | any | any | Unchecked | (blank) |
+13. On an Account with related Leads or Contacts that have key job titles, change Active
+    Drug Count from 3 to 4. Confirm those people's Data Universe Tier changes to 1 without
+    editing them.
 
 ## Post Deployment Items
 
@@ -233,9 +323,9 @@ Github Branch: [Hubspot-Integration](https://github.com/aaroncrear/BeaconImpleme
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|-------------|
-| 1 | Permission Set | N/A | Beacon_Hubspot_Integration | Beacon - Hubspot Integration | Created | Integration user permission set on the Salesforce API Integration licence. Object permissions limited to Modify All on Account, Campaign, Contact, Lead, and Opportunity. Read access to the ten HubSpot custom fields, with edit on HubSpot Lead Score and Module Interest; 608 other object permissions removed. Import Solutions and Manage Categories system permissions removed; other system permissions unchanged. |
+| 1 | Permission Set | N/A | Beacon_Hubspot_Integration | Beacon - Hubspot Integration | Created | Integration user permission set on the Salesforce API Integration licence. Object permissions limited to Modify All on Account, Campaign, Contact, Lead, and Opportunity. Read access to the fourteen HubSpot custom fields, with edit on HubSpot Lead Score and Module Interest; 608 other object permissions removed. Import Solutions and Manage Categories system permissions removed; other system permissions unchanged. |
 | 2 | Profile | N/A | Beacon Integration User | Beacon Integration User | Updated | Salesforce Integration licence profile for integration users (API Enabled, API Only User). Tab settings removed from the file so the profile deploys; no change in the org. |
-| 3 | Permission Set | N/A | Beacon_Hubspot_User | Beacon - Hubspot User | Created | Salesforce licence permission set for Beacon users. Holds customization made outside of the HubSpot managed package. Read access to the ten HubSpot custom fields. |
+| 3 | Permission Set | N/A | Beacon_Hubspot_User | Beacon - Hubspot User | Created | Salesforce licence permission set for Beacon users. Holds customization made outside of the HubSpot managed package. Read access to the fourteen HubSpot custom fields. |
 | 4 | Custom Field | Account | Account.Tier__c | Tier | Created | Restricted picklist, values 1-5. Sales prioritisation and core segmentation. HubSpot integration field, outside the HubSpot managed package. |
 | 5 | Custom Field | Account | Account.ABM_Flag__c | ABM Flag | Created | Checkbox set manually by Beacon on the parent account. HubSpot integration field, outside the HubSpot managed package. |
 | 6 | Custom Field | Account | Account.Active_Drug_Count__c | Active Drug Count | Created | Number(18, 0). Total active drug count, uploaded manually at go-live. HubSpot integration field, outside the HubSpot managed package. |
@@ -246,3 +336,7 @@ Github Branch: [Hubspot-Integration](https://github.com/aaroncrear/BeaconImpleme
 | 11 | Custom Field | Contact | Contact.HubSpot_Lead_Score__c | HubSpot Lead Score | Created | Number(18, 0). Receives the HubSpot-calculated score. HubSpot integration field, outside the HubSpot managed package. |
 | 12 | Custom Field | Contact | Contact.Module_Interest__c | Module Interest | Created | Multi-select picklist on the Primary Module global value set. Receives module interest from HubSpot. HubSpot integration field, outside the HubSpot managed package. |
 | 13 | Custom Field | Contact | Contact.User_Persona__c | User Persona | Created | Text formula. Assigns a Beacon persona group from the Title. HubSpot integration field, outside the HubSpot managed package. |
+| 14 | Custom Field | Lead | Lead.Key_Job_Title__c | Key Job Title | Created | Checkbox formula. Checked when the Title contains a key job title keyword. HubSpot integration field, outside the HubSpot managed package. |
+| 15 | Custom Field | Lead | Lead.Data_Universe_Tier__c | Data Universe Tier | Created | Number formula, 1-4 or blank. Beacon Data Universe Tier from Key Job Title and the related Account. HubSpot integration field, outside the HubSpot managed package. |
+| 16 | Custom Field | Contact | Contact.Key_Job_Title__c | Key Job Title | Created | Checkbox formula. Checked when the Title contains a key job title keyword. HubSpot integration field, outside the HubSpot managed package. |
+| 17 | Custom Field | Contact | Contact.Data_Universe_Tier__c | Data Universe Tier | Created | Number formula, 1-4 or blank. Beacon Data Universe Tier from Key Job Title and the related Account. HubSpot integration field, outside the HubSpot managed package. |
