@@ -1,0 +1,135 @@
+# "Beacon-Subscriptions" – Release Notes
+
+## Requirements
+
+This build was deployed directly to the `Beacon-Subscriptions` branch via Gearset (no written
+requirements doc was supplied alongside the deploy). Based on the metadata that was pushed, and
+the object description, the business need is:
+
+- Track **individual subscribers** to Beacon products. A standard `Asset` record can carry a
+  quantity of subscriptions (seats), but it cannot capture *which* people hold those seats
+  without splitting the Asset into one line item per user.
+- Each subscription record should link one **Contact** (the subscriber) to one **Asset** (the
+  subscribed product), with an optional link to the **Account**.
+- Subscription records should be visible to whoever can see the related Contact and Asset, and
+  changes to them should be auditable.
+
+## Release Notes
+
+A new custom object, `Beacon_Subscription__c` ("Beacon Subscription" / "Beacon Subscriptions"),
+was created as a **junction object** between `Contact` and `Asset`. Each record represents one
+Contact's subscription to one Asset, so an Asset with a quantity of 10 can have up to 10 Beacon
+Subscription records, one for each named user. This keeps `Asset` as the commercial record (product,
+quantity, dates) and holds the per-user detail on the child object, so Assets don't have to be
+split into one line item per user.
+
+Object settings:
+
+| Setting | Value | Notes |
+|---|---|---|
+| Record name | Auto Number, `Beacon Subs - {000000}` | Records are system-named. The name is read-only on the layout. |
+| Sharing model | Controlled by Parent (internal and external) | Access is inherited from the master Contact and Asset. |
+| Field history tracking | Enabled at object level | No individual fields are tracked yet (see Post Deployment Items). |
+| Activities / Reports / Bulk API / Streaming API | Enabled | |
+| Search | Disabled | Records are reached through the Contact/Asset related lists, not global search. |
+| Chatter feed | Disabled | |
+
+Three relationship fields were created:
+
+| Field | Type | Required | Purpose |
+|---|---|---|---|
+| `Contact__c` | Master-Detail(Contact), primary master | Yes | The subscriber. |
+| `Asset__c` | Master-Detail(Asset), secondary master | Yes | The subscribed product. |
+| `Account__c` | Lookup(Account), delete = Set Null | No | Optional link to the Account, for reporting. Populated by hand. |
+
+Because `Contact__c` and `Asset__c` are both master-detail, **deleting a Contact or an Asset
+also deletes its Beacon Subscription records**, and neither master can be reparented
+(`reparentableMasterDetail = false`). `Contact__c` is the primary master, so the record's owner
+and its default report type come from the Contact.
+
+A page layout, `Beacon Subscription Layout`, was created. Its **Information** section shows Name
+(read-only), Contact (required), Asset (required) and Account in the left column, and Currency in
+the right column. Its **System Information** section shows the standard created/modified fields.
+The layout is assigned to all 25 profiles in the repo. (Gearset also moved the `<userLicense>`
+element higher in the `Beacon Standard User` profile. This is a reorder only; nothing changed.)
+
+## Acceptance Criteria
+
+1. **Object exists:** In Setup → Object Manager, confirm `Beacon Subscription`
+   (`Beacon_Subscription__c`) exists with the fields Contact, Asset, Account and Beacon
+   Subscription Name.
+2. **Create from a Contact:** Open a Contact that has a related Asset. In the Beacon
+   Subscriptions related list (once it has been added — see Post Deployment Items), click New.
+   Confirm Contact is pre-filled and Contact and Asset are required. Choose an Asset, optionally
+   an Account, and save.
+3. **Auto Number:** Confirm the saved record is named `Beacon Subs - 000001` (or the next number)
+   and that the name can't be edited.
+4. **Required masters:** Try to save a new Beacon Subscription without a Contact, and then
+   without an Asset. Both saves should be blocked.
+5. **Related lists:** Confirm the record appears in the Beacon Subscriptions related list on the
+   Contact, the Asset and (if it was filled in) the Account.
+6. **Sharing:** Log in as (or impersonate) a user who can't see the parent Contact or Asset.
+   Confirm they can't see the Beacon Subscription.
+7. **Cascade delete:** In a sandbox, delete a test Asset that has Beacon Subscriptions. Confirm
+   its subscriptions are deleted too. Repeat with a test Contact.
+8. **Account lookup Set Null:** In a sandbox, delete a test Account referenced in
+   `Account__c` on a subscription whose Contact and Asset sit under a different Account. Confirm
+   the subscription survives and `Account__c` is blank.
+9. **Reporting:** Create a report on Beacon Subscriptions (via the Contacts with Beacon
+   Subscriptions report type). Confirm Contact, Asset and Account columns are available.
+
+## Post Deployment Items
+
+The deploy contains only the object, its fields, its layout and the profile layout assignments.
+The following are **not** in this branch and must be done in the target org (or added to this
+branch in a later deploy):
+
+1. **Object and field permissions:** No profile or permission set in this branch grants
+   Read/Create/Edit/Delete on `Beacon_Subscription__c`, or field-level security on `Contact__c`,
+   `Asset__c` and `Account__c`. Only System Administrators will be able to use the object until
+   access is added, ideally to the Beacon persona permission sets.
+2. **Related lists:** Add the Beacon Subscriptions related list to the Contact, Asset and Account
+   page layouts or Lightning record pages so users can create and see subscriptions.
+3. **Tab (optional):** No custom tab was created. Add one, and add it to the Beacon app, if users
+   need a list view of all subscriptions.
+4. **Field history (optional):** Object-level history is on, but no fields are tracked. Turn on
+   tracking for `Contact__c`, `Asset__c` and `Account__c` if an audit trail is needed.
+5. **Data load (optional):** If subscriptions already exist on Assets, load the per-user Beacon
+   Subscription records once access has been granted.
+
+## Component Manifest
+
+Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Beacon-Subscriptions
+
+| # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
+|---|----------------|--------|----------|-------|-------------------------|--------------|
+| 1 | Custom Object | Beacon_Subscription__c | Beacon_Subscription__c | Beacon Subscription | Created | Junction object between Contact and Asset that tracks each individual subscriber. Auto Number name `Beacon Subs - {000000}`, sharing Controlled by Parent. |
+| 2 | Field | Beacon_Subscription__c | Contact__c | Contact | Created | Master-Detail(Contact), primary master. The subscriber. |
+| 3 | Field | Beacon_Subscription__c | Asset__c | Asset | Created | Master-Detail(Asset), secondary master. The subscribed product. |
+| 4 | Field | Beacon_Subscription__c | Account__c | Account | Created | Optional Lookup(Account), delete constraint Set Null. |
+| 5 | Page Layout | Beacon_Subscription__c | Beacon_Subscription__c-Beacon Subscription Layout | Beacon Subscription Layout | Created | Information section (Name, Contact, Asset, Account, Currency) and System Information section. |
+| 6 | Profile | N/A | Admin | Admin | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 7 | Profile | N/A | Analytics Cloud Integration User | Analytics Cloud Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 8 | Profile | N/A | Analytics Cloud Security User | Analytics Cloud Security User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 9 | Profile | N/A | Beacon Standard User | Beacon Standard User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. Also moved the userLicense element (reorder only). |
+| 10 | Profile | N/A | CPQ Integration User | CPQ Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 11 | Profile | N/A | Chatter External User | Chatter External User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 12 | Profile | N/A | Chatter Free User | Chatter Free User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 13 | Profile | N/A | Chatter Moderator User | Chatter Moderator User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 14 | Profile | N/A | ContractManager | ContractManager | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 15 | Profile | N/A | Einstein Agent User | Einstein Agent User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 16 | Profile | N/A | End User | End User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 17 | Profile | N/A | Executive Sponsor | Executive Sponsor | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 18 | Profile | N/A | External Apps Login User | External Apps Login User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 19 | Profile | N/A | External Einstein Agent User | External Einstein Agent User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 20 | Profile | N/A | Guest License User | Guest License User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 21 | Profile | N/A | Identity User | Identity User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 22 | Profile | N/A | MarketingProfile | MarketingProfile | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 23 | Profile | N/A | Minimum Access - API Only Integrations | Minimum Access - API Only Integrations | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 24 | Profile | N/A | Minimum Access - Salesforce | Minimum Access - Salesforce | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 25 | Profile | N/A | Read Only | Read Only | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 26 | Profile | N/A | Sales Insights Integration User | Sales Insights Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 27 | Profile | N/A | Salesforce API Only System Integrations | Salesforce API Only System Integrations | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 28 | Profile | N/A | SalesforceIQ Integration User | SalesforceIQ Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 29 | Profile | N/A | SolutionManager | SolutionManager | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 30 | Profile | N/A | Standard | Standard | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
