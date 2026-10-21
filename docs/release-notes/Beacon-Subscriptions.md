@@ -13,6 +13,9 @@ the object description, the business need is:
   subscribed product), with an optional link to the **Account**.
 - Subscription records should be visible to whoever can see the related Contact and Asset, and
   changes to them should be auditable.
+- Every Beacon persona should be able to **read** Beacon Subscriptions. Only Beacon Salesforce
+  Admins should be able to create, edit and delete them, with full Modify All / View All access.
+  The baseline permission sets should not grant access.
 
 ## Release Notes
 
@@ -53,6 +56,23 @@ the right column. Its **System Information** section shows the standard created/
 The layout is assigned to all 25 profiles in the repo. (Gearset also moved the `<userLicense>`
 element higher in the `Beacon Standard User` profile. This is a reorder only; nothing changed.)
 
+**Permission sets.** Access was added to the persona "Object, Tab, FLS" permission sets, following
+the pattern from the `beacon-permission-sets-jaq4s2` branch:
+
+| Permission Set | Object access | `Account__c` FLS |
+|---|---|---|
+| Beacon Consulting, Customer Success, Executive, Finance, Marketing, Product, ResOps, Sales, Tech – Object, Tab, FLS | Read only | Read |
+| Beacon Salesforce Admin – Object, Tab, FLS | Create, Read, Edit, Delete, View All Fields, View All Records, Modify All Records | Read + Edit |
+
+The two baseline permission sets (`Beacon - Baseline - Standard Field Access` and `Beacon -
+Baseline - System & App Access`) were deliberately left alone.
+
+`Contact__c` and `Asset__c` have no field permission entries. Master-detail fields are always
+required, and Salesforce doesn't allow field-level security on required fields. Anyone with
+access to the object can read them, and anyone who can edit the object can edit them. Users
+also need Read access to the parent Contact and Asset to see a subscription. Every persona set
+already grants Read on Contact. Asset access comes from the user's profile and the Asset's Account.
+
 ## Acceptance Criteria
 
 1. **Object exists:** In Setup → Object Manager, confirm `Beacon Subscription`
@@ -75,26 +95,32 @@ element higher in the `Beacon Standard User` profile. This is a reorder only; no
 8. **Account lookup Set Null:** In a sandbox, delete a test Account referenced in
    `Account__c` on a subscription whose Contact and Asset sit under a different Account. Confirm
    the subscription survives and `Account__c` is blank.
-9. **Reporting:** Create a report on Beacon Subscriptions (via the Contacts with Beacon
+9. **Persona read access:** Log in as (or impersonate) a user who has only a persona permission
+   set (e.g. Beacon Sales – Object, Tab, FLS) plus the baseline sets. Confirm they can open a
+   Beacon Subscription and see Contact, Asset and Account. Confirm they have no New, Edit or
+   Delete buttons, and that the Account field is read-only.
+10. **Admin access:** Log in as a user with the Beacon Salesforce Admin – Object, Tab, FLS
+    permission set. Confirm they can create, edit and delete Beacon Subscriptions, edit Account,
+    and see subscriptions on Contacts and Assets they don't otherwise have access to (View All /
+    Modify All).
+11. **Baseline sets untouched:** In Setup, open the two Beacon baseline permission sets. Confirm
+    neither has access to Beacon Subscription.
+12. **Reporting:** Create a report on Beacon Subscriptions (via the Contacts with Beacon
    Subscriptions report type). Confirm Contact, Asset and Account columns are available.
 
 ## Post Deployment Items
 
-The deploy contains only the object, its fields, its layout and the profile layout assignments.
-The following are **not** in this branch and must be done in the target org (or added to this
+The branch contains the object, its fields, its layout, the profile layout assignments and the
+persona permission set access. The following are **not** in this branch and must be done in the target org (or added to this
 branch in a later deploy):
 
-1. **Object and field permissions:** No profile or permission set in this branch grants
-   Read/Create/Edit/Delete on `Beacon_Subscription__c`, or field-level security on `Contact__c`,
-   `Asset__c` and `Account__c`. Only System Administrators will be able to use the object until
-   access is added, ideally to the Beacon persona permission sets.
-2. **Related lists:** Add the Beacon Subscriptions related list to the Contact, Asset and Account
+1. **Related lists:** Add the Beacon Subscriptions related list to the Contact, Asset and Account
    page layouts or Lightning record pages so users can create and see subscriptions.
-3. **Tab (optional):** No custom tab was created. Add one, and add it to the Beacon app, if users
+2. **Tab (optional):** No custom tab was created. Add one, and add it to the Beacon app, if users
    need a list view of all subscriptions.
-4. **Field history (optional):** Object-level history is on, but no fields are tracked. Turn on
+3. **Field history (optional):** Object-level history is on, but no fields are tracked. Turn on
    tracking for `Contact__c`, `Asset__c` and `Account__c` if an audit trail is needed.
-5. **Data load (optional):** If subscriptions already exist on Assets, load the per-user Beacon
+4. **Data load (optional):** If subscriptions already exist on Assets, load the per-user Beacon
    Subscription records once access has been granted.
 
 ## Component Manifest
@@ -133,3 +159,13 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Beacon-Su
 | 28 | Profile | N/A | SalesforceIQ Integration User | SalesforceIQ Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
 | 29 | Profile | N/A | SolutionManager | SolutionManager | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
 | 30 | Profile | N/A | Standard | Standard | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 31 | Permission Set | Beacon_Subscription__c | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Beacon_Subscription__c.Account__c. |
+| 32 | Permission Set | Beacon_Subscription__c | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Beacon_Subscription__c.Account__c. |
+| 33 | Permission Set | Beacon_Subscription__c | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Beacon_Subscription__c.Account__c. |
+| 34 | Permission Set | Beacon_Subscription__c | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Beacon_Subscription__c.Account__c. |
+| 35 | Permission Set | Beacon_Subscription__c | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Beacon_Subscription__c.Account__c. |
+| 36 | Permission Set | Beacon_Subscription__c | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Beacon_Subscription__c.Account__c. |
+| 37 | Permission Set | Beacon_Subscription__c | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Beacon_Subscription__c.Account__c. |
+| 38 | Permission Set | Beacon_Subscription__c | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Beacon_Subscription__c.Account__c. |
+| 39 | Permission Set | Beacon_Subscription__c | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Create/Read/Edit/Delete, View All Fields, View All Records and Modify All Records on Beacon_Subscription__c, and Read + Edit FLS on Beacon_Subscription__c.Account__c. |
+| 40 | Permission Set | Beacon_Subscription__c | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Beacon_Subscription__c.Account__c. |
