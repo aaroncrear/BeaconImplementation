@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Profile xmlns="http://soap.sforce.com/2006/04/metadata">
     <custom>true</custom>
+    <userLicense>Salesforce</userLicense>
+    <layoutAssignments>
+        <layout>Beacon_Subscription__c-Beacon Subscription Layout</layout>
+    </layoutAssignments>
     <layoutAssignments>
         <layout>Case-ResOps Request Case Layout</layout>
         <recordType>Case.ResOps_Request</recordType>
     </layoutAssignments>
-    <userLicense>Salesforce</userLicense>
     <userPermissions>
         <enabled>true</enabled>
         <name>ActivitiesAccess</name>
