@@ -75,6 +75,11 @@ it was added:
   with splits or products).
 - The Gong API User permission set (Gong for Salesforce managed package).
 
+**Role.** A new **Integrations** role was added directly under SF Admin, for the Gong
+integration user and any future integration users. It keeps integration users out of the sales
+and business role branches. Gong's record access comes from View All and Modify All in the
+permission set, not from the role.
+
 The second permission set, `Beacon_Gong_Integration_Object_FLS_Permission`, which is on the
 Salesforce Integration user license, was left empty and is not needed.
 
@@ -99,7 +104,8 @@ to `ControlledByParent` to match the new org-wide default.
    - Task (5 fields) and Event (4): Read and Edit checked.
 5. Assign the permission set to the Gong integration user. That user should have the
    **Salesforce Integration** user license, the **Minimum Access – API Only Integrations**
-   profile, and the **Salesforce API Integration** permission set license.
+   profile, the **Salesforce API Integration** permission set license, and the
+   **Integrations** role.
 6. In Gong, connect Salesforce as the integration user. Check that:
    - The connection succeeds, and Gong shows no missing-permission warnings for required fields.
    - Accounts, Contacts, Leads, and Opportunities import into Gong, including records owned by
@@ -113,6 +119,7 @@ to `ControlledByParent` to match the new org-wide default.
 
 - Assign **Beacon - Gong Integration** to the Gong integration user, along with the **Salesforce
   API Integration** permission set license.
+- Assign the Gong integration user to the **Integrations** role.
 - If the target org isn't Beacon HTCDEV, set the Activity org-wide default to **Controlled by
   Parent** in **Setup → Sharing Settings** before connecting Gong.
 - If Task record types are added later, give the permission set access to them.
@@ -132,3 +139,4 @@ Github Branch: [Gong-Integration](https://github.com/aaroncrear/BeaconImplementa
 | 2 | Custom Object (Standard) | Activity | Activity | Activity | Updated | Sharing model changed from Private to ControlledByParent, so users see all activities on the records they can see. |
 | 3 | Custom Object (Standard) | Task | Task | Task | Updated | Sharing model changed from Private to ControlledByParent to match Activity. |
 | 4 | Custom Object (Standard) | Event | Event | Event | Updated | Sharing model changed from Private to ControlledByParent to match Activity. |
+| 5 | Role | N/A | Integrations | Integrations | Created | New role under SF Admin for integration users, including the Gong integration user. |
