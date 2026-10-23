@@ -3,7 +3,7 @@
     <description>Holds System, Object and FLS level permission for the Gong integration. This is not part of a Gong package.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Beacon - Gong Integration</label>
-    <license>Salesforce API Integration</license>
+    <license>SalesforceAPIIntegrationPsl</license>
     <fieldPermissions>
         <editable>false</editable>
         <field>Account.AccountSource</field>
