@@ -78,9 +78,10 @@ it was added:
 The second permission set, `Beacon_Gong_Integration_Object_FLS_Permission`, which is on the
 Salesforce Integration user license, was left empty and is not needed.
 
-This build was done directly in the Beacon HTCDEV org, so no metadata files were changed in this
-commit. The permission set and the Activity sharing setting will be added to `unpackaged/` by the
-next Gearset commit from the org.
+The permission set was built in the Beacon HTCDEV org and then added to this branch as
+`unpackaged/main/default/permissionsets/Beacon_Gong_Integration.permissionset-meta.xml`. It
+matches the org exactly. The Activity, Task, and Event object files were updated from `Private`
+to `ControlledByParent` to match the new org-wide default.
 
 ## Acceptance Criteria
 
@@ -128,4 +129,6 @@ Github Branch: [Gong-Integration](https://github.com/aaroncrear/BeaconImplementa
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
 | 1 | Permission Set | N/A | Beacon_Gong_Integration | Beacon - Gong Integration | Created | Integration user permission set on the Salesforce API Integration license. Read, Edit, Delete, View All, and Modify All on Account, Contact, Lead, and Opportunity. Read access to 21 fields on those objects, and Read/Edit access to 9 Task and Event fields. Includes the Access Activities, Edit Tasks, Edit Events, and View All Users system permissions. |
-| 2 | Sharing Settings | Activity | Activity | Activity | Updated | Default Internal Access changed from Private to Controlled by Parent, so users see all activities on the records they can see. |
+| 2 | Custom Object (Standard) | Activity | Activity | Activity | Updated | Sharing model changed from Private to ControlledByParent, so users see all activities on the records they can see. |
+| 3 | Custom Object (Standard) | Task | Task | Task | Updated | Sharing model changed from Private to ControlledByParent to match Activity. |
+| 4 | Custom Object (Standard) | Event | Event | Event | Updated | Sharing model changed from Private to ControlledByParent to match Activity. |
