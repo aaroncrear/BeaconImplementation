@@ -1,4 +1,4 @@
-# "claude/charming-albattani-d07jww" – Release Notes
+# "Gong-Integration" – Release Notes
 
 ## Requirements
 
@@ -14,6 +14,8 @@ asked for:
   [Salesforce fields the integration user needs access to](https://help.gong.io/docs/salesforce-fields-the-integration-user-needs-access-to).
 - The system permissions Gong requires for writing activities: Access Activities, Edit Tasks,
   Edit Events, and View All Users. API Enabled is included with the license.
+- Users who can see an Account or Opportunity must be able to see all of its activities, including
+  activities owned by other users. Accounts and Opportunities are Public Read Only.
 
 ## Release Notes
 
@@ -21,18 +23,25 @@ The permission set `Beacon_Gong_Integration` was created in the org with its sys
 already set: Access Activities, Edit Tasks, Edit Events, and View All Users. Object and field
 access was then added to it to match the Gong article.
 
-**Object permissions.** Read and View All Records were granted on Account, Contact, Lead, and
-Opportunity. Create, Edit, Delete, and Modify All are off.
+**Activity sharing.** The org-wide default for Activities was changed from Private to
+**Controlled by Parent**. Activities can't use sharing rules, so under Private, users would only
+see activities they own or that are owned by users below them in the role hierarchy. With
+Accounts and Opportunities set to Public Read Only, that wouldn't meet the requirement. Under
+Controlled by Parent, anyone who can see an Account, Contact, Lead, or Opportunity can see all of
+its activities.
 
-The Gong article says that when Task and Event sharing is Private, the integration user needs
-access to all Accounts, Contacts, Leads, and Opportunities. Task and Event sharing is **Private**
-in this org, so View All Records was granted. It lets Gong see every record without depending on
-the integration user's role. Edit and Modify All are only needed when activity sharing is
-Controlled by Parent, or when an Engage license is in use. Neither applies, so Gong stays
-read only on these objects.
+**Object permissions.** Read, Edit, Delete, View All, and Modify All were granted on Account,
+Contact, Lead, and Opportunity. Create is off.
 
-Task and Event access comes from the Edit Tasks and Edit Events system permissions, not from
-object permissions.
+The Gong article says that when activity sharing is Controlled by Parent, the integration user
+needs Edit and Modify All on these four objects. Under Controlled by Parent, editing an activity
+requires edit access to its parent record. Opportunities and Accounts are Public Read Only, so
+only Modify All lets Gong update activities on records it doesn't own. Salesforce requires Delete
+before Modify All can be granted, so Delete is on too. The integration user can edit and delete
+these records through the API, so its credentials should be protected like an admin login.
+
+Task and Event access comes from the Access Activities, Edit Tasks, and Edit Events system
+permissions. Salesforce doesn't allow object permissions on Task or Event.
 
 **Field Level Security.** 30 field permissions were added. Account, Contact, Lead, and
 Opportunity fields are **Read only**, because Gong only imports them. Task and Event fields are
@@ -61,8 +70,7 @@ for field level security in this org.
 **Not included.** The article lists access that is only needed for optional features. None of
 it was added:
 
-- Campaign and Campaign Member View All, and Edit/Modify All on the core objects (Gong Engage
-  license).
+- Campaign and Campaign Member View All (Gong Engage license).
 - Opportunity Split, Opportunity Split Type, and Opportunity Product (Gong Forecast and Deals
   with splits or products).
 - The Gong API User permission set (Gong for Salesforce managed package).
@@ -71,8 +79,8 @@ The second permission set, `Beacon_Gong_Integration_Object_FLS_Permission`, whic
 Salesforce Integration user license, was left empty and is not needed.
 
 This build was done directly in the Beacon HTCDEV org, so no metadata files were changed in this
-commit. The permission set metadata will be added to `unpackaged/` by the next Gearset commit
-from the org.
+commit. The permission set and the Activity sharing setting will be added to `unpackaged/` by the
+next Gearset commit from the org.
 
 ## Acceptance Criteria
 
@@ -81,8 +89,10 @@ from the org.
 2. Open **System Permissions**. Check that Access Activities, Edit Tasks, Edit Events, and View
    All Users are on.
 3. Open **Object Settings** and check each object:
-   - Account, Contact, Lead, Opportunity: Read and View All Records checked. Create, Edit,
-     Delete, and Modify All unchecked.
+   - Account, Contact, Lead, Opportunity: Read, Edit, Delete, View All, and Modify All checked.
+     Create unchecked.
+   - In **Setup → Sharing Settings**, check that the Default Internal Access for Activity is
+     **Controlled by Parent**.
 4. Check the field permissions for each object against the table in Release Notes:
    - Account (5 fields), Contact (6), Lead (5), Opportunity (5): Read checked, Edit unchecked.
    - Task (5 fields) and Event (4): Read and Edit checked.
@@ -95,14 +105,15 @@ from the org.
      users outside the integration user's role.
    - After a call or meeting syncs, Gong creates a Task or Event in Salesforce, linked to the
      right Contact or Lead (Name) and Account or Opportunity (Related To).
+7. Log in as a sales user who doesn't own a particular Account or Opportunity. Open it and check
+   that the Gong activity, and activities owned by other users, appear in the Activity timeline.
 
 ## Post Deployment Items
 
 - Assign **Beacon - Gong Integration** to the Gong integration user, along with the **Salesforce
   API Integration** permission set license.
-- Assign the integration user a role at the top of the role hierarchy. Task and Event sharing is
-  Private in this org, and Gong's article recommends a top-level role in that case, so Gong can
-  see activities owned by other users.
+- If the target org isn't Beacon HTCDEV, set the Activity org-wide default to **Controlled by
+  Parent** in **Setup → Sharing Settings** before connecting Gong.
 - If Task record types are added later, give the permission set access to them.
 - If Beacon later buys a Gong Engage license, uses Gong Forecast with Opportunity Splits or
   Products, or installs the Gong for Salesforce package, add the extra access listed under
@@ -112,8 +123,9 @@ from the org.
 
 ## Component Manifest
 
-Github Branch: [claude/charming-albattani-d07jww](https://github.com/aaroncrear/BeaconImplementation/tree/claude/charming-albattani-d07jww)
+Github Branch: [Gong-Integration](https://github.com/aaroncrear/BeaconImplementation/tree/Gong-Integration)
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Permission Set | N/A | Beacon_Gong_Integration | Beacon - Gong Integration | Created | Integration user permission set on the Salesforce API Integration license. Read and View All Records on Account, Contact, Lead, and Opportunity. Read access to 21 fields on those objects, and Read/Edit access to 9 Task and Event fields. Includes the Access Activities, Edit Tasks, Edit Events, and View All Users system permissions. |
+| 1 | Permission Set | N/A | Beacon_Gong_Integration | Beacon - Gong Integration | Created | Integration user permission set on the Salesforce API Integration license. Read, Edit, Delete, View All, and Modify All on Account, Contact, Lead, and Opportunity. Read access to 21 fields on those objects, and Read/Edit access to 9 Task and Event fields. Includes the Access Activities, Edit Tasks, Edit Events, and View All Users system permissions. |
+| 2 | Sharing Settings | Activity | Activity | Activity | Updated | Default Internal Access changed from Private to Controlled by Parent, so users see all activities on the records they can see. |
