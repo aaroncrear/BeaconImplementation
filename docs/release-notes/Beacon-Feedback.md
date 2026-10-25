@@ -15,6 +15,10 @@
 - Change the object's API name from `BeaconFeedback__c` to `Beacon_Feedback__c`.
 - Deactivate every record type except Sales Demo, Sales Prospecting, Onboarding Call 1 - Kick Off and Customer Call.
 - Add the Beacon Feedback related list to the Opportunity page layout.
+- Create an **Opportunity - On Create - After Save** flow that creates Beacon Feedback surveys based on the Opportunity's record type, in this order:
+  - **Subscription New**: Sales Demo, then Sales Prospecting.
+  - **Subscription Renewal**: Onboarding Call 1 - Kick Off (due 15 days after Close Date), then Customer Call (due 45 days after Close Date).
+  - Each survey is owned by the Opportunity Owner, has its Survey Type set to match its record type, and is linked to the Opportunity.
 
 ## Release Notes
 
@@ -49,6 +53,32 @@ Only four record types stay active: **Customer Call**, **Onboarding Call 1 - Kic
 
 A **Beacon Feedback** related list was added to the **Opportunity Layout**, directly under **Contact Roles**. It shows the Beacon Feedback records whose **Opportunity** field points to the Opportunity, with these columns: Beacon Feedback Number, Beacon Feedback Name, Record Type, Survey Completed and Due Date. The **Beacon Opportunity Record Page** Lightning page shows related lists as quick links that come from the page layout, so the new list shows up there with no change to the Lightning page.
 
+### Opportunity - On Create - After Save flow
+
+A new record-triggered flow, **Opportunity - On Create - After Save** (`Opportunity_On_Create_After_Save`), creates the Beacon Feedback surveys when an Opportunity is created. It runs after save, so the Opportunity Id is available to link the surveys to.
+
+**Entry criteria.** The flow only starts when the Opportunity's record type is **Subscription New** or **Subscription Renewal**. Consulting Opportunities don't start it.
+
+**What it creates.** A Decision on the record type picks the surveys:
+
+| Opportunity Record Type | Beacon Feedback created (in order) | Survey Type | Due Date Days | Due Date |
+|-------------------------|------------------------------------|-------------|---------------|----------|
+| Subscription New | 1. Sales Demo | Sales Demo | — | — |
+| Subscription New | 2. Sales Prospecting | Sales Prospecting | — | — |
+| Subscription Renewal | 1. Onboarding Call 1 - Kick Off | Onboarding Call 1 - Kick Off | 15 | Close Date + 15 days |
+| Subscription Renewal | 2. Customer Call | Customer Call | 45 | Close Date + 45 days |
+
+Every survey gets **Owner** = Opportunity Owner and **Opportunity** = the new Opportunity.
+
+**How it was built.**
+
+- **Record type Ids aren't hardcoded or stored anywhere.** Each branch has one Get Records per Beacon Feedback record type, filtered by `SobjectType = Beacon_Feedback__c` and the record type's developer name. They sit outside any loop, and Salesforce runs matching Gets together when many Opportunities are created at once, so a bulk load still uses only a few queries.
+- **One Assignment per survey** sets its fields and adds it to a single list (`colBeaconFeedback`). Each survey has its own record variable, so values from one never carry into another.
+- **One Create Records** saves the whole list. Records are added to the list in the required order, so they're created and numbered (BFB-xxxx) in that order.
+- **Due dates** use constants for the days (`conOnboardingCall1DueDateDays` = 15, `conCustomerCallDueDateDays` = 45) and date formulas that add them to the Close Date. The constant is also written to **Due Date Days**, so the number used is visible on the record. To change a due date later, change the constant.
+- **Errors.** If the save fails, the flow goes to the existing **Fault Path Subflow**, which emails the fault message, as in the other flows.
+- The flow and every element in it have a description.
+
 ### Validation Rule bypass removed
 
 `NOT($User.ByPassVR__c)` was used by only one Validation Rule, **Any_Further_Feedback_Mandatory**. It was removed from that rule's formula, and the rest of the formula is unchanged. No other Validation Rule, flow, layout, profile or permission set in the repository references the field.
@@ -82,6 +112,8 @@ Each permission set gets field access for 90 of the 91 fields:
 
 ### Things to know
 
+- The flow runs in system context, so it creates the surveys even if the user creating the Opportunity can't create Beacon Feedback records. However, **the Opportunity Owner must have at least Read access to Beacon Feedback**, because Salesforce won't let a record be owned by a user who can't read that object. All nine Beacon permission sets give Read. If an owner has none of them, the Opportunity save fails and the Fault Path Subflow sends its email.
+- The flow only runs when an Opportunity is created. Changing an existing Opportunity's record type later doesn't create surveys.
 - The **Rate Beacon User Friendliness (1-5)** and **Rate Monthly Digest's Usefulness (1-5)** fields are only on the Your Input layout, which is now inactive. Their Validation Rules still apply if the fields are filled in another way, for example through Data Loader.
 - 26 fields are not on any page layout: Agree Curating Module Specific Data?, Agree With Search Filters In The Spec?, Agree With The Scope Of The Module(s)?, Any Further Feedback Posted To Teams, Comment On The Layout/Appearance, Data Comprehensiveness (1-5), Did Client Understand How To Run Search, Did They Recommend Any Platform Changes, Disease Areas Are They Interested In?, Functionality They Least/Most Interested In?, If Disease Area Is Other, If Growth Factor Is Other, If Interest In New Module, If Risk Factor Is Other, If They Found Data From Other Source, If They Would Like More Info, Overall Demo Rank (1-5), Prospect's Thoughts On The Pricing?, Quality Of Data (1-5), Satisfied With The Accuracy Of Our Data?, Show Interest In Any Other Modules?, Sourcing Data Prior To Beacon?, Speed Of Platform (1-5), Usability Of Platform (1-5) and Would They Like More Information?.
 
@@ -101,7 +133,12 @@ Each permission set gets field access for 90 of the 91 fields:
 12. Log in as (or assign the permission sets to) a test user. With **Beacon Consulting - Object, Tab, FLS**, confirm the user can view Beacon Feedback records and fields but has no New or Edit button. With **Beacon Sales - Object, Tab, FLS** or **Beacon Customer Success - Object, Tab, FLS**, confirm the user can create and edit records but not delete them. With **Beacon Salesforce Admin - Object, Tab, FLS**, confirm the user can delete records and see all records.
 13. In each of the nine permission sets, open **Object Settings → Beacon Feedback** and confirm the object and field access match the table in the Release Notes.
 14. Open an Opportunity. Confirm a **Beacon Feedback** related list appears under **Contact Roles** in the related list quick links, and it shows the Beacon Feedback created in step 6 with the columns Beacon Feedback Number, Beacon Feedback Name, Record Type, Survey Completed and Due Date. Click **New** in the related list and confirm the Opportunity is filled in.
-15. In **Object Manager → User → Fields & Relationships**, confirm **ByPassVR** no longer exists. Also check **Deleted Fields** and erase it there if it is listed.
+15. Create an Opportunity with the **Subscription New** record type. In its **Beacon Feedback** related list, confirm two records were created: first **Sales Demo**, then **Sales Prospecting** (the Sales Demo record has the lower BFB number). For each, confirm the record type and Survey Type match, the Owner is the Opportunity Owner, the Opportunity is the new Opportunity, and Due Date and Due Date Days are blank.
+16. Create an Opportunity with the **Subscription Renewal** record type and a Close Date of, for example, 1 March. Confirm two records were created: first **Onboarding Call 1 - Kick Off** with Due Date Days 15 and Due Date 16 March, then **Customer Call** with Due Date Days 45 and Due Date 15 April. Confirm the record type, Survey Type, Owner and Opportunity on each.
+17. Create an Opportunity with the **Consulting** record type and confirm no Beacon Feedback records are created.
+18. Create a Subscription New Opportunity owned by a user who has none of the Beacon permission sets. Confirm the save fails with an error and the Fault Path Subflow email is sent. Then assign the user a Beacon permission set and confirm the Opportunity saves.
+19. Load several Subscription New and Subscription Renewal Opportunities at once with Data Loader. Confirm each gets the right surveys.
+20. In **Object Manager → User → Fields & Relationships**, confirm **ByPassVR** no longer exists. Also check **Deleted Fields** and erase it there if it is listed.
 
 ## Post Deployment Items
 
@@ -109,6 +146,8 @@ Each permission set gets field access for 90 of the 91 fields:
 - Delete the **ByPassVR** (`ByPassVR__c`) field on User in each target org where it exists. Deploy the updated **Any_Further_Feedback_Mandatory** Validation Rule first, then delete the field. In Gearset, include the deleted field in the comparison. Otherwise, delete it in **Object Manager → User → Fields & Relationships**. Any values stored in the field are lost.
 - Grant record type access where needed. Only **Beacon Marketing** and **Beacon Salesforce Admin** have record type settings today, and this branch doesn't add any for Beacon Feedback. Users without access to a record type can't create records of that type.
 - Add a Beacon Feedback tab if users need one. This branch doesn't include a tab.
+- Activate **Opportunity - On Create - After Save** after deployment if your deployment tool deploys flows as inactive. The flow file is set to Active.
+- Make sure every user who owns Subscription New or Subscription Renewal Opportunities has one of the Beacon permission sets, so they can own the Beacon Feedback records the flow creates.
 
 ## Component Manifest
 
@@ -244,3 +283,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Beacon-Fe
 | 126 | PermissionSet | Beacon_Feedback__c | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Read, Create, Edit, Delete, View All, Modify All, View All Fields access to Beacon Feedback, and read and edit access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
 | 127 | PermissionSet | Beacon_Feedback__c | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read access to Beacon Feedback, and read access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
 | 128 | Layout | Opportunity | Opportunity-Opportunity Layout | Opportunity Layout | Updated | Added the Beacon Feedback related list under Contact Roles. |
+| 129 | Flow | Opportunity | Opportunity_On_Create_After_Save | Opportunity - On Create - After Save | Created | Record-triggered (after save, on create) flow for Subscription New and Subscription Renewal Opportunities. Creates Sales Demo and Sales Prospecting surveys for Subscription New, and Onboarding Call 1 - Kick Off (due Close Date + 15 days) and Customer Call (due Close Date + 45 days) surveys for Subscription Renewal. Each survey is owned by the Opportunity Owner and linked to the Opportunity. |
