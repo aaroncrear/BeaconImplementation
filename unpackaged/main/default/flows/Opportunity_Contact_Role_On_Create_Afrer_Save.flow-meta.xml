@@ -25,7 +25,7 @@
             <label>Yes - Open Opp</label>
         </rules>
     </decisions>
-    <description>Sets the Contact Status to Active Opp</description>
+    <description>Sets the Contact Status to Active Opp. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Opportunity Contact Role - On Create - Afrer Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Opportunity Contact Role - On Create - Afrer Save</label>
@@ -79,6 +79,7 @@
         <connector>
             <targetReference>Is_the_Opportunity_Open</targetReference>
         </connector>
+        <filterFormula>{!$Setup.On_Off_Switch__c.Run_Flows__c}</filterFormula>
         <object>OpportunityContactRole</object>
         <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
