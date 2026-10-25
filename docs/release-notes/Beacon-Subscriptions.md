@@ -193,15 +193,19 @@ The branch contains the object, its fields, its layout, the profile layout assig
 persona permission set access. The following are **not** in this branch and must be done in the target org (or added to this
 branch in a later deploy):
 
-1. **Deployment order (orgs where the object already exists):** The `Beacon-HTCDEV` org already
-   has the object with Contact and Asset as master-detail, Account doesn't exist yet, and there
-   is one test record (`Beacon Subs - 000001`). Salesforce allows only two master-detail fields
-   at a time, and it won't create a new master-detail on an object that already has records.
-   If the Gearset deploy fails on these fields, do this first, then redeploy:
-   1. Delete the test record, or create `Account__c` as a lookup, populate it on every
-      existing record and only then convert it to master-detail.
+1. **Deployment order (orgs where the object already exists):** Salesforce allows only two
+   master-detail fields at a time, and it won't create a new master-detail on an object that
+   already has records. In any org that already has `Beacon_Subscription__c` with Contact as a
+   master-detail, do this before deploying:
+   1. Delete or back up the existing Beacon Subscription records. Alternatively, create
+      `Account__c` as a lookup, fill it in on every record, and then convert it to master-detail.
    2. In Setup, change `Contact__c` from Master-Detail to Lookup **before** `Account__c`
       becomes a master-detail.
+
+   **Status:** done by hand in the HTCDEV sandbox on 2026-10-25. The test record
+   `Beacon Subs - 000001` was deleted, `Contact__c` changed to Lookup(Contact) and `Account__c`
+   created as Master-Detail(Account). The object doesn't exist in UAT yet, so a first deploy
+   there creates the fields in their final form and these steps aren't needed.
 2. **Related lists:** Add the Beacon Subscriptions related list to the Contact, Asset, Account
    and Asset State Period page layouts or Lightning record pages so users can create and see subscriptions.
 3. **Tab (optional):** No custom tab was created. Add one, and add it to the Beacon app, if users
