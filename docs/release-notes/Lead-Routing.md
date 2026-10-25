@@ -101,6 +101,8 @@ Rules, in order:
    - If an APAC person has no APAC rep set on the Campaign, they also fall through to the letter split.
 4. The chosen user must be **active**. If not, no owner is returned and the reason says so.
 
+The engine's first element, **Flows Enabled?**, checks *Run Flows* on the On/Off Switch. When it's unchecked, the engine ends at once and returns a blank owner and routing reason. Its callers already check the switch, so this only matters if the engine is called from somewhere new.
+
 The split fields were 20 characters long, too short for `M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z` (27 characters). They
 are now **255 characters**, with help text explaining the format.
 
@@ -335,7 +337,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Lead-Rout
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Flow | N/A | Lead_Routing_Engine | Lead Routing Engine | Created | Autolaunched subflow (Flow B). Returns the owner and routing reason: Account Team (In Platform Demo Request goes to the AM; otherwise SDR for Leads and AM for Opportunities, with fallback to the other role), then the APAC (excl. India) SDR/AM on the Parent Campaign, then the letter split on SDR/AM Split fields, with no match going to rep 1. Only returns active users. |
+| 1 | Flow | N/A | Lead_Routing_Engine | Lead Routing Engine | Created | Autolaunched subflow (Flow B). Returns the owner and routing reason: Account Team (In Platform Demo Request goes to the AM; otherwise SDR for Leads and AM for Opportunities, with fallback to the other role), then the APAC (excl. India) SDR/AM on the Parent Campaign, then the letter split on SDR/AM Split fields, with no match going to rep 1. Only returns active users. Returns a blank owner when Run Flows is unchecked on the On/Off Switch. |
 | 2 | Flow | CampaignMember | CampaignMember_On_Create_After_Save | CampaignMember - On Create - After Save | Created | Routing entry point (Flow A). Routes new Leads not owned by a sales rep, and re-routes Leads after 21 days on a different module. Sets Ready to Convert for hand-raisers. Creates a Request for Information Opportunity for hand-raiser Contacts. Sends Lead Routing Alerts. |
 | 3 | Flow | Contact | Contact_On_Create_Before_Save | Contact - On Create - Before Save | Updated | Added: Contact owner = the Account Team Account Manager (active) on create, including Lead conversion. The Title start condition moved into a decision so the flow runs on every create. Seniority logic unchanged. |
 | 4 | Flow | Contact | Contact_On_Create_After_Save | Contact - On Create - After Save | Created | Alerts the Contact owner (AM) when someone else creates a Contact on their Account, including by conversion. |

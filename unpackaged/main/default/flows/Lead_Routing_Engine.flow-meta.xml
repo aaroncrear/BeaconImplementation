@@ -23,7 +23,30 @@
             </value>
         </assignmentItems>
     </assignments>
-    <description>Decides who should own a Lead (or an auto-created Opportunity) from a marketing engagement. Called by CampaignMember - On Create - After Save. Order: 1) Account Team (In Platform Demo Request goes to the Account Manager, otherwise the requested rep type, falling back to the other team role); 2) APAC (excluding India) goes to the APAC SDR/AM on the Parent Campaign; 3) letter split on the first letter of the Account name against the Parent Campaign SDR/AM split fields (no match or non-letter goes to rep 1). Returns a blank owner when no active rep is found. Returns the owner and a routing reason; it does not update any records.</description>
+    <decisions>
+        <description>Stops when the On/Off Switch has Run Flows unchecked, returning a blank owner and routing reason.</description>
+        <name>Flows_Enabled</name>
+        <label>Flows Enabled?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Flows Switched Off</defaultConnectorLabel>
+        <rules>
+            <name>Run_Flows</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Setup.On_Off_Switch__c.Run_Flows__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Account_Team_AM</targetReference>
+            </connector>
+            <label>Run Flows</label>
+        </rules>
+    </decisions>
+    <description>Decides who should own a Lead (or an auto-created Opportunity) from a marketing engagement. Called by CampaignMember - On Create - After Save. Order: 1) Account Team (In Platform Demo Request goes to the Account Manager, otherwise the requested rep type, falling back to the other team role); 2) APAC (excluding India) goes to the APAC SDR/AM on the Parent Campaign; 3) letter split on the first letter of the Account name against the Parent Campaign SDR/AM split fields (no match or non-letter goes to rep 1). Returns a blank owner when no active rep is found. Returns the owner and a routing reason; it does not update any records. Returns a blank owner and routing reason when Run Flows is unchecked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <formulas>
         <description>Owner from the Account Team. Blank when the Account has no AM or SDR on its team (unassigned Account).</description>
@@ -245,7 +268,7 @@ IF(ISBLANK({!formOwnerId}), &quot;Not routed: Account unassigned and no rep foun
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Get_Account_Team_AM</targetReference>
+            <targetReference>Flows_Enabled</targetReference>
         </connector>
     </start>
     <status>Active</status>
