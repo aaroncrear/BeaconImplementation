@@ -9,7 +9,7 @@ When an Opportunity is Closed Won, its Account should be marked as a customer au
 A new record-triggered flow, **Opportunity - On Create Update - After Save** (`Opportunity_On_Create_Update_After_Save`), sets **Type** = `Customer` on the Opportunity's Account when the Opportunity is Closed Won.
 
 - **Trigger:** runs after save when an Opportunity is created or updated.
-- **Entry criteria:** `IsWon = true` AND `AccountId` is not blank. The flow is set to run **only when a record is updated to meet the criteria**. It fires once, when the Opportunity becomes Closed Won (or is created as Closed Won). It does not fire again on later edits to an Opportunity that is already won.
+- **Entry criteria:** **Run Flows** is checked on the On/Off Switch custom setting AND `IsWon = true` AND `AccountId` is not blank, as a formula: `AND({!$Setup.On_Off_Switch__c.Run_Flows__c}, {!$Record.IsWon}, NOT(ISBLANK({!$Record.AccountId})))`. The flow is set to run **only when a record is updated to meet the criteria**. It fires once, when the Opportunity becomes Closed Won (or is created as Closed Won). It does not fire again on later edits to an Opportunity that is already won.
 - **Update:** one Update Records element updates the Account where `Id = $Record.AccountId` and `Type != Customer`. The `Type != Customer` filter skips the DML when the Account is already a Customer.
 - **Fault handling:** the update's fault path calls the existing **Fault Path Subflow**, which emails an automation-failure notification. This matches the other record-triggered flows in the org.
 
@@ -24,6 +24,7 @@ A new record-triggered flow, **Opportunity - On Create Update - After Save** (`O
 5. Close Won an Opportunity on an Account that is already `Customer`. Confirm the save succeeds and **Type** stays `Customer`.
 6. On the Account from step 1, set its **Type** back to `Prospect`. Then edit a field on the won Opportunity, such as Description, and save. Confirm the Account's **Type** stays `Prospect`, because the flow only fires when the Opportunity first becomes won.
 7. Confirm the Account's **Engagement Status** shows the Customer image after steps 1 and 2.
+8. Add a **User** level On/Off Switch record for your user with **Run Flows** unchecked. Repeat step 2 on another Account that is not a Customer and confirm its **Type** does not change. Delete the User level record afterwards.
 
 ## Post Deployment Items
 
@@ -36,4 +37,4 @@ Github Branch: [Test-Flow](https://github.com/aaroncrear/BeaconImplementation/tr
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Flow | Opportunity | Opportunity_On_Create_Update_After_Save | Opportunity - On Create Update - After Save | Created | Record-triggered after-save flow that sets Account Type to Customer when an Opportunity is created as, or updated to, Closed Won. |
+| 1 | Flow | Opportunity | Opportunity_On_Create_Update_After_Save | Opportunity - On Create Update - After Save | Created | Record-triggered after-save flow that sets Account Type to Customer when an Opportunity is created as, or updated to, Closed Won. Only runs when Run Flows is checked on the On/Off Switch. |
