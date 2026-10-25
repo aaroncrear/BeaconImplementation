@@ -132,8 +132,12 @@ need Read access to the parent Account and Asset to see a subscription. Every pe
 already granted Read on Account. **Read on Asset was added to every persona set**, and full
 access to Asset (Create, Read, Edit, Delete, View All, Modify All) was added to the Salesforce
 Admin set, matching its access to the other objects. Without this, the deploy failed with
-"Permission Read Beacon_Subscription__c depends on permission(s): Read Asset". The persona sets
-can now read Asset records the user has sharing access to, but can't create, edit or delete them.
+"Permission Read Beacon_Subscription__c depends on permission(s): Read Asset". Read on Asset in
+turn requires Read on **Product** (`Product2`). In the org, every profile and permission set
+that can read Asset can also read Product, and none of the Beacon sets had Product, so the Asset
+access was dropped and the same error came back. **Read on Product was therefore added to every
+persona set**, with full access for the Salesforce Admin set. The persona sets can now read
+Asset and Product records but can't create, edit or delete them.
 
 ## Acceptance Criteria
 
@@ -169,9 +173,9 @@ can now read Asset records the user has sharing access to, but can't create, edi
     neither has access to Beacon Subscription.
 12. **New fields on layout:** Open a Beacon Subscription as an admin. Confirm Start Date,
     End Date, Date Access Removed, Status and Active (both read-only) are on the layout.
-13. **Asset access:** As a persona user, open an Asset on an Account they can see. Confirm they
-    can view it but have no New, Edit or Delete buttons. As an admin, confirm Assets can be
-    created and edited.
+13. **Asset and Product access:** As a persona user, open an Asset on an Account they can see,
+    and then its Product. Confirm they can view both but have no New, Edit or Delete buttons.
+    As an admin, confirm Assets and Products can be created and edited.
 14. **Active – current term:** Set Start Date to yesterday, End Date to tomorrow and leave Date
     Access Removed blank. Save. Confirm Active is checked and Status shows the green Active flag.
 15. **Active – boundary days:** Set Start Date = today, then End Date = today. Confirm Active
@@ -266,13 +270,13 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Beacon-Su
 | 35 | Profile | N/A | SalesforceIQ Integration User | SalesforceIQ Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
 | 36 | Profile | N/A | SolutionManager | SolutionManager | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
 | 37 | Profile | N/A | Standard | Standard | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 38 | Permission Set | Beacon_Subscription__c | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Asset, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 39 | Permission Set | Beacon_Subscription__c | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Asset, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 40 | Permission Set | Beacon_Subscription__c | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Asset, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 41 | Permission Set | Beacon_Subscription__c | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Asset, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 42 | Permission Set | Beacon_Subscription__c | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Asset, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 43 | Permission Set | Beacon_Subscription__c | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Asset, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 44 | Permission Set | Beacon_Subscription__c | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Asset, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 45 | Permission Set | Beacon_Subscription__c | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Asset, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 46 | Permission Set | Beacon_Subscription__c | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Create/Read/Edit/Delete, View All Fields, View All Records and Modify All Records on Beacon_Subscription__c and Asset, Read + Edit FLS on Contact__c, Start_Date__c, End_Date__c and Date_Access_Removed__c, and Read FLS on Active__c and Status__c. |
-| 47 | Permission Set | Beacon_Subscription__c | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Asset, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 38 | Permission Set | Beacon_Subscription__c | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c, Asset and Product2, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 39 | Permission Set | Beacon_Subscription__c | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c, Asset and Product2, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 40 | Permission Set | Beacon_Subscription__c | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c, Asset and Product2, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 41 | Permission Set | Beacon_Subscription__c | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c, Asset and Product2, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 42 | Permission Set | Beacon_Subscription__c | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c, Asset and Product2, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 43 | Permission Set | Beacon_Subscription__c | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c, Asset and Product2, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 44 | Permission Set | Beacon_Subscription__c | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c, Asset and Product2, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 45 | Permission Set | Beacon_Subscription__c | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c, Asset and Product2, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 46 | Permission Set | Beacon_Subscription__c | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Create/Read/Edit/Delete, View All Fields, View All Records and Modify All Records on Beacon_Subscription__c, Asset and Product2, Read + Edit FLS on Contact__c, Start_Date__c, End_Date__c and Date_Access_Removed__c, and Read FLS on Active__c and Status__c. |
+| 47 | Permission Set | Beacon_Subscription__c | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c, Asset and Product2, and Read FLS on Contact__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
