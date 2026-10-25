@@ -60,11 +60,9 @@
         <object>Quote</object>
         <recordTriggerType>Create</recordTriggerType>
         <scheduledPaths>
-            <name>Run_Asynchronously</name>
             <connector>
                 <targetReference>Sync_Quote_To_Opportunity</targetReference>
             </connector>
-            <label>Run Asynchronously</label>
             <pathType>AsyncAfterCommit</pathType>
         </scheduledPaths>
         <triggerType>RecordAfterSave</triggerType>
