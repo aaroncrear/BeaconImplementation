@@ -17,7 +17,9 @@ the object description, the business need is:
   Period), link to the Asset Time Period (Asset State Period) record it covers, and capture the
   date access was removed if it ended early.
 - An **Active** flag should show whether the subscription is live today: within its Start and
-  End Date and not removed early.
+  End Date and not removed early. It must be usable as a filter in list views and reports.
+- A **Status** field should show the same thing visually, as a green "Active" or red "Inactive"
+  flag icon in the same style as the Engagement Status icons.
 - Every Beacon persona should be able to **read** Beacon Subscriptions. Only Beacon Salesforce
   Admins should be able to create, edit and delete them, with full Modify All / View All access.
   The baseline permission sets should not grant access.
@@ -51,14 +53,15 @@ Three relationship fields were created:
 | `Account__c` | Lookup(Account), delete = Set Null | No | Optional link to the Account, for reporting. Populated by hand. |
 | `Asset_Time_Period__c` | Lookup(Asset State Period), delete = Set Null | No (see below) | The Asset Time Period this subscription covers. |
 
-Four fields track the subscription term and status:
+Five fields track the subscription term and status:
 
 | Field | Type | Description |
 |---|---|---|
 | `Start_Date__c` | Date | Subscription start date. Corresponds to Start Date on the related Asset Time Period. |
 | `End_Date__c` | Date | Subscription end date. Corresponds to End Date on the related Asset Time Period. |
 | `Date_Access_Removed__c` | Date | Date access was removed if done prior to end date. |
-| `Active__c` | Formula (Text) | Shows a green **Active** flag when today is between Start Date and End Date (inclusive) and Date Access Removed is blank. Otherwise shows a red **Inactive** flag, including when either date is blank. |
+| `Active__c` | Formula (Checkbox) | True when today is between Start Date and End Date (inclusive) and Date Access Removed is blank. Otherwise false, including when either date is blank. |
+| `Status__c` | Formula (Text) | Shows a green **Active** flag when `Active__c` is true, otherwise a red **Inactive** flag. |
 
 "Asset Time Period" is the standard Revenue Cloud object **Asset State Period**
 (`AssetStatePeriod`). It was requested as a master-detail, but Salesforce allows at most two
@@ -70,19 +73,23 @@ Cloud rebuilds Asset State Periods on amendments, and Restrict would block that.
 Start Date and End Date are plain date fields that users enter. They are **not** copied
 automatically from the Asset Time Period.
 
-`Active__c` is a text formula that uses `IMAGE()` to display one of two new static resources,
-`Active` (green flag, "Active") and `Inactive` (red flag, "Inactive"). The icons were built in
-the same style as the Engagement Status icons from the `Traffic-Light-System` branch. They reuse
-the same rounded white badge, the same green flag as `Customer` and the same red flag as
-`Do_Not_Contact`, with the same bold label font and colours. Like those icons, they are stored at
-40px high and displayed at 20px (`IMAGE(..., 20, 60)` and `IMAGE(..., 20, 69)`) so they stay
-sharp on high-resolution screens. The field was first built as a checkbox formula and was
-changed to a text formula on this branch so it matches the other status flags in the org.
+`Active__c` is a checkbox formula, so it can be used to filter list views and reports
+(Active equals True/False). `Status__c` is a separate text formula that reads `Active__c` and uses
+`IMAGE()` to show one of two new static resources: `Active` (green flag, "Active") or `Inactive`
+(red flag, "Inactive"). Splitting them this way keeps the active rule in one place, `Active__c`,
+while still giving users a visual flag. An image formula can't be used as a true/false filter,
+which is why the checkbox is kept as well. (On this branch, Active was briefly changed to an
+image formula and then changed back.)
 
-`Active__c` is calculated each time the record is read, using `TODAY()`, so it changes
-overnight with no automation. Because it is an image formula, it can't be used to trigger flows,
-isn't stored for field history, and can't be filtered as true/false in list views or reports.
-To filter on it in a report, use the Start Date, End Date and Date Access Removed fields.
+The icons were built in the same style as the Engagement Status icons from the
+`Traffic-Light-System` branch. They reuse the same rounded white badge, the same green flag as
+`Customer` and the same red flag as `Do_Not_Contact`, with the same bold label font and colours.
+Like those icons, they are stored at 40px high and displayed at 20px (`IMAGE(..., 20, 60)` and
+`IMAGE(..., 20, 69)`) so they stay sharp on high-resolution screens.
+
+Both fields are calculated each time the record is read, using `TODAY()`, so they change
+overnight with no automation. Because they are formulas, they can't trigger flows and aren't
+stored for field history.
 
 Because `Contact__c` and `Asset__c` are both master-detail, **deleting a Contact or an Asset
 also deletes its Beacon Subscription records**, and neither master can be reparented
@@ -91,7 +98,7 @@ and its default report type come from the Contact.
 
 A page layout, `Beacon Subscription Layout`, was created. Its **Information** section shows Name
 (read-only), Contact (required), Asset (required) and Account in the left column, and Currency in
-the right column. Asset Time Period was added to the left column. Active (read-only), Start Date,
+the right column. Asset Time Period was added to the left column. Status and Active (both read-only), Start Date,
 End Date and Date Access Removed were added to the right column above Currency. Its **System Information** section shows the standard created/modified fields.
 The layout is assigned to all 25 profiles in the repo. (Gearset also moved the `<userLicense>`
 element higher in the `Beacon Standard User` profile. This is a reorder only; nothing changed.)
@@ -102,7 +109,7 @@ the pattern from the `beacon-permission-sets-jaq4s2` branch:
 | Permission Set | Object access | Field-level security |
 |---|---|---|
 | Beacon Consulting, Customer Success, Executive, Finance, Marketing, Product, ResOps, Sales, Tech – Object, Tab, FLS | Read only | Read on all custom fields |
-| Beacon Salesforce Admin – Object, Tab, FLS | Create, Read, Edit, Delete, View All Fields, View All Records, Modify All Records | Read + Edit on all custom fields (Active is a formula, so it is Read only) |
+| Beacon Salesforce Admin – Object, Tab, FLS | Create, Read, Edit, Delete, View All Fields, View All Records, Modify All Records | Read + Edit on all custom fields (Active and Status are formulas, so they are Read only) |
 
 The two baseline permission sets (`Beacon - Baseline - Standard Field Access` and `Beacon -
 Baseline - System & App Access`) were deliberately left alone.
@@ -146,20 +153,25 @@ already grants Read on Contact. Asset access comes from the user's profile and t
 11. **Baseline sets untouched:** In Setup, open the two Beacon baseline permission sets. Confirm
     neither has access to Beacon Subscription.
 12. **New fields on layout:** Open a Beacon Subscription as an admin. Confirm Asset Time
-    Period, Start Date, End Date, Date Access Removed and Active (read-only) are on the layout.
+    Period, Start Date, End Date, Date Access Removed, Status and Active (both read-only) are on the layout.
 13. **Asset Time Period lookup:** Choose an Asset Time Period and save. Confirm the
     subscription shows in the Beacon Subscriptions related list on that Asset State Period.
 14. **Active – current term:** Set Start Date to yesterday, End Date to tomorrow and leave Date
-    Access Removed blank. Save. Confirm Active shows the green Active flag.
+    Access Removed blank. Save. Confirm Active is checked and Status shows the green Active flag.
 15. **Active – boundary days:** Set Start Date = today, then End Date = today. Confirm Active
-    shows the green Active flag in both cases.
-16. **Active – future / expired:** Set Start Date to tomorrow and confirm Active shows the red
-    Inactive flag. Then set dates entirely in the past and confirm it shows the red Inactive flag.
+    is checked and Status shows the green Active flag in both cases.
+16. **Active – future / expired:** Set Start Date to tomorrow and confirm Active is unchecked and
+    Status shows the red Inactive flag. Then set dates entirely in the past and confirm the same.
 17. **Active – access removed:** With a current term, enter today in Date Access Removed.
-    Confirm Active shows the red Inactive flag. Clear it and confirm it shows the green Active flag again.
-18. **Active – blank dates:** Clear Start Date or End Date. Confirm Active shows the red Inactive flag.
-19. **Persona FLS:** As a persona user, confirm the five new fields are visible and read-only.
-20. **Reporting:** Create a report on Beacon Subscriptions (via the Contacts with Beacon
+    Confirm Active is unchecked and Status shows the red Inactive flag. Clear it and confirm Active is
+    checked and Status shows the green Active flag again.
+18. **Active – blank dates:** Clear Start Date or End Date. Confirm Active is unchecked and Status
+    shows the red Inactive flag.
+19. **List view / report filter:** Create a Beacon Subscriptions list view filtered on Active
+    equals True. Confirm only current subscriptions appear. Add Status as a column and confirm
+    each row shows the green flag. Repeat with Active equals False (red flags).
+20. **Persona FLS:** As a persona user, confirm the six new fields are visible and read-only.
+21. **Reporting:** Create a report on Beacon Subscriptions (via the Contacts with Beacon
    Subscriptions report type). Confirm Contact, Asset and Account columns are available.
 
 ## Post Deployment Items
@@ -194,42 +206,43 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Beacon-Su
 | 6 | Field | Beacon_Subscription__c | Start_Date__c | Start Date | Created | Date. Corresponds to Start Date on the related Asset Time Period. |
 | 7 | Field | Beacon_Subscription__c | End_Date__c | End Date | Created | Date. Corresponds to End Date on the related Asset Time Period. |
 | 8 | Field | Beacon_Subscription__c | Date_Access_Removed__c | Date Access Removed | Created | Date access was removed if done prior to end date. |
-| 9 | Field | Beacon_Subscription__c | Active__c | Active | Created | Formula (Text). Shows the Active static resource (green flag) when today is within Start/End Date and Date Access Removed is blank; otherwise the Inactive static resource (red flag). |
-| 10 | Static Resource | N/A | Active | Active | Created | Green flag badge with the text "Active" (PNG, 120x40), used by Beacon_Subscription__c.Active__c. |
-| 11 | Static Resource | N/A | Inactive | Inactive | Created | Red flag badge with the text "Inactive" (PNG, 138x40), used by Beacon_Subscription__c.Active__c. |
-| 12 | Page Layout | Beacon_Subscription__c | Beacon_Subscription__c-Beacon Subscription Layout | Beacon Subscription Layout | Created | Information section (Name, Contact, Asset, Account, Asset Time Period, Active, Start Date, End Date, Date Access Removed, Currency) and System Information section. |
-| 13 | Profile | N/A | Admin | Admin | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 14 | Profile | N/A | Analytics Cloud Integration User | Analytics Cloud Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 15 | Profile | N/A | Analytics Cloud Security User | Analytics Cloud Security User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 16 | Profile | N/A | Beacon Standard User | Beacon Standard User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. Also moved the userLicense element (reorder only). |
-| 17 | Profile | N/A | CPQ Integration User | CPQ Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 18 | Profile | N/A | Chatter External User | Chatter External User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 19 | Profile | N/A | Chatter Free User | Chatter Free User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 20 | Profile | N/A | Chatter Moderator User | Chatter Moderator User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 21 | Profile | N/A | ContractManager | ContractManager | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 22 | Profile | N/A | Einstein Agent User | Einstein Agent User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 23 | Profile | N/A | End User | End User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 24 | Profile | N/A | Executive Sponsor | Executive Sponsor | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 25 | Profile | N/A | External Apps Login User | External Apps Login User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 26 | Profile | N/A | External Einstein Agent User | External Einstein Agent User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 27 | Profile | N/A | Guest License User | Guest License User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 28 | Profile | N/A | Identity User | Identity User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 29 | Profile | N/A | MarketingProfile | MarketingProfile | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 30 | Profile | N/A | Minimum Access - API Only Integrations | Minimum Access - API Only Integrations | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 31 | Profile | N/A | Minimum Access - Salesforce | Minimum Access - Salesforce | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 32 | Profile | N/A | Read Only | Read Only | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 33 | Profile | N/A | Sales Insights Integration User | Sales Insights Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 34 | Profile | N/A | Salesforce API Only System Integrations | Salesforce API Only System Integrations | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 35 | Profile | N/A | SalesforceIQ Integration User | SalesforceIQ Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 36 | Profile | N/A | SolutionManager | SolutionManager | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 37 | Profile | N/A | Standard | Standard | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 38 | Permission Set | Beacon_Subscription__c | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c and Active__c. |
-| 39 | Permission Set | Beacon_Subscription__c | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c and Active__c. |
-| 40 | Permission Set | Beacon_Subscription__c | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c and Active__c. |
-| 41 | Permission Set | Beacon_Subscription__c | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c and Active__c. |
-| 42 | Permission Set | Beacon_Subscription__c | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c and Active__c. |
-| 43 | Permission Set | Beacon_Subscription__c | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c and Active__c. |
-| 44 | Permission Set | Beacon_Subscription__c | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c and Active__c. |
-| 45 | Permission Set | Beacon_Subscription__c | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c and Active__c. |
-| 46 | Permission Set | Beacon_Subscription__c | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Create/Read/Edit/Delete, View All Fields, View All Records and Modify All Records on Beacon_Subscription__c, Read + Edit FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c and Date_Access_Removed__c, and Read FLS on Active__c. |
-| 47 | Permission Set | Beacon_Subscription__c | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c and Active__c. |
+| 9 | Field | Beacon_Subscription__c | Active__c | Active | Created | Formula (Checkbox). True when today is within Start/End Date and Date Access Removed is blank. Usable in list view and report filters. |
+| 10 | Field | Beacon_Subscription__c | Status__c | Status | Created | Formula (Text). Shows the Active static resource (green flag) when Active__c is true, otherwise the Inactive static resource (red flag). |
+| 11 | Static Resource | N/A | Active | Active | Created | Green flag badge with the text "Active" (PNG, 120x40), used by Beacon_Subscription__c.Status__c. |
+| 12 | Static Resource | N/A | Inactive | Inactive | Created | Red flag badge with the text "Inactive" (PNG, 138x40), used by Beacon_Subscription__c.Status__c. |
+| 13 | Page Layout | Beacon_Subscription__c | Beacon_Subscription__c-Beacon Subscription Layout | Beacon Subscription Layout | Created | Information section (Name, Contact, Asset, Account, Asset Time Period, Status, Active, Start Date, End Date, Date Access Removed, Currency) and System Information section. |
+| 14 | Profile | N/A | Admin | Admin | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 15 | Profile | N/A | Analytics Cloud Integration User | Analytics Cloud Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 16 | Profile | N/A | Analytics Cloud Security User | Analytics Cloud Security User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 17 | Profile | N/A | Beacon Standard User | Beacon Standard User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. Also moved the userLicense element (reorder only). |
+| 18 | Profile | N/A | CPQ Integration User | CPQ Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 19 | Profile | N/A | Chatter External User | Chatter External User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 20 | Profile | N/A | Chatter Free User | Chatter Free User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 21 | Profile | N/A | Chatter Moderator User | Chatter Moderator User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 22 | Profile | N/A | ContractManager | ContractManager | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 23 | Profile | N/A | Einstein Agent User | Einstein Agent User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 24 | Profile | N/A | End User | End User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 25 | Profile | N/A | Executive Sponsor | Executive Sponsor | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 26 | Profile | N/A | External Apps Login User | External Apps Login User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 27 | Profile | N/A | External Einstein Agent User | External Einstein Agent User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 28 | Profile | N/A | Guest License User | Guest License User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 29 | Profile | N/A | Identity User | Identity User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 30 | Profile | N/A | MarketingProfile | MarketingProfile | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 31 | Profile | N/A | Minimum Access - API Only Integrations | Minimum Access - API Only Integrations | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 32 | Profile | N/A | Minimum Access - Salesforce | Minimum Access - Salesforce | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 33 | Profile | N/A | Read Only | Read Only | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 34 | Profile | N/A | Sales Insights Integration User | Sales Insights Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 35 | Profile | N/A | Salesforce API Only System Integrations | Salesforce API Only System Integrations | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 36 | Profile | N/A | SalesforceIQ Integration User | SalesforceIQ Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 37 | Profile | N/A | SolutionManager | SolutionManager | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 38 | Profile | N/A | Standard | Standard | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
+| 39 | Permission Set | Beacon_Subscription__c | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 40 | Permission Set | Beacon_Subscription__c | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 41 | Permission Set | Beacon_Subscription__c | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 42 | Permission Set | Beacon_Subscription__c | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 43 | Permission Set | Beacon_Subscription__c | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 44 | Permission Set | Beacon_Subscription__c | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 45 | Permission Set | Beacon_Subscription__c | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 46 | Permission Set | Beacon_Subscription__c | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 47 | Permission Set | Beacon_Subscription__c | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Create/Read/Edit/Delete, View All Fields, View All Records and Modify All Records on Beacon_Subscription__c, Read + Edit FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c and Date_Access_Removed__c, and Read FLS on Active__c and Status__c. |
+| 48 | Permission Set | Beacon_Subscription__c | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
