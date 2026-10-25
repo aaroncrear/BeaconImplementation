@@ -4,7 +4,7 @@
 
 When a Quote is created, it should automatically become the primary Quote and sync to its Opportunity, so users don't have to click **Start Sync** by hand.
 
-When a synced Quote's Status is changed to **Approved**, its Opportunity's Stage should move to **Contract**.
+When a synced Quote's Status is changed to **Accepted**, its Opportunity's Stage should move to **Contract**.
 
 ## Release Notes
 
@@ -34,7 +34,7 @@ If the update fails, the Flow calls the existing **Fault Path Subflow** to send 
 
 ### Quote - On Update - After Save Flow
 
-A new record-triggered Flow, **Quote - On Update - After Save** (`Quote_On_Update_After_Save`), runs when a Quote is updated. When the Quote's **Status** is changed to **Approved** and the Quote is syncing, it sets the Opportunity's **Stage** to **Contract**.
+A new record-triggered Flow, **Quote - On Update - After Save** (`Quote_On_Update_After_Save`), runs when a Quote is updated. When the Quote's **Status** is changed to **Accepted** and the Quote is syncing, it sets the Opportunity's **Stage** to **Contract**.
 
 **Entry conditions** (Formula Evaluates to True):
 
@@ -42,13 +42,13 @@ A new record-triggered Flow, **Quote - On Update - After Save** (`Quote_On_Updat
 AND(
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
     ISCHANGED({!$Record.Status}),
-    ISPICKVAL({!$Record.Status}, "Approved"),
+    ISPICKVAL({!$Record.Status}, "Accepted"),
     {!$Record.IsSyncing},
     NOT(ISBLANK({!$Record.OpportunityId}))
 )
 ```
 
-- **`ISCHANGED`** makes the Flow run only when the Status changes to Approved. Later edits to an already Approved Quote don't move the Stage again.
+- **`ISCHANGED`** makes the Flow run only when the Status changes to Accepted. Later edits to an already Accepted Quote don't move the Stage again.
 - **`IsSyncing`** limits the Flow to the Opportunity's synced Quote, so approving a Quote that isn't syncing doesn't change the Opportunity.
 - The Flow honors the **On/Off Switch**.
 
@@ -79,29 +79,29 @@ This Flow runs on the immediate path, because nothing else needs to finish first
    2. Create a Quote on an Opportunity. Confirm it is **not** Syncing.
    3. Delete the User level record. Create another Quote and confirm it **is** Syncing.
 
-7. **Approved synced Quote moves the Stage to Contract:**
+7. **Accepted synced Quote moves the Stage to Contract:**
    1. Open an open Opportunity at a stage before Contract (e.g. Proposal) with a synced Quote.
-   2. Change the synced Quote's **Status** to **Approved** and save.
+   2. Change the synced Quote's **Status** to **Accepted** and save.
    3. Open the Opportunity. Confirm its **Stage** is **Contract**.
 8. **Quote that isn't syncing doesn't move the Stage:**
    1. On an Opportunity at Proposal with two Quotes, open the Quote that is **not** Syncing.
-   2. Change its **Status** to **Approved** and save.
+   2. Change its **Status** to **Accepted** and save.
    3. Confirm the Opportunity's **Stage** is still **Proposal**.
 9. **Other Status values don't move the Stage:**
-   1. On an Opportunity at Proposal, change its synced Quote's **Status** to a value other than Approved (e.g. **In Review**) and save.
+   1. On an Opportunity at Proposal, change its synced Quote's **Status** to a value other than Accepted (e.g. **Approved**) and save.
    2. Confirm the Opportunity's **Stage** is still **Proposal**.
 10. **Closed Opportunities are left alone:**
-    1. On a **Closed Won** Opportunity with a synced Quote, change the Quote's **Status** to **Approved** and save.
+    1. On a **Closed Won** Opportunity with a synced Quote, change the Quote's **Status** to **Accepted** and save.
     2. Confirm the Opportunity's **Stage** is still **Closed Won**.
 11. **On/Off Switch:**
     1. Add a **User** level On/Off Switch record for your user with **Run Flows** unchecked.
-    2. Change a synced Quote's **Status** to **Approved** on an Opportunity at Proposal. Confirm the Stage is still **Proposal**.
+    2. Change a synced Quote's **Status** to **Accepted** on an Opportunity at Proposal. Confirm the Stage is still **Proposal**.
     3. Delete the User level record afterwards.
 
 ## Post Deployment Items
 
 - Confirm **Enable Quotes** is on in **Setup → Quote Settings** in the target org. The Flow can't start syncing if Quotes are off.
-- Confirm the Quote **Status** picklist in the target org has an **Approved** value with the API name `Approved`. The Flow checks for that exact value.
+- Confirm the Quote **Status** picklist in the target org has an **Accepted** value with the API name `Accepted`. The Flow checks for that exact value.
 - Tell users that new Quotes now sync automatically and replace the Opportunity's existing synced Quote. To make an older Quote primary again, open it and click **Start Sync**.
 
 ## Component Manifest
@@ -111,4 +111,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Quote-Aut
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
 | 1 | Flow | Quote | Quote_On_Create_After_Save | Quote - On Create - After Save | Created | Record-triggered After Save Flow. When a Quote is created, sets the parent Opportunity's Synced Quote to the new Quote on the Run Asynchronously path, so the Quote becomes the primary, synced Quote. Honors the On/Off Switch. |
-| 2 | Flow | Quote | Quote_On_Update_After_Save | Quote - On Update - After Save | Created | Record-triggered After Save Flow. When a syncing Quote's Status is changed to Approved, sets the Opportunity's Stage to Contract, unless the Opportunity is already closed. Honors the On/Off Switch. |
+| 2 | Flow | Quote | Quote_On_Update_After_Save | Quote - On Update - After Save | Created | Record-triggered After Save Flow. When a syncing Quote's Status is changed to Accepted, sets the Opportunity's Stage to Contract, unless the Opportunity is already closed. Honors the On/Off Switch. |

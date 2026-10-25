@@ -2,7 +2,7 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <description>When a syncing Quote&apos;s Status is changed to Approved, sets its Opportunity&apos;s Stage to Contract. Quotes that aren&apos;t syncing to their Opportunity are skipped, and Opportunities that are already Closed Won or Closed Lost are left unchanged. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>When a syncing Quote&apos;s Status is changed to Accepted, sets its Opportunity&apos;s Stage to Contract. Quotes that aren&apos;t syncing to their Opportunity are skipped, and Opportunities that are already Closed Won or Closed Lost are left unchanged. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Quote - On Update - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Quote - On Update - After Save</label>
@@ -66,7 +66,7 @@
         <filterFormula>AND(
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
     ISCHANGED({!$Record.Status}),
-    ISPICKVAL({!$Record.Status}, &quot;Approved&quot;),
+    ISPICKVAL({!$Record.Status}, &quot;Accepted&quot;),
     {!$Record.IsSyncing},
     NOT(ISBLANK({!$Record.OpportunityId}))
 )</filterFormula>
