@@ -2,8 +2,10 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Hours_Must_Be_Positive</fullName>
     <active>true</active>
-    <description>Hours must be greater than zero.</description>
-    <errorConditionFormula>AND(NOT(ISBLANK(Hours__c)), Hours__c &lt;= 0)</errorConditionFormula>
+    <description>Hours must be greater than zero. Honors the On/Off Switch (Run Validation Rules).</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp; (
+    AND(NOT(ISBLANK(Hours__c)), Hours__c &lt;= 0)
+)</errorConditionFormula>
     <errorDisplayField>Hours__c</errorDisplayField>
     <errorMessage>Hours must be greater than zero.</errorMessage>
 </ValidationRule>

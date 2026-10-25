@@ -2,8 +2,10 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Project_Type_Other_Required</fullName>
     <active>true</active>
-    <description>Project Type - Other must be completed when Project Type is Other.</description>
-    <errorConditionFormula>AND(ISPICKVAL(Project_Type__c, "Other"), ISBLANK(Project_Type_Other__c))</errorConditionFormula>
+    <description>Project Type - Other must be completed when Project Type is Other. Honors the On/Off Switch (Run Validation Rules).</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp; (
+    AND(ISPICKVAL(Project_Type__c, "Other"), ISBLANK(Project_Type_Other__c))
+)</errorConditionFormula>
     <errorDisplayField>Project_Type_Other__c</errorDisplayField>
     <errorMessage>Please specify the project type in Project Type - Other.</errorMessage>
 </ValidationRule>

@@ -2,8 +2,10 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Deadline_After_Kickoff</fullName>
     <active>true</active>
-    <description>Deadline cannot be before Kickoff.</description>
-    <errorConditionFormula>AND(NOT(ISBLANK(Kickoff__c)), NOT(ISBLANK(Deadline__c)), Deadline__c &lt; Kickoff__c)</errorConditionFormula>
+    <description>Deadline cannot be before Kickoff. Honors the On/Off Switch (Run Validation Rules).</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp; (
+    AND(NOT(ISBLANK(Kickoff__c)), NOT(ISBLANK(Deadline__c)), Deadline__c &lt; Kickoff__c)
+)</errorConditionFormula>
     <errorDisplayField>Deadline__c</errorDisplayField>
     <errorMessage>Deadline cannot be before Kickoff.</errorMessage>
 </ValidationRule>

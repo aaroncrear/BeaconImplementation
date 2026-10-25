@@ -37,6 +37,7 @@
   - The Slack record channel button is excluded from the Project and Project Time layouts.
   - The Lightning pages are activated as the org default desktop record page through each object's View action override.
   - The Project layout includes the Project Team Members, Project Time, activity and field history related lists.
+- **On/Off Switch.** All three validation rules only fire when *Run Validation Rules* is checked on the On/Off Switch custom setting, so admins can turn them off for a data load.
 - **Tabs and permissions.** Tabs were added for Projects and Project Time. Both permission sets grant the object, field and tab access listed below.
   - Master-detail fields are left out of field-level security because Salesforce always grants access to them.
   - Formula fields are read-only.
@@ -55,6 +56,7 @@
 10. From the Project's Related tab, create a **Project Time** record with Project Team Member, Date and Hours = 1.5 and a Description. Confirm it saves as `PT - 000001` with the Description shown. Enter Hours = 0 and confirm the error.
 11. As the Consulting user, confirm Projects can be created and edited but not deleted, and that Projects owned by other users are visible and editable.
 12. Assign **Beacon Salesforce Admin - Object, Tab, FLS** to a test user. Confirm the user can delete Projects, Project Time and Project Team Members, and has View All / Modify All.
+13. Add a **User** level On/Off Switch record for your user with **Run Validation Rules** unchecked. Repeat the error checks in steps 5, 7 and 10 and confirm each record saves without an error. Delete the User level record afterwards.
 
 ## Post Deployment Items
 
@@ -95,8 +97,8 @@ Github Branch: [Beacon-Custom-PM-App](https://github.com/aaroncrear/BeaconImplem
 | 17 | Custom Field (Text) | Project__c | Project_Type_Other__c | Project Type - Other | Created | Free-text project type, required when Project Type is Other. |
 | 18 | Custom Field (Picklist) | Project__c | Project_Type__c | Project Type | Created | Type of project delivered. When Other is selected, Project Type - Other must be filled in. |
 | 19 | Custom Field (Lookup) | Project__c | Sales_Owner__c | Sales Owner | Created | User who sold the project. The project Owner is the user delivering it. |
-| 20 | Validation Rule | Project__c | Deadline_After_Kickoff | Deadline After Kickoff | Created | Deadline cannot be before Kickoff. |
-| 21 | Validation Rule | Project__c | Project_Type_Other_Required | Project Type Other Required | Created | Project Type - Other must be completed when Project Type is Other. |
+| 20 | Validation Rule | Project__c | Deadline_After_Kickoff | Deadline After Kickoff | Created | Deadline cannot be before Kickoff. Respects the On/Off Switch. |
+| 21 | Validation Rule | Project__c | Project_Type_Other_Required | Project Type Other Required | Created | Project Type - Other must be completed when Project Type is Other. Respects the On/Off Switch. |
 | 22 | Compact Layout | Project__c | Beacon_Project_Compact_Layout | Beacon Project Compact Layout | Created | Highlights panel fields: Project Code, Project Name, Account, Project Status, Deadline, Owner. |
 | 23 | List View | Project__c | Project__c.All | All | Created | List view showing all records. |
 | 24 | Custom Object | Project_Time__c | Project_Time__c | Project Time | Created | Hours logged by a team member against a Project on a given date. Detail of Project. |
@@ -105,7 +107,7 @@ Github Branch: [Beacon-Custom-PM-App](https://github.com/aaroncrear/BeaconImplem
 | 27 | Custom Field (TextArea) | Project_Time__c | Description__c | Description | Created | What the time was used for. |
 | 28 | Custom Field (Lookup) | Project_Time__c | Project_Team_Member__c | Project Team Member | Created | User who did the work. Lookup to User because master-detail relationships cannot point at User. |
 | 29 | Custom Field (MasterDetail) | Project_Time__c | Project__c | Project | Created | Project the time is logged against. |
-| 30 | Validation Rule | Project_Time__c | Hours_Must_Be_Positive | Hours Must Be Positive | Created | Hours must be greater than zero. |
+| 30 | Validation Rule | Project_Time__c | Hours_Must_Be_Positive | Hours Must Be Positive | Created | Hours must be greater than zero. Respects the On/Off Switch. |
 | 31 | List View | Project_Time__c | Project_Time__c.All | All | Created | List view showing all records. |
 | 32 | Custom Object | Project_Team_Member__c | Project_Team_Member__c | Project Team Member | Updated | Member of a project team, with their role. Detail of Project. Master-detail now points at the new Project object. |
 | 33 | Custom Field (MasterDetail) | Project_Team_Member__c | Project__c | Project | Updated | Master-detail changed from Milestone1_Project__c to the new Project (Project__c) object. Recreated with the same API name after the old field was deleted and erased manually. |
