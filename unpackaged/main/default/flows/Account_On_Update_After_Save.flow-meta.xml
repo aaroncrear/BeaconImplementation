@@ -179,7 +179,7 @@
             <label>Open Opportunities Exist</label>
         </rules>
     </decisions>
-    <description>When any of the compliance fields (Blacklisted, Blacklisted Reason, Do Not Call, Email Opt Out) is changed on an Account, this after-save flow copies the new values to the corresponding fields on all related Contacts, all related Leads (Account lookup), and all open Opportunities. After each Get Records a decision checks whether any records were found before looping, and each update routes its fault path to the reusable Fault Path Subflow, which emails an automation-failure notification.</description>
+    <description>When any of the compliance fields (Blacklisted, Blacklisted Reason, Do Not Call, Email Opt Out) is changed on an Account, this after-save flow copies the new values to the corresponding fields on all related Contacts, all related Leads (Account lookup), and all open Opportunities. After each Get Records a decision checks whether any records were found before looping, and each update routes its fault path to the reusable Fault Path Subflow, which emails an automation-failure notification. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Account - On Update - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Account - On Update - After Save</label>
@@ -355,27 +355,15 @@
         <connector>
             <targetReference>Get_Contacts</targetReference>
         </connector>
-        <filterLogic>1 OR 2 OR 3 OR 4</filterLogic>
-        <filters>
-            <field>Blacklisted__c</field>
-            <operator>IsChanged</operator>
-            <value><booleanValue>true</booleanValue></value>
-        </filters>
-        <filters>
-            <field>Blacklisted_Reason__c</field>
-            <operator>IsChanged</operator>
-            <value><booleanValue>true</booleanValue></value>
-        </filters>
-        <filters>
-            <field>Do_Not_Call__c</field>
-            <operator>IsChanged</operator>
-            <value><booleanValue>true</booleanValue></value>
-        </filters>
-        <filters>
-            <field>Email_Opt_Out__c</field>
-            <operator>IsChanged</operator>
-            <value><booleanValue>true</booleanValue></value>
-        </filters>
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    OR(
+        ISCHANGED({!$Record.Blacklisted__c}),
+        ISCHANGED({!$Record.Blacklisted_Reason__c}),
+        ISCHANGED({!$Record.Do_Not_Call__c}),
+        ISCHANGED({!$Record.Email_Opt_Out__c})
+    )
+)</filterFormula>
         <object>Account</object>
         <recordTriggerType>Update</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>

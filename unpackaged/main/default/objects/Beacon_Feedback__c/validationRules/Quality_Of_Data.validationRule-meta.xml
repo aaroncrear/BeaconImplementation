@@ -2,11 +2,13 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Quality_Of_Data</fullName>
     <active>true</active>
-    <description>Makes sure Quality Of Data is a number between 1 and 5.</description>
-    <errorConditionFormula>OR(
-					Quality_Of_Data__c &gt; 5,
-					Quality_Of_Data__c &lt; 1
-	)</errorConditionFormula>
+    <description>Makes sure Quality Of Data is a number between 1 and 5. Honors the On/Off Switch (Run Validation Rules).</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp; (
+    OR(
+    					Quality_Of_Data__c &gt; 5,
+    					Quality_Of_Data__c &lt; 1
+    	)
+)</errorConditionFormula>
     <errorDisplayField>Quality_Of_Data__c</errorDisplayField>
     <errorMessage>Select a number between 1 and 5</errorMessage>
 </ValidationRule>

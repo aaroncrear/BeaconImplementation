@@ -2,11 +2,13 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Speed_Of_Platform</fullName>
     <active>true</active>
-    <description>Makes sure Speed Of Platform is a number between 1 and 5.</description>
-    <errorConditionFormula>OR(
-					Speed_Of_Platform__c &gt; 5,
-					Speed_Of_Platform__c &lt; 1
-	)</errorConditionFormula>
+    <description>Makes sure Speed Of Platform is a number between 1 and 5. Honors the On/Off Switch (Run Validation Rules).</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp; (
+    OR(
+    					Speed_Of_Platform__c &gt; 5,
+    					Speed_Of_Platform__c &lt; 1
+    	)
+)</errorConditionFormula>
     <errorDisplayField>Speed_Of_Platform__c</errorDisplayField>
     <errorMessage>Select a number between 1 and 5</errorMessage>
 </ValidationRule>

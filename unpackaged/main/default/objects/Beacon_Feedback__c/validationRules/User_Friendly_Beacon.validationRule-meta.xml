@@ -2,11 +2,13 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>User_Friendly_Beacon</fullName>
     <active>true</active>
-    <description>Makes sure the Beacon user-friendliness rating is a number between 1 and 5.</description>
-    <errorConditionFormula>OR(
-					How_User_Friendly_Do_You_Find_Beacon__c &gt; 5,
-					How_User_Friendly_Do_You_Find_Beacon__c &lt; 1
-	)</errorConditionFormula>
+    <description>Makes sure the Beacon user-friendliness rating is a number between 1 and 5. Honors the On/Off Switch (Run Validation Rules).</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp; (
+    OR(
+    					How_User_Friendly_Do_You_Find_Beacon__c &gt; 5,
+    					How_User_Friendly_Do_You_Find_Beacon__c &lt; 1
+    	)
+)</errorConditionFormula>
     <errorDisplayField>How_User_Friendly_Do_You_Find_Beacon__c</errorDisplayField>
     <errorMessage>Select a number between 1 and 5</errorMessage>
 </ValidationRule>

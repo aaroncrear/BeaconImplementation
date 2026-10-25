@@ -2,10 +2,12 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Number_Of_Customers_On_Call</fullName>
     <active>true</active>
-    <description>Makes sure Number Of Customers On Call is a number between 1 and 200.</description>
-    <errorConditionFormula>OR(
-Number_Of_Customers_On_Call__c &gt; 200,
-Number_Of_Customers_On_Call__c &lt; 1
+    <description>Makes sure Number Of Customers On Call is a number between 1 and 200. Honors the On/Off Switch (Run Validation Rules).</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp; (
+    OR(
+    Number_Of_Customers_On_Call__c &gt; 200,
+    Number_Of_Customers_On_Call__c &lt; 1
+    )
 )</errorConditionFormula>
     <errorDisplayField>Number_Of_Customers_On_Call__c</errorDisplayField>
     <errorMessage>Select a number between 1 and 200</errorMessage>

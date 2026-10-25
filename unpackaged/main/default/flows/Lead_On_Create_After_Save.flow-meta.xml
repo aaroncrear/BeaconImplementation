@@ -51,7 +51,7 @@
             <label>Domain Matching Account Found</label>
         </rules>
     </decisions>
-    <description>When a Lead is created, matches it to an Account by comparing the Lead&apos;s Email Domain to the Account&apos;s Domain field and the Lead&apos;s Country to the Account&apos;s Billing Country, then updates the Lead&apos;s Account lookup field with the matched Account.</description>
+    <description>When a Lead is created, matches it to an Account by comparing the Lead&apos;s Email Domain to the Account&apos;s Domain field and the Lead&apos;s Country to the Account&apos;s Billing Country, then updates the Lead&apos;s Account lookup field with the matched Account. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Lead - On Create - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Lead - On Create - After Save</label>
@@ -171,6 +171,7 @@
         <connector>
             <targetReference>Get_Matching_Account_by_Domain_and_Country</targetReference>
         </connector>
+        <filterFormula>{!$Setup.On_Off_Switch__c.Run_Flows__c}</filterFormula>
         <object>Lead</object>
         <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>

@@ -82,7 +82,7 @@
             <label>Title Is Changed</label>
         </rules>
     </decisions>
-    <description>Sets the Status to Do Not Engage if the record is Blacklisted or DNC and Email Opt Out. Sets the Seniority Level based on the Title when the Title changes.</description>
+    <description>Sets the Status to Do Not Engage if the record is Blacklisted or DNC and Email Opt Out. Sets the Seniority Level based on the Title when the Title changes. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <formulas>
         <description>True when the record is now Blacklisted, or Do Not Call and Email Opt Out, and was not before this update.</description>
@@ -232,12 +232,15 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
             <targetReference>Do_Not_Engage_Criteria_Met</targetReference>
         </connector>
         <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
-        <filterFormula>OR(
-    AND(
-        OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
-        NOT(OR(PRIORVALUE({!$Record.Blacklisted__c}), AND(PRIORVALUE({!$Record.DoNotCall}), PRIORVALUE({!$Record.HasOptedOutOfEmail}))))
-    ),
-    ISCHANGED({!$Record.Title})
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    OR(
+        AND(
+            OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
+            NOT(OR(PRIORVALUE({!$Record.Blacklisted__c}), AND(PRIORVALUE({!$Record.DoNotCall}), PRIORVALUE({!$Record.HasOptedOutOfEmail}))))
+        ),
+        ISCHANGED({!$Record.Title})
+    )
 )</filterFormula>
         <object>Lead</object>
         <recordTriggerType>Update</recordTriggerType>

@@ -39,7 +39,7 @@
             <label>Parent Found</label>
         </rules>
     </decisions>
-    <description>When a Sub Campaign is created, sets its Primary Module field to match the Primary Module field on its Parent Campaign.</description>
+    <description>When a Sub Campaign is created, sets its Primary Module field to match the Primary Module field on its Parent Campaign. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Campaign - On Create - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Campaign - On Create - Before Save</label>
@@ -90,7 +90,10 @@
         <connector>
             <targetReference>Get_Parent_Campaign</targetReference>
         </connector>
-        <filterFormula>{!$Record.RecordType.DeveloperName} = &quot;Sub_Campaign&quot;</filterFormula>
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    {!$Record.RecordType.DeveloperName} = &quot;Sub_Campaign&quot;
+)</filterFormula>
         <object>Campaign</object>
         <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordBeforeSave</triggerType>

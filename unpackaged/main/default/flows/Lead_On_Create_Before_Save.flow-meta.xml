@@ -2,7 +2,7 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <description>Sets the Seniority Level based on the Title when a Lead is created with a Title.</description>
+    <description>Sets the Seniority Level based on the Title when a Lead is created with a Title. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <formulas>
         <description>Returns the Seniority Level picklist API name based on the Title. Checks the Title against the Seniority Ranking keywords in order; the first keyword the Title contains sets the level. Scores 0-1 and Titles with no matching keyword return blank, which clears the field.</description>
@@ -156,14 +156,10 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
         <connector>
             <targetReference>Update_Seniority_Level</targetReference>
         </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Title</field>
-            <operator>IsNull</operator>
-            <value>
-                <booleanValue>false</booleanValue>
-            </value>
-        </filters>
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    NOT(ISBLANK({!$Record.Title}))
+)</filterFormula>
         <object>Lead</object>
         <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordBeforeSave</triggerType>

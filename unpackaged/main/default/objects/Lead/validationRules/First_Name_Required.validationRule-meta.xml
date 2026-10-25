@@ -2,8 +2,10 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>First_Name_Required</fullName>
     <active>true</active>
-    <description>Requires First Name to be populated on Lead</description>
-    <errorConditionFormula>ISBLANK(FirstName)</errorConditionFormula>
+    <description>Requires First Name to be populated on Lead. Honors the On/Off Switch (Run Validation Rules).</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp; (
+    ISBLANK(FirstName)
+)</errorConditionFormula>
     <errorDisplayField>FirstName</errorDisplayField>
     <errorMessage>First Name is required.</errorMessage>
 </ValidationRule>
