@@ -9,9 +9,10 @@ the object description, the business need is:
 - Track **individual subscribers** to Beacon products. A standard `Asset` record can carry a
   quantity of subscriptions (seats), but it cannot capture *which* people hold those seats
   without splitting the Asset into one line item per user.
-- Each subscription record should link one **Contact** (the subscriber) to one **Asset** (the
-  subscribed product), with an optional link to the **Account**.
-- Subscription records should be visible to whoever can see the related Contact and Asset, and
+- Subscriptions are **purchased by an Account** before the subscriber is known. Each record must
+  link to the purchasing **Account** and the subscribed **Asset** when it is created. The
+  **Contact** (the subscriber) is added later, once the person is known.
+- Subscription records should be visible to whoever can see the related Account and Asset, and
   changes to them should be auditable.
 - Each subscription should record its term (Start Date and End Date, matching the Asset Time
   Period), link to the Asset Time Period (Asset State Period) record it covers, and capture the
@@ -27,9 +28,9 @@ the object description, the business need is:
 ## Release Notes
 
 A new custom object, `Beacon_Subscription__c` ("Beacon Subscription" / "Beacon Subscriptions"),
-was created as a **junction object** between `Contact` and `Asset`. Each record represents one
-Contact's subscription to one Asset, so an Asset with a quantity of 10 can have up to 10 Beacon
-Subscription records, one for each named user. This keeps `Asset` as the commercial record (product,
+was created as a **junction object** between `Account` and `Asset`. Each record represents one
+purchased seat on an Asset, so an Asset with a quantity of 10 can have up to 10 Beacon
+Subscription records. The subscriber's Contact is added to each seat once it is known. This keeps `Asset` as the commercial record (product,
 quantity, dates) and holds the per-user detail on the child object, so Assets don't have to be
 split into one line item per user.
 
@@ -38,19 +39,19 @@ Object settings:
 | Setting | Value | Notes |
 |---|---|---|
 | Record name | Auto Number, `Beacon Subs - {000000}` | Records are system-named. The name is read-only on the layout. |
-| Sharing model | Controlled by Parent (internal and external) | Access is inherited from the master Contact and Asset. |
+| Sharing model | Controlled by Parent (internal and external) | Access is inherited from the master Account and Asset. |
 | Field history tracking | Enabled at object level | No individual fields are tracked yet (see Post Deployment Items). |
 | Activities / Reports / Bulk API / Streaming API | Enabled | |
-| Search | Disabled | Records are reached through the Contact/Asset related lists, not global search. |
+| Search | Disabled | Records are reached through the Account/Asset/Contact related lists, not global search. |
 | Chatter feed | Disabled | |
 
-Three relationship fields were created:
+Four relationship fields were created:
 
 | Field | Type | Required | Purpose |
 |---|---|---|---|
-| `Contact__c` | Master-Detail(Contact), primary master | Yes | The subscriber. |
+| `Account__c` | Master-Detail(Account), primary master | Yes | The Account that purchased the subscription. |
 | `Asset__c` | Master-Detail(Asset), secondary master | Yes | The subscribed product. |
-| `Account__c` | Lookup(Account), delete = Set Null | No | Optional link to the Account, for reporting. Populated by hand. |
+| `Contact__c` | Lookup(Contact), delete = Set Null | No | The subscriber. Left blank at purchase and filled in once the person is known. |
 | `Asset_Time_Period__c` | Lookup(Asset State Period), delete = Set Null | No (see below) | The Asset Time Period this subscription covers. |
 
 Five fields track the subscription term and status:
@@ -65,7 +66,7 @@ Five fields track the subscription term and status:
 
 "Asset Time Period" is the standard Revenue Cloud object **Asset State Period**
 (`AssetStatePeriod`). It was requested as a master-detail, but Salesforce allows at most two
-master-detail relationships per object and Contact and Asset already use both. It was therefore
+master-detail relationships per object and Account and Asset already use both. It was therefore
 built as a **Lookup** (agreed with the requester). It isn't required at the field level, so it
 can still be given field-level security. It uses Set Null rather than Restrict because Revenue
 Cloud rebuilds Asset State Periods on amendments, and Restrict would block that.
@@ -91,13 +92,21 @@ Both fields are calculated each time the record is read, using `TODAY()`, so the
 overnight with no automation. Because they are formulas, they can't trigger flows and aren't
 stored for field history.
 
-Because `Contact__c` and `Asset__c` are both master-detail, **deleting a Contact or an Asset
-also deletes its Beacon Subscription records**, and neither master can be reparented
-(`reparentableMasterDetail = false`). `Contact__c` is the primary master, so the record's owner
-and its default report type come from the Contact.
+**Why Account is the master and Contact is a lookup.** Contact was first built as a
+master-detail and Account as an optional lookup. That was changed on this branch: subscriptions
+are purchased before the subscriber is known, and a master-detail field is always required, so
+records couldn't be created without a Contact. Account is now the primary master and is
+required. Contact is an optional lookup that is filled in later. If a Contact is deleted, its
+subscriptions stay and the Contact field is cleared, so the seat can be given to someone else.
+
+Because `Account__c` and `Asset__c` are both master-detail, **deleting an Account or an Asset
+also deletes its Beacon Subscription records**, and neither master can be changed after the
+record is saved (`reparentableMasterDetail = false`). `Account__c` is the primary master, so the
+record's owner and its default report type ("Accounts with Beacon Subscriptions") come from the
+Account.
 
 A page layout, `Beacon Subscription Layout`, was created. Its **Information** section shows Name
-(read-only), Contact (required), Asset (required) and Account in the left column, and Currency in
+(read-only), Account (required), Asset (required) and Contact in the left column, and Currency in
 the right column. Asset Time Period was added to the left column. Status and Active (both read-only), Start Date,
 End Date and Date Access Removed were added to the right column above Currency. Its **System Information** section shows the standard created/modified fields.
 The layout is assigned to all 25 profiles in the repo. (Gearset also moved the `<userLicense>`
@@ -114,41 +123,44 @@ the pattern from the `beacon-permission-sets-jaq4s2` branch:
 The two baseline permission sets (`Beacon - Baseline - Standard Field Access` and `Beacon -
 Baseline - System & App Access`) were deliberately left alone.
 
-`Contact__c` and `Asset__c` have no field permission entries. Master-detail fields are always
+`Account__c` and `Asset__c` have no field permission entries. Master-detail fields are always
 required, and Salesforce doesn't allow field-level security on required fields. Anyone with
-access to the object can read them, and anyone who can edit the object can edit them. Users
-also need Read access to the parent Contact and Asset to see a subscription. Every persona set
-already grants Read on Contact. Asset access comes from the user's profile and the Asset's Account.
+access to the object can read them, and anyone who can edit the object can edit them. (When
+Account was a lookup it had its own field permission entries. These were removed when it became
+a master-detail. The new Contact lookup was given field permissions in their place.) Users also
+need Read access to the parent Account and Asset to see a subscription. Every persona set
+already grants Read on Account. Asset access comes from the user's profile and the Asset's
+Account.
 
 ## Acceptance Criteria
 
 1. **Object exists:** In Setup → Object Manager, confirm `Beacon Subscription`
    (`Beacon_Subscription__c`) exists with the fields Contact, Asset, Account and Beacon
    Subscription Name.
-2. **Create from a Contact:** Open a Contact that has a related Asset. In the Beacon
+2. **Create at purchase, without a Contact:** Open an Account that has an Asset. In the Beacon
    Subscriptions related list (once it has been added — see Post Deployment Items), click New.
-   Confirm Contact is pre-filled and Contact and Asset are required. Choose an Asset, optionally
-   an Account, and save.
+   Confirm Account is pre-filled and Account and Asset are required. Choose the Asset, leave
+   Contact blank, and save. The record should save.
 3. **Auto Number:** Confirm the saved record is named `Beacon Subs - 000001` (or the next number)
    and that the name can't be edited.
-4. **Required masters:** Try to save a new Beacon Subscription without a Contact, and then
+4. **Required masters:** Try to save a new Beacon Subscription without an Account, and then
    without an Asset. Both saves should be blocked.
-5. **Related lists:** Confirm the record appears in the Beacon Subscriptions related list on the
-   Contact, the Asset and (if it was filled in) the Account.
-6. **Sharing:** Log in as (or impersonate) a user who can't see the parent Contact or Asset.
+5. **Add the Contact later:** Edit the subscription from step 2, choose a Contact and save.
+   Confirm the record appears in the Beacon Subscriptions related list on the Account, the
+   Asset and the Contact.
+6. **Sharing:** Log in as (or impersonate) a user who can't see the parent Account or Asset.
    Confirm they can't see the Beacon Subscription.
 7. **Cascade delete:** In a sandbox, delete a test Asset that has Beacon Subscriptions. Confirm
-   its subscriptions are deleted too. Repeat with a test Contact.
-8. **Account lookup Set Null:** In a sandbox, delete a test Account referenced in
-   `Account__c` on a subscription whose Contact and Asset sit under a different Account. Confirm
-   the subscription survives and `Account__c` is blank.
+   its subscriptions are deleted too. Repeat with a test Account.
+8. **Contact lookup Set Null:** In a sandbox, delete a test Contact that is on a subscription.
+   Confirm the subscription survives and `Contact__c` is blank.
 9. **Persona read access:** Log in as (or impersonate) a user who has only a persona permission
    set (e.g. Beacon Sales – Object, Tab, FLS) plus the baseline sets. Confirm they can open a
-   Beacon Subscription and see Contact, Asset and Account. Confirm they have no New, Edit or
-   Delete buttons, and that the Account field is read-only.
+   Beacon Subscription and see Account, Asset and Contact. Confirm they have no New, Edit or
+   Delete buttons, and that the Contact field is read-only.
 10. **Admin access:** Log in as a user with the Beacon Salesforce Admin – Object, Tab, FLS
-    permission set. Confirm they can create, edit and delete Beacon Subscriptions, edit Account,
-    and see subscriptions on Contacts and Assets they don't otherwise have access to (View All /
+    permission set. Confirm they can create, edit and delete Beacon Subscriptions, edit Contact,
+    and see subscriptions on Accounts and Assets they don't otherwise have access to (View All /
     Modify All).
 11. **Baseline sets untouched:** In Setup, open the two Beacon baseline permission sets. Confirm
     neither has access to Beacon Subscription.
@@ -171,8 +183,9 @@ already grants Read on Contact. Asset access comes from the user's profile and t
     equals True. Confirm only current subscriptions appear. Add Status as a column and confirm
     each row shows the green flag. Repeat with Active equals False (red flags).
 20. **Persona FLS:** As a persona user, confirm the six new fields are visible and read-only.
-21. **Reporting:** Create a report on Beacon Subscriptions (via the Contacts with Beacon
-   Subscriptions report type). Confirm Contact, Asset and Account columns are available.
+21. **Reporting:** Create a report using the Accounts with Beacon Subscriptions report type.
+    Confirm Account, Asset and Contact columns are available. Filter on Contact equals blank to
+    list seats that haven't been assigned yet.
 
 ## Post Deployment Items
 
@@ -180,17 +193,26 @@ The branch contains the object, its fields, its layout, the profile layout assig
 persona permission set access. The following are **not** in this branch and must be done in the target org (or added to this
 branch in a later deploy):
 
-1. **Related lists:** Add the Beacon Subscriptions related list to the Contact, Asset, Account
+1. **Deployment order (orgs where the object already exists):** The `Beacon-HTCDEV` org already
+   has the object with Contact and Asset as master-detail, Account doesn't exist yet, and there
+   is one test record (`Beacon Subs - 000001`). Salesforce allows only two master-detail fields
+   at a time, and it won't create a new master-detail on an object that already has records.
+   If the Gearset deploy fails on these fields, do this first, then redeploy:
+   1. Delete the test record, or create `Account__c` as a lookup, populate it on every
+      existing record and only then convert it to master-detail.
+   2. In Setup, change `Contact__c` from Master-Detail to Lookup **before** `Account__c`
+      becomes a master-detail.
+2. **Related lists:** Add the Beacon Subscriptions related list to the Contact, Asset, Account
    and Asset State Period page layouts or Lightning record pages so users can create and see subscriptions.
-2. **Tab (optional):** No custom tab was created. Add one, and add it to the Beacon app, if users
+3. **Tab (optional):** No custom tab was created. Add one, and add it to the Beacon app, if users
    need a list view of all subscriptions.
-3. **Field history (optional):** Object-level history is on, but no fields are tracked. Turn on
-   tracking for `Contact__c`, `Asset__c`, `Account__c`, `Asset_Time_Period__c`, the date fields
+4. **Field history (optional):** Object-level history is on, but no fields are tracked. Turn on
+   tracking for `Account__c`, `Asset__c`, `Contact__c`, `Asset_Time_Period__c`, the date fields
    and `Date_Access_Removed__c` if an audit trail is needed.
-4. **Date population (optional):** Start Date and End Date are entered by hand. If they should
+5. **Date population (optional):** Start Date and End Date are entered by hand. If they should
    default from the selected Asset Time Period, that needs a flow (not in this branch).
-5. **Data load (optional):** If subscriptions already exist on Assets, load the per-user Beacon
-   Subscription records once access has been granted.
+6. **Data load (optional):** If subscriptions already exist on Assets, load one Beacon
+   Subscription record per purchased seat (Account and Asset required, Contact where known).
 
 ## Component Manifest
 
@@ -198,10 +220,10 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Beacon-Su
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Custom Object | Beacon_Subscription__c | Beacon_Subscription__c | Beacon Subscription | Created | Junction object between Contact and Asset that tracks each individual subscriber. Auto Number name `Beacon Subs - {000000}`, sharing Controlled by Parent. |
-| 2 | Field | Beacon_Subscription__c | Contact__c | Contact | Created | Master-Detail(Contact), primary master. The subscriber. |
+| 1 | Custom Object | Beacon_Subscription__c | Beacon_Subscription__c | Beacon Subscription | Created | Junction object between Account and Asset that tracks each purchased seat and its subscriber. Auto Number name `Beacon Subs - {000000}`, sharing Controlled by Parent. |
+| 2 | Field | Beacon_Subscription__c | Account__c | Account | Created | Master-Detail(Account), primary master. The purchasing Account. |
 | 3 | Field | Beacon_Subscription__c | Asset__c | Asset | Created | Master-Detail(Asset), secondary master. The subscribed product. |
-| 4 | Field | Beacon_Subscription__c | Account__c | Account | Created | Optional Lookup(Account), delete constraint Set Null. |
+| 4 | Field | Beacon_Subscription__c | Contact__c | Contact | Created | Optional Lookup(Contact), delete constraint Set Null. The subscriber, filled in once known. |
 | 5 | Field | Beacon_Subscription__c | Asset_Time_Period__c | Asset Time Period | Created | Lookup(Asset State Period), delete constraint Set Null. |
 | 6 | Field | Beacon_Subscription__c | Start_Date__c | Start Date | Created | Date. Corresponds to Start Date on the related Asset Time Period. |
 | 7 | Field | Beacon_Subscription__c | End_Date__c | End Date | Created | Date. Corresponds to End Date on the related Asset Time Period. |
@@ -210,7 +232,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Beacon-Su
 | 10 | Field | Beacon_Subscription__c | Status__c | Status | Created | Formula (Text). Shows the Active static resource (green flag) when Active__c is true, otherwise the Inactive static resource (red flag). |
 | 11 | Static Resource | N/A | Active | Active | Created | Green flag badge with the text "Active" (PNG, 120x40), used by Beacon_Subscription__c.Status__c. |
 | 12 | Static Resource | N/A | Inactive | Inactive | Created | Red flag badge with the text "Inactive" (PNG, 138x40), used by Beacon_Subscription__c.Status__c. |
-| 13 | Page Layout | Beacon_Subscription__c | Beacon_Subscription__c-Beacon Subscription Layout | Beacon Subscription Layout | Created | Information section (Name, Contact, Asset, Account, Asset Time Period, Status, Active, Start Date, End Date, Date Access Removed, Currency) and System Information section. |
+| 13 | Page Layout | Beacon_Subscription__c | Beacon_Subscription__c-Beacon Subscription Layout | Beacon Subscription Layout | Created | Information section (Name, Account, Asset, Contact, Asset Time Period, Status, Active, Start Date, End Date, Date Access Removed, Currency) and System Information section. |
 | 14 | Profile | N/A | Admin | Admin | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
 | 15 | Profile | N/A | Analytics Cloud Integration User | Analytics Cloud Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
 | 16 | Profile | N/A | Analytics Cloud Security User | Analytics Cloud Security User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
@@ -236,13 +258,13 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Beacon-Su
 | 36 | Profile | N/A | SalesforceIQ Integration User | SalesforceIQ Integration User | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
 | 37 | Profile | N/A | SolutionManager | SolutionManager | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
 | 38 | Profile | N/A | Standard | Standard | Updated | Assigned the Beacon Subscription Layout to Beacon_Subscription__c. |
-| 39 | Permission Set | Beacon_Subscription__c | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 40 | Permission Set | Beacon_Subscription__c | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 41 | Permission Set | Beacon_Subscription__c | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 42 | Permission Set | Beacon_Subscription__c | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 43 | Permission Set | Beacon_Subscription__c | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 44 | Permission Set | Beacon_Subscription__c | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 45 | Permission Set | Beacon_Subscription__c | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 46 | Permission Set | Beacon_Subscription__c | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
-| 47 | Permission Set | Beacon_Subscription__c | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Create/Read/Edit/Delete, View All Fields, View All Records and Modify All Records on Beacon_Subscription__c, Read + Edit FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c and Date_Access_Removed__c, and Read FLS on Active__c and Status__c. |
-| 48 | Permission Set | Beacon_Subscription__c | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Account__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 39 | Permission Set | Beacon_Subscription__c | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Contact__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 40 | Permission Set | Beacon_Subscription__c | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Contact__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 41 | Permission Set | Beacon_Subscription__c | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Contact__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 42 | Permission Set | Beacon_Subscription__c | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Contact__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 43 | Permission Set | Beacon_Subscription__c | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Contact__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 44 | Permission Set | Beacon_Subscription__c | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Contact__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 45 | Permission Set | Beacon_Subscription__c | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Contact__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 46 | Permission Set | Beacon_Subscription__c | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Contact__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
+| 47 | Permission Set | Beacon_Subscription__c | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Create/Read/Edit/Delete, View All Fields, View All Records and Modify All Records on Beacon_Subscription__c, Read + Edit FLS on Contact__c, Asset_Time_Period__c, Start_Date__c, End_Date__c and Date_Access_Removed__c, and Read FLS on Active__c and Status__c. |
+| 48 | Permission Set | Beacon_Subscription__c | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read on Beacon_Subscription__c and Read FLS on Contact__c, Asset_Time_Period__c, Start_Date__c, End_Date__c, Date_Access_Removed__c, Active__c and Status__c. |
