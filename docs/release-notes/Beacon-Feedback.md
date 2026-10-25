@@ -19,6 +19,7 @@
   - **Subscription New**: Sales Demo, then Sales Prospecting.
   - **Subscription Renewal**: Onboarding Call 1 - Kick Off (due 15 days after Close Date), then Customer Call (due 45 days after Close Date).
   - Each survey is owned by the Opportunity Owner, has its Survey Type set to match its record type, and is linked to the Opportunity.
+  - The flow must obey the **On/Off Switch** custom setting (**Run Flows**).
 
 ## Release Notes
 
@@ -57,7 +58,10 @@ A **Beacon Feedback** related list was added to the **Opportunity Layout**, dire
 
 A new record-triggered flow, **Opportunity - On Create - After Save** (`Opportunity_On_Create_After_Save`), creates the Beacon Feedback surveys when an Opportunity is created. It runs after save, so the Opportunity Id is available to link the surveys to.
 
-**Entry criteria.** The flow only starts when the Opportunity's record type is **Subscription New** or **Subscription Renewal**. Consulting Opportunities don't start it.
+**Entry criteria.** The flow only starts when both of these are true:
+
+- **Run Flows** is checked on the **On/Off Switch** custom setting (`{!$Setup.On_Off_Switch__c.Run_Flows__c}`). The setting is resolved at the User, then Profile, then Org Default level, so an admin can turn the flow off for one user (for example, during a data load) or for everyone. This is the first flow in the org to check the switch, following the pattern in the On-Off-Switch release notes.
+- The Opportunity's record type is **Subscription New** or **Subscription Renewal**. Consulting Opportunities don't start it.
 
 **What it creates.** A Decision on the record type picks the surveys:
 
@@ -138,7 +142,8 @@ Each permission set gets field access for 90 of the 91 fields:
 17. Create an Opportunity with the **Consulting** record type and confirm no Beacon Feedback records are created.
 18. Create a Subscription New Opportunity owned by a user who has none of the Beacon permission sets. Confirm the save fails with an error and the Fault Path Subflow email is sent. Then assign the user a Beacon permission set and confirm the Opportunity saves.
 19. Load several Subscription New and Subscription Renewal Opportunities at once with Data Loader. Confirm each gets the right surveys.
-20. In **Object Manager → User → Fields & Relationships**, confirm **ByPassVR** no longer exists. Also check **Deleted Fields** and erase it there if it is listed.
+20. In **Setup → Custom Settings → On/Off Switch → Manage**, create a User level record for your user with **Run Flows** unchecked. Create a Subscription New Opportunity and confirm no Beacon Feedback records are created. Confirm another user still gets the surveys. Then delete your User level record (or check **Run Flows**) and confirm the surveys are created again.
+21. In **Object Manager → User → Fields & Relationships**, confirm **ByPassVR** no longer exists. Also check **Deleted Fields** and erase it there if it is listed.
 
 ## Post Deployment Items
 
@@ -146,6 +151,7 @@ Each permission set gets field access for 90 of the 91 fields:
 - Delete the **ByPassVR** (`ByPassVR__c`) field on User in each target org where it exists. Deploy the updated **Any_Further_Feedback_Mandatory** Validation Rule first, then delete the field. In Gearset, include the deleted field in the comparison. Otherwise, delete it in **Object Manager → User → Fields & Relationships**. Any values stored in the field are lost.
 - Grant record type access where needed. Only **Beacon Marketing** and **Beacon Salesforce Admin** have record type settings today, and this branch doesn't add any for Beacon Feedback. Users without access to a record type can't create records of that type.
 - Add a Beacon Feedback tab if users need one. This branch doesn't include a tab.
+- Make sure the **On/Off Switch** **Org Default** record exists with **Run Flows** checked (see the On-Off-Switch release notes). The flow only runs when Run Flows resolves to checked for the user creating the Opportunity.
 - Activate **Opportunity - On Create - After Save** after deployment if your deployment tool deploys flows as inactive. The flow file is set to Active.
 - Make sure every user who owns Subscription New or Subscription Renewal Opportunities has one of the Beacon permission sets, so they can own the Beacon Feedback records the flow creates.
 
@@ -283,4 +289,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Beacon-Fe
 | 126 | PermissionSet | Beacon_Feedback__c | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Read, Create, Edit, Delete, View All, Modify All, View All Fields access to Beacon Feedback, and read and edit access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
 | 127 | PermissionSet | Beacon_Feedback__c | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read access to Beacon Feedback, and read access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
 | 128 | Layout | Opportunity | Opportunity-Opportunity Layout | Opportunity Layout | Updated | Added the Beacon Feedback related list under Contact Roles. |
-| 129 | Flow | Opportunity | Opportunity_On_Create_After_Save | Opportunity - On Create - After Save | Created | Record-triggered (after save, on create) flow for Subscription New and Subscription Renewal Opportunities. Creates Sales Demo and Sales Prospecting surveys for Subscription New, and Onboarding Call 1 - Kick Off (due Close Date + 15 days) and Customer Call (due Close Date + 45 days) surveys for Subscription Renewal. Each survey is owned by the Opportunity Owner and linked to the Opportunity. |
+| 129 | Flow | Opportunity | Opportunity_On_Create_After_Save | Opportunity - On Create - After Save | Created | Record-triggered (after save, on create) flow for Subscription New and Subscription Renewal Opportunities. Creates Sales Demo and Sales Prospecting surveys for Subscription New, and Onboarding Call 1 - Kick Off (due Close Date + 15 days) and Customer Call (due Close Date + 45 days) surveys for Subscription Renewal. Each survey is owned by the Opportunity Owner and linked to the Opportunity. Only runs when Run Flows is checked on the On/Off Switch custom setting. |
