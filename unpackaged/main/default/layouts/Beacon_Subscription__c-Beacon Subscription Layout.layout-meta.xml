@@ -24,10 +24,6 @@
                 <behavior>Edit</behavior>
                 <field>Contact__c</field>
             </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>Asset_Time_Period__c</field>
-            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
