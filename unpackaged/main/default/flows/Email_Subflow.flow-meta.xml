@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>What was the specific trigger from the record-triggered Flow?</description>
+        <name>Which_Account_Trigger</name>
+        <label>Which Account Trigger?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Account_Placeholder</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varTrigger</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Placeholder</stringValue>
+                </rightValue>
+            </conditions>
+            <label>Account Placeholder</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>What was the specific trigger from the record-triggered Flow?</description>
+        <name>Which_Case_Trigger</name>
+        <label>Which Case Trigger?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Case_Placeholder</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varTrigger</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Placeholder</stringValue>
+                </rightValue>
+            </conditions>
+            <label>Case Placeholder</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>What was the specific trigger from the record-triggered Flow?</description>
+        <name>Which_Contact_Trigger</name>
+        <label>Which Contact Trigger?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Contact_Placeholder</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varTrigger</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Placeholder</stringValue>
+                </rightValue>
+            </conditions>
+            <label>Contact Placeholder</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>What was the specific trigger from the record-triggered Flow?</description>
+        <name>Which_Lead_Trigger</name>
+        <label>Which Lead Trigger?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Lead_Placeholder</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varTrigger</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Placeholder</stringValue>
+                </rightValue>
+            </conditions>
+            <label>Lead Placeholder</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Which Object triggered this Subflow. This is passed in from the record-triggered Flow.</description>
+        <name>Which_Object</name>
+        <label>Which Object?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Account</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varObject</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Account</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Which_Account_Trigger</targetReference>
+            </connector>
+            <label>Account</label>
+        </rules>
+        <rules>
+            <name>Contact</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varObject</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Contact</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Which_Contact_Trigger</targetReference>
+            </connector>
+            <label>Contact</label>
+        </rules>
+        <rules>
+            <name>Lead</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varObject</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Lead</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Which_Lead_Trigger</targetReference>
+            </connector>
+            <label>Lead</label>
+        </rules>
+        <rules>
+            <name>Opportunity</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varObject</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Opportunity</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Which_Opportunity_Trigger</targetReference>
+            </connector>
+            <label>Opportunity</label>
+        </rules>
+        <rules>
+            <name>Case</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varObject</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Case</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Which_Case_Trigger</targetReference>
+            </connector>
+            <label>Case</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>What was the specific trigger from the record-triggered Flow?</description>
+        <name>Which_Opportunity_Trigger</name>
+        <label>Which Opportunity Trigger?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Opportunity_Placeholder</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varTrigger</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Placeholder</stringValue>
+                </rightValue>
+            </conditions>
+            <label>Opportunity Placeholder</label>
+        </rules>
+    </decisions>
+    <description>This Subflow sends email. It is called from various record-triggered Flows across multiple Objects. This allows a single place to identify and update email actions.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Creates a clickable link</description>
+        <name>formRecordLink</name>
+        <dataType>String</dataType>
+        <expression>LEFT({!$Api.Partner_Server_URL_630}, FIND( &apos;/services&apos;, {!$Api.Partner_Server_URL_630}))+{!varRecordID}</expression>
+    </formulas>
+    <interviewLabel>Email Subflow {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Email Subflow</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Which_Object</targetReference>
+        </connector>
+    </start>
+    <status>Draft</status>
+    <variables>
+        <description>The Object that triggered this Subflow</description>
+        <name>varObject</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>The record ID that triggered this Subflow</description>
+        <name>varRecordID</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>The specific trigger for this Subflow</description>
+        <name>varTrigger</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>
