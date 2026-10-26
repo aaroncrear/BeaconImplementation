@@ -44,7 +44,7 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Get_Parent_Campaign_Record_Type</targetReference>
+            <targetReference>Get_Primary_Contact_Role</targetReference>
         </connector>
     </assignments>
     <assignments>
@@ -62,6 +62,23 @@
         </assignmentItems>
         <connector>
             <targetReference>Create_Contract_Cleanup_Case</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Sets the Case Contact to the Contact on the Opportunity&apos;s primary Contact Role.</description>
+        <name>Assign_Case_Contact</name>
+        <label>Assign Case Contact</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varContractCleanupCase.ContactId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Primary_Contact_Role.ContactId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Get_Parent_Campaign_Record_Type</targetReference>
         </connector>
     </assignments>
     <decisions>
@@ -108,6 +125,32 @@
                 <targetReference>Assign_Contract_Cleanup_Case</targetReference>
             </connector>
             <label>Record Type Found</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks that the Opportunity has a primary Contact Role. If not, the Case is created without a Contact.</description>
+        <name>Primary_Contact_Role_Found</name>
+        <label>Primary Contact Role Found?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Get_Parent_Campaign_Record_Type</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Primary Contact Role Not Found</defaultConnectorLabel>
+        <rules>
+            <name>Contact_Role_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Primary_Contact_Role</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Case_Contact</targetReference>
+            </connector>
+            <label>Contact Role Found</label>
         </rules>
     </decisions>
     <decisions>
@@ -169,7 +212,7 @@
             <label>Campaign Found</label>
         </rules>
     </decisions>
-    <description>When a Subscription New Opportunity&apos;s Stage is changed to Contract, creates a Contract Cleanup ResOps Request Case linked to the Opportunity and its Account. The Case is owned by the ResOps Primary on the Parent Campaign whose Primary Module matches the Opportunity&apos;s Primary Module. If no such Campaign is found, the Case is owned by the user who updated the Opportunity. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>When a Subscription New Opportunity&apos;s Stage is changed to Contract, creates a Contract Cleanup ResOps Request Case linked to the Opportunity, its Account and the Contact on its primary Contact Role. The Case is owned by the ResOps Primary on the Parent Campaign whose Primary Module matches the Opportunity&apos;s Primary Module. If no such Campaign is found, the Case is owned by the user who updated the Opportunity. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Opportunity - On Update - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Opportunity - On Update - After Save</label>
@@ -237,6 +280,40 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
+        <description>Finds the Opportunity&apos;s primary Contact Role, so its Contact can be set on the Case.</description>
+        <name>Get_Primary_Contact_Role</name>
+        <label>Get Primary Contact Role</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Primary_Contact_Role_Found</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>OpportunityId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>IsPrimary</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>OpportunityContactRole</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>ContactId</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
         <description>Retrieves the Campaign Parent Campaign record type by its developer name (Parent_Campaign), so its Id isn&apos;t hardcoded.</description>
         <name>Get_Parent_Campaign_Record_Type</name>
         <label>Get Parent Campaign Record Type</label>
@@ -270,7 +347,7 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
-        <description>Finds the Parent Campaign whose Primary Module matches the Opportunity&apos;s Primary Module and that has a ResOps Primary. If more than one matches, the oldest Campaign is used.</description>
+        <description>Finds the Campaign on the Parent Campaign record type (Sub Campaigns and Campaigns on other record types are never matched) whose Primary Module matches the Opportunity&apos;s Primary Module and that has a ResOps Primary. If more than one matches, the oldest Campaign is used.</description>
         <name>Get_Parent_Campaign</name>
         <label>Get Parent Campaign</label>
         <locationX>0</locationX>

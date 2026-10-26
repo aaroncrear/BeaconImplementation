@@ -14,7 +14,8 @@
 7. The Case is created with:
    - **Subject** = New Customer - Contract ResOps Cleanup
    - **Type** = Contract Cleanup
-   - **Owner** = the **ResOps Primary** of the Campaign (Parent Campaign record type) whose **Primary Module** matches the triggering Opportunity's Primary Module.
+   - **Owner** = the **ResOps Primary** of the Campaign whose **Primary Module** matches the triggering Opportunity's Primary Module. Only Campaigns on the **Parent Campaign** record type are considered.
+   - **Contact** = the Contact on the Opportunity's **primary Contact Role**.
 
 ## Release Notes
 
@@ -54,11 +55,13 @@ AND(
 2. **Get ResOps Request Record Type** (Get Records). Finds the Case record type with developer name `ResOps_Request`.
 3. **ResOps Request Record Type Found?** (Decision). If the record type isn't found, the Flow ends without creating a Case.
 4. **Assign Contract Cleanup Case** (Assignment). Sets the record type, Subject (`New Customer - Contract ResOps Cleanup`) and Type (`Contract Cleanup`). It also sets the Case's **Opportunity** to the triggering Opportunity and **Account** to its Account. These two weren't in the request, but they link the Case to the deal. They make the Case appear in the Opportunity's Cases related list, and they let the Case's Primary Module formula work.
-5. **Get Parent Campaign Record Type** (Get Records). Finds the Campaign record type with developer name `Parent_Campaign`.
-6. **Can Look Up Parent Campaign?** (Decision). Continues only if the Opportunity has a Primary Module and the Parent Campaign record type was found. Without this check, a blank value in the next lookup could match the wrong Campaign.
-7. **Get Parent Campaign** (Get Records). Finds a Parent Campaign whose Primary Module equals the Opportunity's Primary Module and whose ResOps Primary isn't blank. Both Primary Module fields use the shared Primary Module global value set, so the values match exactly. If more than one Campaign matches, the oldest one (by Created Date) is used.
-8. **Parent Campaign Found?** (Decision). If a Campaign is found, **Assign Case Owner** sets the Case Owner to its ResOps Primary.
-9. **Create Contract Cleanup Case** (Create Records). Creates the Case. Status defaults to New from the ResOps Request support process.
+5. **Get Primary Contact Role** (Get Records). Finds the Opportunity Contact Role on the triggering Opportunity where **Primary** is checked.
+6. **Primary Contact Role Found?** (Decision). If one is found, **Assign Case Contact** sets the Case **Contact** to that Contact Role's Contact. If the Opportunity has no primary Contact Role, the Case is created without a Contact.
+7. **Get Parent Campaign Record Type** (Get Records). Finds the Campaign record type with developer name `Parent_Campaign`.
+8. **Can Look Up Parent Campaign?** (Decision). Continues only if the Opportunity has a Primary Module and the Parent Campaign record type was found. Without this check, a blank value in the next lookup could match the wrong Campaign. If the Parent Campaign record type isn't found, no Campaign is used at all.
+9. **Get Parent Campaign** (Get Records). Filters on **Record Type = Parent Campaign** (by the Id found in step 7), so Sub Campaigns are never matched. It finds the Campaign whose Primary Module equals the Opportunity's Primary Module and whose ResOps Primary isn't blank. Both Primary Module fields use the shared Primary Module global value set, so the values match exactly. If more than one Campaign matches, the oldest one (by Created Date) is used.
+10. **Parent Campaign Found?** (Decision). If a Campaign is found, **Assign Case Owner** sets the Case Owner to its ResOps Primary.
+11. **Create Contract Cleanup Case** (Create Records). Creates the Case. Status defaults to New from the ResOps Request support process.
 
 **When no Owner can be found** (the Opportunity has no Primary Module, or no Parent Campaign with that module has a ResOps Primary), the Case is still created. It's owned by the user who moved the Opportunity to Contract. This way the request isn't lost, and the Case can be reassigned.
 
@@ -68,7 +71,7 @@ AND(
 
 ## Acceptance Criteria
 
-**Setup data:** make sure an active **Parent Campaign** has a **Primary Module** (e.g. *Module A*) and a **ResOps Primary** user. Pick a ResOps Primary user who isn't you, so you can see the Owner was set.
+**Setup data:** make sure the test Opportunity has a **primary Contact Role**. Make sure an active **Parent Campaign** has a **Primary Module** (e.g. *Module A*) and a **ResOps Primary** user. Pick a ResOps Primary user who isn't you, so you can see the Owner was set.
 
 1. **ResOps Manager field.** In Setup → Object Manager → Campaign → Fields & Relationships, confirm **ResOps Manager** exists as a Lookup(User) with a description.
 2. **Field access.** Open each persona "Object, Tab, FLS" permission set → Object Settings → Campaigns. Confirm ResOps Manager has the same access as ResOps Primary: Read/Edit in Beacon Marketing and Beacon Salesforce Admin, and Read only in the other eight.
@@ -78,13 +81,15 @@ AND(
    1. Open a **Subscription New** Opportunity at a stage before Contract, with Primary Module = *Module A*.
    2. Change the Stage to **Contract** and save.
    3. In the Opportunity's **Cases** related list, open the new Case.
-   4. Confirm: Record Type = **ResOps Request**, Subject = **New Customer - Contract ResOps Cleanup**, Type = **Contract Cleanup**, Status = **New**, Opportunity and Account are filled in, and **Owner** = the Parent Campaign's ResOps Primary.
+   4. Confirm: Record Type = **ResOps Request**, Subject = **New Customer - Contract ResOps Cleanup**, Type = **Contract Cleanup**, Status = **New**, Opportunity and Account are filled in, **Contact** = the Contact on the Opportunity's primary Contact Role, and **Owner** = the Parent Campaign's ResOps Primary.
 6. **No duplicate on a re-save.** Edit another field on the same Opportunity (still at Contract) and save. Confirm no second Case is created.
-7. **No Matching Campaign.** On a Subscription New Opportunity whose Primary Module isn't on any Parent Campaign with a ResOps Primary, or that has no Primary Module, move the Stage to Contract. Confirm the Case is created and owned by you.
-8. **Other record types are skipped.** Move a **Subscription Renewal** Opportunity and a **Consulting** Opportunity to Contract. Confirm no Case is created.
-9. **Other stages are skipped.** Move a Subscription New Opportunity to a stage other than Contract. Confirm no Case is created.
-10. **Accepted Quote.** On a Subscription New Opportunity at Proposal, set its synced Quote's Status to **Accepted**. Confirm the Opportunity moves to Contract and a Contract Cleanup Case is created.
-11. **On/Off Switch:**
+7. **No primary Contact Role.** On a Subscription New Opportunity with no primary Contact Role (no Contact Roles, or none marked Primary), move the Stage to Contract. Confirm the Case is created with Contact blank.
+8. **Sub Campaigns are ignored.** Create a **Sub Campaign** with a Primary Module (e.g. *Module B*) and a ResOps Primary, and make sure no Parent Campaign has *Module B* with a ResOps Primary. Move a Subscription New Opportunity with Primary Module *Module B* to Contract. Confirm the Case is owned by you, not the Sub Campaign's ResOps Primary.
+9. **No Matching Campaign.** On a Subscription New Opportunity whose Primary Module isn't on any Parent Campaign with a ResOps Primary, or that has no Primary Module, move the Stage to Contract. Confirm the Case is created and owned by you.
+10. **Other record types are skipped.** Move a **Subscription Renewal** Opportunity and a **Consulting** Opportunity to Contract. Confirm no Case is created.
+11. **Other stages are skipped.** Move a Subscription New Opportunity to a stage other than Contract. Confirm no Case is created.
+12. **Accepted Quote.** On a Subscription New Opportunity at Proposal, set its synced Quote's Status to **Accepted**. Confirm the Opportunity moves to Contract and a Contract Cleanup Case is created.
+13. **On/Off Switch:**
     1. Add a **User** level On/Off Switch record for your user with **Run Flows** unchecked.
     2. Move a Subscription New Opportunity to Contract. Confirm no Case is created.
     3. Delete the User level record afterwards.
@@ -112,4 +117,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/ResOps-au
 | 10 | Permission Set | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Read on Campaign.ResOps_Manager__c, matching ResOps Primary. |
 | 11 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Read/Edit on Campaign.ResOps_Manager__c, matching ResOps Primary. |
 | 12 | Permission Set | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Read on Campaign.ResOps_Manager__c, matching ResOps Primary. |
-| 13 | Flow | Opportunity | Opportunity_On_Update_After_Save | Opportunity - On Update - After Save | Created | Record-triggered After Save Flow. When a Subscription New Opportunity's Stage changes to Contract, creates a Contract Cleanup ResOps Request Case owned by the ResOps Primary of the Parent Campaign with the matching Primary Module. Honors the On/Off Switch. |
+| 13 | Flow | Opportunity | Opportunity_On_Update_After_Save | Opportunity - On Update - After Save | Created | Record-triggered After Save Flow. When a Subscription New Opportunity's Stage changes to Contract, creates a Contract Cleanup ResOps Request Case linked to the Opportunity's primary Contact Role Contact and owned by the ResOps Primary of the Parent Campaign (Parent Campaign record type only) with the matching Primary Module. Honors the On/Off Switch. |
