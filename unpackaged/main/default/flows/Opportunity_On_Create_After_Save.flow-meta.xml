@@ -275,7 +275,7 @@
         </defaultConnector>
         <defaultConnectorLabel>Not Found</defaultConnectorLabel>
         <rules>
-            <name>Custom_Call_Found</name>
+            <name>Customer_Call_Found</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
                 <leftValueReference>Get_Customer_Call_Record_Type.Id</leftValueReference>
@@ -287,11 +287,11 @@
             <connector>
                 <targetReference>Assign_Customer_Call_Feedback</targetReference>
             </connector>
-            <label>Custom Call Found</label>
+            <label>Customer Call Found</label>
         </rules>
     </decisions>
     <decisions>
-        <description>Checks that the Beacon Feedback Onboarding Call 1 - Kick Off record type (Onboarding_Call_1_Kick_Off) was found. If it was, builds the Onboarding Call 1 - Kick Off survey. If not, skips it and moves on to the Customer Call check, so a missing record type never creates a survey with a blank record type.</description>
+        <description>Checks that the Beacon Feedback Onboarding Call 1 - Kick Off record type (Onboarding_Call_1_Kick_Off) was found. If it was, builds the Onboarding Call 1 - Kick Off survey. If not, skips it and moves on to Get Customer Call Record Type, so a missing record type never creates a survey with a blank record type.</description>
         <name>Was_Onboarding_Call_1_Record_Type_Found</name>
         <label>Was Onboarding Call 1 - Kick Off Record Type Found?</label>
         <locationX>0</locationX>
@@ -317,7 +317,7 @@
         </rules>
     </decisions>
     <decisions>
-        <description>Checks that the Beacon Feedback Sales Demo record type (Sales_Demo) was found. If it was, builds the Sales Demo survey. If not, skips it and moves on to the Sales Prospecting check, so a missing record type never creates a survey with a blank record type.</description>
+        <description>Checks that the Beacon Feedback Sales Demo record type (Sales_Demo) was found. If it was, builds the Sales Demo survey. If not, skips it and moves on to Get Sales Prospecting Record Type, so a missing record type never creates a survey with a blank record type.</description>
         <name>Was_Sales_Demo_Record_Type_Found</name>
         <label>Was Sales Demo Record Type Found?</label>
         <locationX>0</locationX>
