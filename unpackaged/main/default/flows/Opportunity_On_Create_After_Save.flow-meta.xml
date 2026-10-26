@@ -3,89 +3,58 @@
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
-        <description>Builds the Sales Demo Beacon Feedback record (record type, owner, Survey Type and Opportunity) and adds it to the list of records to create.</description>
-        <name>Assign_Sales_Demo_Feedback</name>
-        <label>Assign Sales Demo Feedback</label>
+        <description>Builds the Customer Call Beacon Feedback record (record type, owner, Survey Type and Opportunity, plus Due Date Days of 45 and Due Date of Close Date + 45 days) and adds it to the list of records to create.</description>
+        <name>Assign_Customer_Call_Feedback</name>
+        <label>Assign Customer Call Feedback</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignmentItems>
-            <assignToReference>varSalesDemoFeedback.RecordTypeId</assignToReference>
+            <assignToReference>varCustomerCallFeedback.RecordTypeId</assignToReference>
             <operator>Assign</operator>
             <value>
-                <elementReference>Get_Sales_Demo_Record_Type.Id</elementReference>
+                <elementReference>Get_Customer_Call_Record_Type.Id</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
-            <assignToReference>varSalesDemoFeedback.OwnerId</assignToReference>
+            <assignToReference>varCustomerCallFeedback.OwnerId</assignToReference>
             <operator>Assign</operator>
             <value>
                 <elementReference>$Record.OwnerId</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
-            <assignToReference>varSalesDemoFeedback.Survey_Type__c</assignToReference>
+            <assignToReference>varCustomerCallFeedback.Survey_Type__c</assignToReference>
             <operator>Assign</operator>
             <value>
-                <stringValue>Sales Demo</stringValue>
+                <stringValue>Customer Call</stringValue>
             </value>
         </assignmentItems>
         <assignmentItems>
-            <assignToReference>varSalesDemoFeedback.Opportunity__c</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>$Record.Id</elementReference>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>colBeaconFeedback</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <elementReference>varSalesDemoFeedback</elementReference>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>Was_Sales_Prospecting_Record_Type_Found</targetReference>
-        </connector>
-    </assignments>
-    <assignments>
-        <description>Builds the Sales Prospecting Beacon Feedback record (record type, owner, Survey Type and Opportunity) and adds it to the list of records to create.</description>
-        <name>Assign_Sales_Prospecting_Feedback</name>
-        <label>Assign Sales Prospecting Feedback</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>varSalesProspectingFeedback.RecordTypeId</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>Get_Sales_Prospecting_Record_Type.Id</elementReference>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>varSalesProspectingFeedback.OwnerId</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>$Record.OwnerId</elementReference>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>varSalesProspectingFeedback.Survey_Type__c</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <stringValue>Sales Prospecting</stringValue>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>varSalesProspectingFeedback.Opportunity__c</assignToReference>
+            <assignToReference>varCustomerCallFeedback.Opportunity__c</assignToReference>
             <operator>Assign</operator>
             <value>
                 <elementReference>$Record.Id</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
+            <assignToReference>varCustomerCallFeedback.Due_Date_Days__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>conCustomerCallDueDateDays</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varCustomerCallFeedback.Due_Date__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formCustomerCallDueDate</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
             <assignToReference>colBeaconFeedback</assignToReference>
             <operator>Add</operator>
             <value>
-                <elementReference>varSalesProspectingFeedback</elementReference>
+                <elementReference>varCustomerCallFeedback</elementReference>
             </value>
         </assignmentItems>
         <connector>
@@ -148,62 +117,93 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Was_Customer_Call_Record_Type_Found</targetReference>
+            <targetReference>Get_Customer_Call_Record_Type</targetReference>
         </connector>
     </assignments>
     <assignments>
-        <description>Builds the Customer Call Beacon Feedback record (record type, owner, Survey Type and Opportunity, plus Due Date Days of 45 and Due Date of Close Date + 45 days) and adds it to the list of records to create.</description>
-        <name>Assign_Customer_Call_Feedback</name>
-        <label>Assign Customer Call Feedback</label>
+        <description>Builds the Sales Demo Beacon Feedback record (record type, owner, Survey Type and Opportunity) and adds it to the list of records to create.</description>
+        <name>Assign_Sales_Demo_Feedback</name>
+        <label>Assign Sales Demo Feedback</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignmentItems>
-            <assignToReference>varCustomerCallFeedback.RecordTypeId</assignToReference>
+            <assignToReference>varSalesDemoFeedback.RecordTypeId</assignToReference>
             <operator>Assign</operator>
             <value>
-                <elementReference>Get_Customer_Call_Record_Type.Id</elementReference>
+                <elementReference>Get_Sales_Demo_Record_Type.Id</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
-            <assignToReference>varCustomerCallFeedback.OwnerId</assignToReference>
+            <assignToReference>varSalesDemoFeedback.OwnerId</assignToReference>
             <operator>Assign</operator>
             <value>
                 <elementReference>$Record.OwnerId</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
-            <assignToReference>varCustomerCallFeedback.Survey_Type__c</assignToReference>
+            <assignToReference>varSalesDemoFeedback.Survey_Type__c</assignToReference>
             <operator>Assign</operator>
             <value>
-                <stringValue>Customer Call</stringValue>
+                <stringValue>Sales Demo</stringValue>
             </value>
         </assignmentItems>
         <assignmentItems>
-            <assignToReference>varCustomerCallFeedback.Opportunity__c</assignToReference>
+            <assignToReference>varSalesDemoFeedback.Opportunity__c</assignToReference>
             <operator>Assign</operator>
             <value>
                 <elementReference>$Record.Id</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
-            <assignToReference>varCustomerCallFeedback.Due_Date_Days__c</assignToReference>
+            <assignToReference>colBeaconFeedback</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>varSalesDemoFeedback</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Get_Sales_Prospecting_Record_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Builds the Sales Prospecting Beacon Feedback record (record type, owner, Survey Type and Opportunity) and adds it to the list of records to create.</description>
+        <name>Assign_Sales_Prospecting_Feedback</name>
+        <label>Assign Sales Prospecting Feedback</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varSalesProspectingFeedback.RecordTypeId</assignToReference>
             <operator>Assign</operator>
             <value>
-                <elementReference>conCustomerCallDueDateDays</elementReference>
+                <elementReference>Get_Sales_Prospecting_Record_Type.Id</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
-            <assignToReference>varCustomerCallFeedback.Due_Date__c</assignToReference>
+            <assignToReference>varSalesProspectingFeedback.OwnerId</assignToReference>
             <operator>Assign</operator>
             <value>
-                <elementReference>formCustomerCallDueDate</elementReference>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSalesProspectingFeedback.Survey_Type__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Sales Prospecting</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSalesProspectingFeedback.Opportunity__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>colBeaconFeedback</assignToReference>
             <operator>Add</operator>
             <value>
-                <elementReference>varCustomerCallFeedback</elementReference>
+                <elementReference>varSalesProspectingFeedback</elementReference>
             </value>
         </assignmentItems>
         <connector>
@@ -211,19 +211,19 @@
         </connector>
     </assignments>
     <constants>
-        <description>Number of days after the Opportunity Close Date that the Onboarding Call 1 - Kick Off survey is due.</description>
-        <name>conOnboardingCall1DueDateDays</name>
-        <dataType>Number</dataType>
-        <value>
-            <numberValue>15.0</numberValue>
-        </value>
-    </constants>
-    <constants>
         <description>Number of days after the Opportunity Close Date that the Customer Call survey is due.</description>
         <name>conCustomerCallDueDateDays</name>
         <dataType>Number</dataType>
         <value>
             <numberValue>45.0</numberValue>
+        </value>
+    </constants>
+    <constants>
+        <description>Number of days after the Opportunity Close Date that the Onboarding Call 1 - Kick Off survey is due.</description>
+        <name>conOnboardingCall1DueDateDays</name>
+        <dataType>Number</dataType>
+        <value>
+            <numberValue>15.0</numberValue>
         </value>
     </constants>
     <decisions>
@@ -265,13 +265,65 @@
         </rules>
     </decisions>
     <decisions>
+        <description>Checks that the Beacon Feedback Customer Call record type (Customer_Call) was found. If it was, builds the Customer Call survey. If not, skips it and goes straight to Create Beacon Feedback Records, so a missing record type never creates a survey with a blank record type.</description>
+        <name>Was_Customer_Call_Record_Type_Found</name>
+        <label>Was Customer Call Record Type Found?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Create_Beacon_Feedback_Records</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Not Found</defaultConnectorLabel>
+        <rules>
+            <name>Custom_Call_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Customer_Call_Record_Type.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Customer_Call_Feedback</targetReference>
+            </connector>
+            <label>Custom Call Found</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks that the Beacon Feedback Onboarding Call 1 - Kick Off record type (Onboarding_Call_1_Kick_Off) was found. If it was, builds the Onboarding Call 1 - Kick Off survey. If not, skips it and moves on to the Customer Call check, so a missing record type never creates a survey with a blank record type.</description>
+        <name>Was_Onboarding_Call_1_Record_Type_Found</name>
+        <label>Was Onboarding Call 1 - Kick Off Record Type Found?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Get_Customer_Call_Record_Type</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Not Found</defaultConnectorLabel>
+        <rules>
+            <name>Onboarding_Call_1_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Onboarding_Call_1_Record_Type.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Onboarding_Call_1_Feedback</targetReference>
+            </connector>
+            <label>Onboarding Call 1 Found</label>
+        </rules>
+    </decisions>
+    <decisions>
         <description>Checks that the Beacon Feedback Sales Demo record type (Sales_Demo) was found. If it was, builds the Sales Demo survey. If not, skips it and moves on to the Sales Prospecting check, so a missing record type never creates a survey with a blank record type.</description>
         <name>Was_Sales_Demo_Record_Type_Found</name>
         <label>Was Sales Demo Record Type Found?</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <defaultConnector>
-            <targetReference>Was_Sales_Prospecting_Record_Type_Found</targetReference>
+            <targetReference>Get_Sales_Prospecting_Record_Type</targetReference>
         </defaultConnector>
         <defaultConnectorLabel>Not Found</defaultConnectorLabel>
         <rules>
@@ -287,7 +339,7 @@
             <connector>
                 <targetReference>Assign_Sales_Demo_Feedback</targetReference>
             </connector>
-            <label>Found</label>
+            <label>Sales Demo Found</label>
         </rules>
     </decisions>
     <decisions>
@@ -313,74 +365,22 @@
             <connector>
                 <targetReference>Assign_Sales_Prospecting_Feedback</targetReference>
             </connector>
-            <label>Found</label>
-        </rules>
-    </decisions>
-    <decisions>
-        <description>Checks that the Beacon Feedback Onboarding Call 1 - Kick Off record type (Onboarding_Call_1_Kick_Off) was found. If it was, builds the Onboarding Call 1 - Kick Off survey. If not, skips it and moves on to the Customer Call check, so a missing record type never creates a survey with a blank record type.</description>
-        <name>Was_Onboarding_Call_1_Record_Type_Found</name>
-        <label>Was Onboarding Call 1 - Kick Off Record Type Found?</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>Was_Customer_Call_Record_Type_Found</targetReference>
-        </defaultConnector>
-        <defaultConnectorLabel>Not Found</defaultConnectorLabel>
-        <rules>
-            <name>Onboarding_Call_1_Found</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>Get_Onboarding_Call_1_Record_Type.Id</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Assign_Onboarding_Call_1_Feedback</targetReference>
-            </connector>
-            <label>Found</label>
-        </rules>
-    </decisions>
-    <decisions>
-        <description>Checks that the Beacon Feedback Customer Call record type (Customer_Call) was found. If it was, builds the Customer Call survey. If not, skips it and goes straight to Create Beacon Feedback Records, so a missing record type never creates a survey with a blank record type.</description>
-        <name>Was_Customer_Call_Record_Type_Found</name>
-        <label>Was Customer Call Record Type Found?</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>Create_Beacon_Feedback_Records</targetReference>
-        </defaultConnector>
-        <defaultConnectorLabel>Not Found</defaultConnectorLabel>
-        <rules>
-            <name>Customer_Call_Found</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>Get_Customer_Call_Record_Type.Id</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Assign_Customer_Call_Feedback</targetReference>
-            </connector>
-            <label>Found</label>
+            <label>Sales Prospecting Found</label>
         </rules>
     </decisions>
     <description>When a Subscription New or Subscription Renewal Opportunity is created, creates its Beacon Feedback survey records. Subscription New gets Sales Demo and Sales Prospecting surveys. Subscription Renewal gets Onboarding Call 1 - Kick Off and Customer Call surveys, due 15 and 45 days after the Close Date. Each survey is owned by the Opportunity Owner and linked to the Opportunity. A survey is only built if its Beacon Feedback record type is found. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <formulas>
-        <description>Due Date for the Onboarding Call 1 - Kick Off survey: the Opportunity Close Date plus 15 days.</description>
-        <name>formOnboardingCall1DueDate</name>
-        <dataType>Date</dataType>
-        <expression>{!$Record.CloseDate} + {!conOnboardingCall1DueDateDays}</expression>
-    </formulas>
-    <formulas>
         <description>Due Date for the Customer Call survey: the Opportunity Close Date plus 45 days.</description>
         <name>formCustomerCallDueDate</name>
         <dataType>Date</dataType>
         <expression>{!$Record.CloseDate} + {!conCustomerCallDueDateDays}</expression>
+    </formulas>
+    <formulas>
+        <description>Due Date for the Onboarding Call 1 - Kick Off survey: the Opportunity Close Date plus 15 days.</description>
+        <name>formOnboardingCall1DueDate</name>
+        <dataType>Date</dataType>
+        <expression>{!$Record.CloseDate} + {!conOnboardingCall1DueDateDays}</expression>
     </formulas>
     <interviewLabel>Opportunity - On Create - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Opportunity - On Create - After Save</label>
@@ -415,6 +415,66 @@
         <inputReference>colBeaconFeedback</inputReference>
     </recordCreates>
     <recordLookups>
+        <description>Retrieves the Beacon Feedback Customer Call record type by its developer name (Customer_Call), so its Id isn&apos;t hardcoded.</description>
+        <name>Get_Customer_Call_Record_Type</name>
+        <label>Get Customer Call Record Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Was_Customer_Call_Record_Type_Found</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Beacon_Feedback__c</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Customer_Call</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Retrieves the Beacon Feedback Onboarding Call 1 - Kick Off record type by its developer name (Onboarding_Call_1_Kick_Off), so its Id isn&apos;t hardcoded.</description>
+        <name>Get_Onboarding_Call_1_Record_Type</name>
+        <label>Get Onboarding Call 1 - Kick Off Record Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Was_Onboarding_Call_1_Record_Type_Found</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Beacon_Feedback__c</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Onboarding_Call_1_Kick_Off</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
         <description>Retrieves the Beacon Feedback Sales Demo record type by its developer name (Sales_Demo), so its Id isn&apos;t hardcoded.</description>
         <name>Get_Sales_Demo_Record_Type</name>
         <label>Get Sales Demo Record Type</label>
@@ -422,7 +482,7 @@
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Get_Sales_Prospecting_Record_Type</targetReference>
+            <targetReference>Was_Sales_Demo_Record_Type_Found</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -452,7 +512,7 @@
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Was_Sales_Demo_Record_Type_Found</targetReference>
+            <targetReference>Was_Sales_Prospecting_Record_Type_Found</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -467,66 +527,6 @@
             <operator>EqualTo</operator>
             <value>
                 <stringValue>Sales_Prospecting</stringValue>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>RecordType</object>
-        <queriedFields>Id</queriedFields>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordLookups>
-        <description>Retrieves the Beacon Feedback Onboarding Call 1 - Kick Off record type by its developer name (Onboarding_Call_1_Kick_Off), so its Id isn&apos;t hardcoded.</description>
-        <name>Get_Onboarding_Call_1_Record_Type</name>
-        <label>Get Onboarding Call 1 - Kick Off Record Type</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Get_Customer_Call_Record_Type</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>SobjectType</field>
-            <operator>EqualTo</operator>
-            <value>
-                <stringValue>Beacon_Feedback__c</stringValue>
-            </value>
-        </filters>
-        <filters>
-            <field>DeveloperName</field>
-            <operator>EqualTo</operator>
-            <value>
-                <stringValue>Onboarding_Call_1_Kick_Off</stringValue>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>RecordType</object>
-        <queriedFields>Id</queriedFields>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordLookups>
-        <description>Retrieves the Beacon Feedback Customer Call record type by its developer name (Customer_Call), so its Id isn&apos;t hardcoded.</description>
-        <name>Get_Customer_Call_Record_Type</name>
-        <label>Get Customer Call Record Type</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Was_Onboarding_Call_1_Record_Type_Found</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>SobjectType</field>
-            <operator>EqualTo</operator>
-            <value>
-                <stringValue>Beacon_Feedback__c</stringValue>
-            </value>
-        </filters>
-        <filters>
-            <field>DeveloperName</field>
-            <operator>EqualTo</operator>
-            <value>
-                <stringValue>Customer_Call</stringValue>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
