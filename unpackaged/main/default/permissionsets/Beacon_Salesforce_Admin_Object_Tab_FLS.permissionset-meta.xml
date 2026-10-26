@@ -1071,6 +1071,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Campaign.ResOps_Manager__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Campaign.ResOps_Primary__c</field>
         <readable>true</readable>
     </fieldPermissions>

@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Builds the Contract Cleanup ResOps Request Case: record type, Subject, Type, and the triggering Opportunity and its Account.</description>
+        <name>Assign_Contract_Cleanup_Case</name>
+        <label>Assign Contract Cleanup Case</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varContractCleanupCase.RecordTypeId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_ResOps_Request_Record_Type.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varContractCleanupCase.Subject</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>New Customer - Contract ResOps Cleanup</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varContractCleanupCase.Type</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Contract Cleanup</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varContractCleanupCase.Opportunity__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varContractCleanupCase.AccountId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Get_Parent_Campaign_Record_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Sets the Case Owner to the ResOps Primary user on the matching Parent Campaign.</description>
+        <name>Assign_Case_Owner</name>
+        <label>Assign Case Owner</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varContractCleanupCase.OwnerId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Parent_Campaign.ResOps_Primary__c</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Create_Contract_Cleanup_Case</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>Checks which Stage the Opportunity was moved to, so each stage can have its own outcome.</description>
+        <name>Opportunity_Stage</name>
+        <label>Opportunity Stage</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Other Stage</defaultConnectorLabel>
+        <rules>
+            <name>Contract</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Contract</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_ResOps_Request_Record_Type</targetReference>
+            </connector>
+            <label>Contract</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks that the Case ResOps Request record type was found. If it wasn&apos;t, no Case is created.</description>
+        <name>ResOps_Request_Record_Type_Found</name>
+        <label>ResOps Request Record Type Found?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Record Type Not Found</defaultConnectorLabel>
+        <rules>
+            <name>Record_Type_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_ResOps_Request_Record_Type</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Contract_Cleanup_Case</targetReference>
+            </connector>
+            <label>Record Type Found</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks that the Opportunity has a Primary Module and the Campaign Parent Campaign record type was found before looking up the Parent Campaign. Without both, the lookup could match the wrong Campaign, so the Case is created without setting the Owner.</description>
+        <name>Can_Look_Up_Parent_Campaign</name>
+        <label>Can Look Up Parent Campaign?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Create_Contract_Cleanup_Case</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Missing Primary Module or Record Type</defaultConnectorLabel>
+        <rules>
+            <name>Primary_Module_And_Record_Type_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Primary_Module__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Parent_Campaign_Record_Type</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Parent_Campaign</targetReference>
+            </connector>
+            <label>Primary Module and Record Type Found</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks that a Parent Campaign with a matching Primary Module and a ResOps Primary was found. If not, the Case is created without setting the Owner.</description>
+        <name>Parent_Campaign_Found</name>
+        <label>Parent Campaign Found?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Create_Contract_Cleanup_Case</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Parent Campaign Not Found</defaultConnectorLabel>
+        <rules>
+            <name>Campaign_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Parent_Campaign</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Case_Owner</targetReference>
+            </connector>
+            <label>Campaign Found</label>
+        </rules>
+    </decisions>
+    <description>When a Subscription New Opportunity&apos;s Stage is changed to Contract, creates a Contract Cleanup ResOps Request Case linked to the Opportunity and its Account. The Case is owned by the ResOps Primary on the Parent Campaign whose Primary Module matches the Opportunity&apos;s Primary Module. If no such Campaign is found, the Case is owned by the user who updated the Opportunity. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <environments>Default</environments>
+    <interviewLabel>Opportunity - On Update - After Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity - On Update - After Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <description>Creates the Contract Cleanup ResOps Request Case.</description>
+        <name>Create_Contract_Cleanup_Case</name>
+        <label>Create Contract Cleanup Case</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <inputReference>varContractCleanupCase</inputReference>
+    </recordCreates>
+    <recordLookups>
+        <description>Retrieves the Case ResOps Request record type by its developer name (ResOps_Request), so its Id isn&apos;t hardcoded.</description>
+        <name>Get_ResOps_Request_Record_Type</name>
+        <label>Get ResOps Request Record Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>ResOps_Request_Record_Type_Found</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Case</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>ResOps_Request</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Retrieves the Campaign Parent Campaign record type by its developer name (Parent_Campaign), so its Id isn&apos;t hardcoded.</description>
+        <name>Get_Parent_Campaign_Record_Type</name>
+        <label>Get Parent Campaign Record Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Can_Look_Up_Parent_Campaign</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Campaign</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Parent_Campaign</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Finds the Parent Campaign whose Primary Module matches the Opportunity&apos;s Primary Module and that has a ResOps Primary. If more than one matches, the oldest Campaign is used.</description>
+        <name>Get_Parent_Campaign</name>
+        <label>Get Parent Campaign</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Parent_Campaign_Found</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Parent_Campaign_Record_Type.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Primary_Module__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Primary_Module__c</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>ResOps_Primary__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Campaign</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>ResOps_Primary__c</queriedFields>
+        <sortField>CreatedDate</sortField>
+        <sortOrder>Asc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Opportunity_Stage</targetReference>
+        </connector>
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    {!$Record.RecordType.DeveloperName} = &quot;Subscription_New&quot;,
+    ISCHANGED({!$Record.StageName}),
+    ISPICKVAL({!$Record.StageName}, &quot;Contract&quot;)
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <subflows>
+        <description>Used to send email notification</description>
+        <name>Fault_Path_Subflow</name>
+        <label>Fault Path Subflow</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>Fault_Path_Subflow</flowName>
+        <inputAssignments>
+            <name>varFaultMessage</name>
+            <value>
+                <elementReference>$Flow.FaultMessage</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <variables>
+        <description>Holds the Contract Cleanup ResOps Request Case before it is created.</description>
+        <name>varContractCleanupCase</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Case</objectType>
+    </variables>
+</Flow>
