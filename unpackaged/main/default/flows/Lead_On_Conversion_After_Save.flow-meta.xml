@@ -25,8 +25,14 @@
             <label>Opportunity Exists</label>
         </rules>
     </decisions>
-    <description>When a Lead is converted, stamps the resulting Account, Contact, and Opportunity (if one was created) with Created Through Lead Conversion = true and Converted Lead ID = the 18-digit Id of the converted Lead.</description>
+    <description>When a Lead is converted, stamps the resulting Account, Contact, and Opportunity (if one was created) with Created Through Lead Conversion = true and Converted Lead ID = the 18-digit Id of the converted Lead. The Account and Contact are only stamped when they were newly created by the conversion, not when the Lead was converted into an existing Account or Contact.</description>
     <environments>Default</environments>
+    <formulas>
+        <description>Returns 60 seconds before this flow interview started. Accounts and Contacts created by the conversion are inserted in the same transaction just before this flow runs, so a CreatedDate on or after this time means the record was created by the conversion rather than being an existing record the Lead was converted into.</description>
+        <name>formConversionWindowStart</name>
+        <dataType>DateTime</dataType>
+        <expression>{!$Flow.InterviewStartTime} - (60 / 86400)</expression>
+    </formulas>
     <interviewLabel>Lead - On Conversion - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Lead - On Conversion - After Save</label>
     <processMetadataValues>
@@ -49,7 +55,7 @@
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
     <recordUpdates>
-        <description>Sets Created Through Lead Conversion to true and Converted Lead ID to the converted Lead&apos;s Id on the Account the Lead was converted into.</description>
+        <description>Sets Created Through Lead Conversion to true and Converted Lead ID to the converted Lead&apos;s Id on the Account the Lead was converted into, only if that Account was newly created by the conversion (CreatedDate on or after formConversionWindowStart). An existing Account chosen during conversion matches no records and is left unchanged.</description>
         <name>Update_Converted_Account</name>
         <label>Update Converted Account</label>
         <locationX>0</locationX>
@@ -68,6 +74,13 @@
                 <elementReference>$Record.ConvertedAccountId</elementReference>
             </value>
         </filters>
+        <filters>
+            <field>CreatedDate</field>
+            <operator>GreaterThanOrEqualTo</operator>
+            <value>
+                <elementReference>formConversionWindowStart</elementReference>
+            </value>
+        </filters>
         <inputAssignments>
             <field>Converted_Lead_ID__c</field>
             <value>
@@ -83,7 +96,7 @@
         <object>Account</object>
     </recordUpdates>
     <recordUpdates>
-        <description>Sets Created Through Lead Conversion to true and Converted Lead ID to the converted Lead&apos;s Id on the Contact the Lead was converted into.</description>
+        <description>Sets Created Through Lead Conversion to true and Converted Lead ID to the converted Lead&apos;s Id on the Contact the Lead was converted into, only if that Contact was newly created by the conversion (CreatedDate on or after formConversionWindowStart). An existing Contact chosen during conversion matches no records and is left unchanged.</description>
         <name>Update_Converted_Contact</name>
         <label>Update Converted Contact</label>
         <locationX>0</locationX>
@@ -101,6 +114,13 @@
             <operator>EqualTo</operator>
             <value>
                 <elementReference>$Record.ConvertedContactId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>CreatedDate</field>
+            <operator>GreaterThanOrEqualTo</operator>
+            <value>
+                <elementReference>formConversionWindowStart</elementReference>
             </value>
         </filters>
         <inputAssignments>
