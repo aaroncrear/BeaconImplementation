@@ -39,10 +39,21 @@ sets (without the `_Object_Tab_FLS` suffix) and the Baseline sets were not chang
 in system context, so users don't need Edit access for it to stamp the fields.
 
 A new record-triggered flow, **`Lead - On Conversion - After Save`**
-(`Lead_On_Conversion_After_Save`), was added. It runs after save on Lead **update** with the entry
-condition `IsConverted = true`. It is set to run *only when a record is updated to meet the
-condition requirements*, so it fires once, at the moment of conversion, and not on any later
-update to an already-converted Lead. The flow does the following:
+(`Lead_On_Conversion_After_Save`), was added. It runs after save on Lead **update**, with this
+entry condition formula:
+
+```
+AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    ISCHANGED({!$Record.IsConverted}),
+    {!$Record.IsConverted}
+)
+```
+
+The `Run_Flows__c` check means the flow respects the **On/Off Switch** custom setting, like the
+other flows that use it (for example, `Quote - On Update - After Save`). `ISCHANGED` plus
+`IsConverted` means it fires once, at the moment of conversion, and not on any later update to an
+already-converted Lead. The flow does the following:
 
 1. **`Update Converted Account`** — updates the Account whose Id equals `$Record.ConvertedAccountId`
    **and** whose `CreatedDate` is on or after `formConversionWindowStart`. It sets
@@ -109,12 +120,20 @@ available as a mappable Lead field. The flow sets all three objects from a singl
     support manual or historic data loads.
 14. Edit an already-converted Lead (if the profile allows it). Confirm the flow does not run
     again.
+15. In Setup > Custom Settings > On/Off Switch > Manage, add a User-level record for your test
+    user with **Run Flows** unchecked. Convert a Lead as that user, creating a new Account, Contact,
+    and Opportunity. Confirm none of the three records are stamped. Delete the User-level record
+    afterwards.
 
 ## Post Deployment Items
 
 - **Confirm Lead Settings allow automation on conversion.** In Setup > Lead Settings, confirm
   **"Require Validation for Converted Leads"** is enabled. Without it, Lead automation, including
   record-triggered flows, may not run during conversion, and the fields won't be populated.
+- **On/Off Switch Org Default must exist.** The entry condition reads
+  `$Setup.On_Off_Switch__c.Run_Flows__c`. If no Org Default On/Off Switch record exists in the
+  target org, the value is blank and the flow won't run. Confirm the Org Default record exists
+  with **Run Flows** checked (see the On/Off Switch setup steps in `README.md`).
 - **Historic data load (optional).** This flow only stamps Leads converted after deployment. To
   backfill existing records, export converted Leads (`IsConverted = true`) with
   `ConvertedAccountId`, `ConvertedContactId`, and `ConvertedOpportunityId`, then load
@@ -123,8 +142,7 @@ available as a mappable Lead field. The flow sets all three objects from a singl
 - **Edge case: very recently created existing records.** The new-vs-existing check uses a 60-second
   window. If a user creates an Account, Contact, or Opportunity manually and converts a Lead into
   it within 60 seconds, that record will be stamped as if the conversion had created it. This
-  should be rare.
-  Historic data loads should also follow the same rule: only stamp records the conversion
+  should be rare. Historic data loads should also follow the same rule: only stamp records the conversion
   created, which are those whose `CreatedDate` is close to the Lead's `ConvertedDate`.
 
 ## Component Manifest
@@ -139,7 +157,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Lead-Conv
 | 4 | Field | Contact | Converted_Lead_ID__c | Converted Lead ID | Created | Text(18). The 18-character Id of the Lead converted to create this Contact. Set by the Lead - On Conversion - After Save flow. |
 | 5 | Field | Opportunity | Created_Through_Lead_Conversion__c | Created Through Lead Conversion | Created | Checkbox (default false). Checked when the Opportunity was created through Lead conversion. Set by the Lead - On Conversion - After Save flow. Not a formula, so historic data loads are possible. |
 | 6 | Field | Opportunity | Converted_Lead_ID__c | Converted Lead ID | Created | Text(18). The 18-character Id of the Lead converted to create this Opportunity. Set by the Lead - On Conversion - After Save flow. |
-| 7 | Flow | Lead | Lead_On_Conversion_After_Save | Lead - On Conversion - After Save | Created | After-save, record-triggered on Lead update when IsConverted changes to true. Stamps Created Through Lead Conversion = true and Converted Lead ID = Lead Id on the converted Account, Contact, and Opportunity (if one was created), each only if it was newly created by the conversion (CreatedDate filter against formConversionWindowStart, 60 seconds before the interview started). Fault paths go to Fault_Path_Subflow. |
+| 7 | Flow | Lead | Lead_On_Conversion_After_Save | Lead - On Conversion - After Save | Created | After-save, record-triggered on Lead update when IsConverted changes to true and the On/Off Switch Run Flows setting is on. Stamps Created Through Lead Conversion = true and Converted Lead ID = Lead Id on the converted Account, Contact, and Opportunity (if one was created), each only if it was newly created by the conversion (CreatedDate filter against formConversionWindowStart, 60 seconds before the interview started). Fault paths go to Fault_Path_Subflow. |
 | 8 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read access to Created_Through_Lead_Conversion__c and Converted_Lead_ID__c on Account, Contact, and Opportunity. |
 | 9 | Permission Set | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read access to Created_Through_Lead_Conversion__c and Converted_Lead_ID__c on Account, Contact, and Opportunity. |
 | 10 | Permission Set | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read access to Created_Through_Lead_Conversion__c and Converted_Lead_ID__c on Account, Contact, and Opportunity. |
