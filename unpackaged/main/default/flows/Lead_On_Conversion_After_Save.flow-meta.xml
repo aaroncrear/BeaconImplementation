@@ -25,10 +25,10 @@
             <label>Opportunity Exists</label>
         </rules>
     </decisions>
-    <description>When a Lead is converted, stamps the resulting Account, Contact, and Opportunity (if one was created) with Created Through Lead Conversion = true and Converted Lead ID = the 18-digit Id of the converted Lead. The Account and Contact are only stamped when they were newly created by the conversion, not when the Lead was converted into an existing Account or Contact.</description>
+    <description>When a Lead is converted, stamps the resulting Account, Contact, and Opportunity (if one was created) with Created Through Lead Conversion = true and Converted Lead ID = the 18-digit Id of the converted Lead. Each record is only stamped when it was newly created by the conversion, not when the Lead was converted into an existing Account, Contact, or Opportunity.</description>
     <environments>Default</environments>
     <formulas>
-        <description>Returns 60 seconds before this flow interview started. Accounts and Contacts created by the conversion are inserted in the same transaction just before this flow runs, so a CreatedDate on or after this time means the record was created by the conversion rather than being an existing record the Lead was converted into.</description>
+        <description>Returns 60 seconds before this flow interview started. Accounts, Contacts, and Opportunities created by the conversion are inserted in the same transaction just before this flow runs, so a CreatedDate on or after this time means the record was created by the conversion rather than being an existing record the Lead was converted into.</description>
         <name>formConversionWindowStart</name>
         <dataType>DateTime</dataType>
         <expression>{!$Flow.InterviewStartTime} - (60 / 86400)</expression>
@@ -138,7 +138,7 @@
         <object>Contact</object>
     </recordUpdates>
     <recordUpdates>
-        <description>Sets Created Through Lead Conversion to true and Converted Lead ID to the converted Lead&apos;s Id on the Opportunity created during the conversion.</description>
+        <description>Sets Created Through Lead Conversion to true and Converted Lead ID to the converted Lead&apos;s Id on the Opportunity the Lead was converted into, only if that Opportunity was newly created by the conversion (CreatedDate on or after formConversionWindowStart). An existing Opportunity chosen during conversion matches no records and is left unchanged.</description>
         <name>Update_Converted_Opportunity</name>
         <label>Update Converted Opportunity</label>
         <locationX>0</locationX>
@@ -153,6 +153,13 @@
             <operator>EqualTo</operator>
             <value>
                 <elementReference>$Record.ConvertedOpportunityId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>CreatedDate</field>
+            <operator>GreaterThanOrEqualTo</operator>
+            <value>
+                <elementReference>formConversionWindowStart</elementReference>
             </value>
         </filters>
         <inputAssignments>

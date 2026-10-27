@@ -15,8 +15,8 @@ Lead, and which Lead they came from:
   access to `Beacon Salesforce Admin - Object, Tab, FLS`.
 - Build a `Lead - On Conversion - After Save` flow that populates both fields on all three objects
   when a Lead is converted.
-- Do not populate the fields when a Lead is converted into an **existing** Account or Contact.
-  Only records newly created by the conversion should be stamped.
+- Do not populate the fields when a Lead is converted into an **existing** Account, Contact, or
+  Opportunity. Only records newly created by the conversion should be stamped.
 
 ## Release Notes
 
@@ -52,18 +52,17 @@ update to an already-converted Lead. The flow does the following:
 3. **`Opportunity Created?`** — users can choose not to create an Opportunity during conversion,
    so this checks that `$Record.ConvertedOpportunityId` is populated.
 4. **`Update Converted Opportunity`** — the same update, on the Opportunity whose Id equals
-   `$Record.ConvertedOpportunityId`.
+   `$Record.ConvertedOpportunityId`, with the same `CreatedDate` filter.
 
-**Skipping existing Accounts and Contacts.** Flow can't directly tell whether a conversion created
-a new Account or Contact or used an existing one. During conversion, though, a new Account and
-Contact are inserted in the same transaction, seconds before this flow runs. The formula resource
-`formConversionWindowStart` returns `$Flow.InterviewStartTime` minus 60 seconds, and the Account and
-Contact updates only match a record created on or after that time. An existing Account or Contact
-chosen during conversion was created earlier, so it doesn't match the filter and is left unchanged:
-its `Created Through Lead Conversion` and `Converted Lead ID` keep their current values. The filter
-is applied directly on the Update Records elements, so no extra Get Records or Decision elements
-are needed. The Opportunity update has no `CreatedDate` filter, because the requirement covered
-only Accounts and Contacts.
+**Skipping existing Accounts, Contacts, and Opportunities.** Flow can't directly tell whether a
+conversion created a new record or used an existing one. During conversion, though, a new Account,
+Contact, and Opportunity are inserted in the same transaction, seconds before this flow runs. The
+formula resource `formConversionWindowStart` returns `$Flow.InterviewStartTime` minus 60 seconds,
+and all three updates only match a record created on or after that time. An existing Account,
+Contact, or Opportunity chosen during conversion was created earlier, so it doesn't match the
+filter and is left unchanged: its `Created Through Lead Conversion` and `Converted Lead ID` keep
+their current values. The filter is applied directly on the Update Records elements, so no extra
+Get Records or Decision elements are needed.
 
 Every Update Records element sends its fault connector to the existing `Fault Path Subflow`, which
 emails the fault message instead of failing silently. This is the same pattern used in
@@ -95,17 +94,20 @@ available as a mappable Lead field. The flow sets all three objects from a singl
    `Converted Lead ID` isn't overwritten. Confirm that the new Opportunity **is** stamped.
 8. Convert a Lead into an existing Account but create a **new** Contact. Confirm only the Contact
    (and the Opportunity, if created) is stamped, and the Account is unchanged.
-9. Convert a different Lead, ticking **"Don't create an opportunity upon conversion."** Confirm the
+9. Convert a Lead into an existing Account and Contact and choose an **existing** Opportunity in
+   the conversion dialog. Confirm the existing Opportunity is **not** changed:
+   `Created Through Lead Conversion` stays as it was and `Converted Lead ID` isn't overwritten.
+10. Convert a different Lead, ticking **"Don't create an opportunity upon conversion."** Confirm the
    Account and Contact are stamped as in step 6, and that the conversion completes without error.
-10. Edit a field on an Account, Contact, or Opportunity from step 6 and save. Confirm the two
+11. Edit a field on an Account, Contact, or Opportunity from step 6 and save. Confirm the two
    fields keep their values.
-11. As a user with only a persona `Object, Tab, FLS` permission set (not Admin), confirm the two
+12. As a user with only a persona `Object, Tab, FLS` permission set (not Admin), confirm the two
    fields are visible but read-only (for example, in a list view or report, since they're not on
    layouts). Confirm that the user can still convert a Lead and that the fields are populated.
-12. As a Salesforce Admin, edit `Created Through Lead Conversion` and `Converted Lead ID` on an
+13. As a Salesforce Admin, edit `Created Through Lead Conversion` and `Converted Lead ID` on an
     existing Account, Contact, or Opportunity. Confirm both can be saved, which shows the fields
     support manual or historic data loads.
-13. Edit an already-converted Lead (if the profile allows it). Confirm the flow does not run
+14. Edit an already-converted Lead (if the profile allows it). Confirm the flow does not run
     again.
 
 ## Post Deployment Items
@@ -119,8 +121,9 @@ available as a mappable Lead field. The flow sets all three objects from a singl
   `Created_Through_Lead_Conversion__c = true` and `Converted_Lead_ID__c = Lead Id` onto those
   records. This is why the checkbox is not a formula.
 - **Edge case: very recently created existing records.** The new-vs-existing check uses a 60-second
-  window. If a user creates an Account or Contact manually and converts a Lead into it within 60
-  seconds, that record will be stamped as if the conversion had created it. This should be rare.
+  window. If a user creates an Account, Contact, or Opportunity manually and converts a Lead into
+  it within 60 seconds, that record will be stamped as if the conversion had created it. This
+  should be rare.
   Historic data loads should also follow the same rule: only stamp records the conversion
   created, which are those whose `CreatedDate` is close to the Lead's `ConvertedDate`.
 
@@ -136,7 +139,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Lead-Conv
 | 4 | Field | Contact | Converted_Lead_ID__c | Converted Lead ID | Created | Text(18). The 18-character Id of the Lead converted to create this Contact. Set by the Lead - On Conversion - After Save flow. |
 | 5 | Field | Opportunity | Created_Through_Lead_Conversion__c | Created Through Lead Conversion | Created | Checkbox (default false). Checked when the Opportunity was created through Lead conversion. Set by the Lead - On Conversion - After Save flow. Not a formula, so historic data loads are possible. |
 | 6 | Field | Opportunity | Converted_Lead_ID__c | Converted Lead ID | Created | Text(18). The 18-character Id of the Lead converted to create this Opportunity. Set by the Lead - On Conversion - After Save flow. |
-| 7 | Flow | Lead | Lead_On_Conversion_After_Save | Lead - On Conversion - After Save | Created | After-save, record-triggered on Lead update when IsConverted changes to true. Stamps Created Through Lead Conversion = true and Converted Lead ID = Lead Id on the converted Account and Contact only if they were newly created by the conversion (CreatedDate filter against formConversionWindowStart, 60 seconds before the interview started), and on the converted Opportunity (if one was created). Fault paths go to Fault_Path_Subflow. |
+| 7 | Flow | Lead | Lead_On_Conversion_After_Save | Lead - On Conversion - After Save | Created | After-save, record-triggered on Lead update when IsConverted changes to true. Stamps Created Through Lead Conversion = true and Converted Lead ID = Lead Id on the converted Account, Contact, and Opportunity (if one was created), each only if it was newly created by the conversion (CreatedDate filter against formConversionWindowStart, 60 seconds before the interview started). Fault paths go to Fault_Path_Subflow. |
 | 8 | Permission Set | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read access to Created_Through_Lead_Conversion__c and Converted_Lead_ID__c on Account, Contact, and Opportunity. |
 | 9 | Permission Set | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read access to Created_Through_Lead_Conversion__c and Converted_Lead_ID__c on Account, Contact, and Opportunity. |
 | 10 | Permission Set | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read access to Created_Through_Lead_Conversion__c and Converted_Lead_ID__c on Account, Contact, and Opportunity. |
