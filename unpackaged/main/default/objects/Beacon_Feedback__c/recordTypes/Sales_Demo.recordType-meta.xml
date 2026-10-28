@@ -1,0 +1,1003 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Sales_Demo</fullName>
+    <active>true</active>
+    <label>Sales Demo</label>
+    <picklistValues>
+        <picklist>Agree_Curating_Module_Specific_Data__c</picklist>
+        <values>
+            <fullName>100%25 Happy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Explored</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Happy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Satisfactory</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Agree_With_Search_Filters_In_The_Spec__c</picklist>
+        <values>
+            <fullName>100%25 Happy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Explored</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Happy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Satisfactory</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Agree_With_The_Scope_Of_The_Module_s__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Wasn%27t Mentioned</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Any_Additional_Users_Interested__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Any_Challenges_Faced__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Call_Type__c</picklist>
+        <values>
+            <fullName>121 Training</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AAA Calls</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Catch up %E2%80%93 Touchpoint</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Intelligence Calls</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Introduction Call</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>QBR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Webinar</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Confident_To_Get_Started_With_Beacon__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Current_Solution__c</picklist>
+        <values>
+            <fullName>Citeline</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Clarivate</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GlobalData</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Manual</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Did_Client_Understand_How_To_Run_Search__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Disease_Areas_Are_They_Interested_In__c</picklist>
+        <values>
+            <fullName>Brain Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Breast Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Colorectal Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Endocrine Tumors</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Head and Neck Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Leukemia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lung Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lymphoma</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Multiple Myeloma</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Myeloma</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>None</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pancreatic Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prostate Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Skin Cancer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Urothelial Cancer</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Drug_Trial_Pages_Easy_To_Navigate__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Unknown</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Expressed_Interest_In_Any_Other_Modules__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Expressed_Interest_In_Other_Modules__c</picklist>
+        <values>
+            <fullName>ADC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bispecific</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cancer Vaccines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cell Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Checkpoint</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cytokine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DDR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gene Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Immune Tolerance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbiome</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncolyic viruses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RNA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TPD</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Functionality_They_Least_Interested_In__c</picklist>
+        <values>
+            <fullName>Analysis Tab</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Companies</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Deals</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Drugs</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Trials</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Functionality_They_Most_Interested_In__c</picklist>
+        <values>
+            <fullName>Analysis Tab</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Companies</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Deals</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Drugs</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Trials</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Growth_Factors_For_The_Account__c</picklist>
+        <values>
+            <fullName>Company Growing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DM Promotion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>High Usage</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Increased Focus</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>New Partnership</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>New Pipeline</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Positive Beacon Feedback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Successful Preclinical%2FClinical Results</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>User Promotion</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Has_Completed_The_Onboarding_Checklist__c</picklist>
+        <values>
+            <fullName>Company search</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Conducted a search</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Deals search</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Detailed view of a drug page</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Detailed view of a trial page</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Logged in their account</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Saved Search</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Have_Set_Up_Their_Own_Saved_Searches__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Have_They_Completed_The_Onboarding__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Have_They_Used_The_Milestones_Tool__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Have_Used_The_Download_Functionality__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>How_Did_They_Find_Onboarding_Process__c</picklist>
+        <values>
+            <fullName>Good</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neutral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Poor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Very Good</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Very Poor</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>How_Often_Used_Download_Functionality__c</picklist>
+        <values>
+            <fullName>Not Often</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not at All</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Often</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Very Often</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>How_Often_Used_The_Milestones_Tool__c</picklist>
+        <values>
+            <fullName>Not Often</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not at All</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Often</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Very Often</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>How_Satisfied_Are_You_With_Support__c</picklist>
+        <values>
+            <fullName>Dissatisfied</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neutral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Satisfied</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Very Dissatisfied</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Very Satisfied</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Is_This_A_Large_Onboarding__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Job_Focus__c</picklist>
+        <values>
+            <fullName>Clinical</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Commercial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Preclinical</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Translational</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Key_Challenges__c</picklist>
+        <values>
+            <fullName>Accurate Data</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Benchmarking</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Current Data Source Not Up To Standards</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Investor Discussions</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Making Correct Decisions</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Showing Differentiation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Timely</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Matched_Use_Cases_Since_Onboarding__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Milestones__c</picklist>
+        <values>
+            <fullName>Funding</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Partnerships</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Progressing Asset</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Modules_Interested_In_SDR_Prospecting__c</picklist>
+        <values>
+            <fullName>ADC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bispecific</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cancer Vaccines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cell Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Checkpoint</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cytokine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DDR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gene Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Immune Tolerance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbiome</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuroscience</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncolyic viruses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RNA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TPD</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Prospect_s_Thoughts_On_The_Pricing__c</picklist>
+        <values>
+            <fullName>Expensive But Within Expectation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Explored</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Overpriced</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reasonable</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Satisfied_With_Initial_Kick_Off__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Satisfied_With_The_Accuracy_Of_Our_Data__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Wasn%27t Mentioned</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Show_Interest_In_Any_Other_Modules__c</picklist>
+        <values>
+            <fullName>ADC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bispecific</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cancer Vaccines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cell Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Checkpoint</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cytokine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DDR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gene Therapy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Immune Tolerance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbiome</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>New Module</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>None</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oncolyic viruses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RNA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TPD</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Sourcing_Data_Prior_To_Beacon__c</picklist>
+        <values>
+            <fullName>Clinicaltrials%2Egov</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Google</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other Database</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PubMed</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Survey_Completed__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Survey_Type__c</picklist>
+        <values>
+            <fullName>Customer Call</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Onboarding Call 1 - Kick Off</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Onboarding Call 2 - Becoming an Expert</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sales Demo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sales Prospecting</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Your Input</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Was_Any_Missing_Data_Identified__c</picklist>
+        <values>
+            <fullName>Data with Trial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Data within Drug</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Drug</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>None</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Trial</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>What_Are_Risk_Factors_For_The_Account__c</picklist>
+        <values>
+            <fullName>Change of focus</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DM change</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Financial difficulties</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Implemented competitor solution</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Low Usage</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Negative Beacon Feedback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>None</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Preclinical%2FClinical failure</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>User change</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>What_Are_The_User_Personas__c</picklist>
+        <values>
+            <fullName>Business Development %28BD%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Clinical</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Competitive Intelligence %28CI%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Research Scientist</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Scientific Strategy Leader</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Senior Leadership</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Translational</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>What_Was_The_Outcome_Of_The_Demo__c</picklist>
+        <values>
+            <fullName>Interest in founding partnership %28dependent on internal conversations%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not interested</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not interested in access now %28timing%2Fbudget etc%2E%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Strong interest in founding partnership %28trial dependent%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Strong interest in paid subscription %28regardless of FP trial%29</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Would_They_Like_More_Information__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Mentioned</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

@@ -26,7 +26,7 @@
         <label>Needs Analysis</label>
         <closed>false</closed>
         <forecastCategory>Omitted</forecastCategory>
-        <probability>25</probability>
+        <probability>0</probability>
         <won>false</won>
     </standardValue>
     <standardValue>
@@ -35,7 +35,7 @@
         <label>Demo Booked</label>
         <closed>false</closed>
         <forecastCategory>Pipeline</forecastCategory>
-        <probability>30</probability>
+        <probability>0</probability>
         <won>false</won>
     </standardValue>
     <standardValue>
@@ -44,7 +44,7 @@
         <label>Demo Completed</label>
         <closed>false</closed>
         <forecastCategory>Pipeline</forecastCategory>
-        <probability>50</probability>
+        <probability>0</probability>
         <won>false</won>
     </standardValue>
     <standardValue>
@@ -54,7 +54,7 @@
         <label>Proposal</label>
         <closed>false</closed>
         <forecastCategory>BestCase</forecastCategory>
-        <probability>60</probability>
+        <probability>10</probability>
         <won>false</won>
     </standardValue>
     <standardValue>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Required_Fields_Demo_Booked</fullName>
+    <active>true</active>
+    <description>Requires Primary Campaign Source, Type, Primary Module, Lead Source and Lead Type to be populated when the Opportunity Stage is Demo Booked. Honors the On/Off Switch (Run Validation Rules).</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp; (
+    ISPICKVAL(StageName, &quot;Demo Booked&quot;) &amp;&amp;
+    (
+        ISBLANK(CampaignId) ||
+        ISBLANK(TEXT(Type)) ||
+        ISBLANK(TEXT(Primary_Module__c)) ||
+        ISBLANK(TEXT(LeadSource)) ||
+        ISBLANK(TEXT(Lead_Type__c))
+    )
+)</errorConditionFormula>
+    <errorMessage>Before moving the Opportunity to Demo Booked, please complete the following fields: Primary Campaign Source, Type, Primary Module, Lead Source and Lead Type.</errorMessage>
+</ValidationRule>

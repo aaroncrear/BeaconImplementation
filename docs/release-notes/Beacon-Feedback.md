@@ -1,0 +1,292 @@
+# "Beacon-Feedback" – Release Notes
+
+## Requirements
+
+- Add a new **Beacon Feedback** custom object to store Beacon feedback and surveys in Salesforce. It replaces the old Beacon_Feeback process, which stored surveys in Jotform.
+- Give the object one record type and page layout for each survey type: Customer Call, Intelligence, Onboarding Call 1 - Kick Off, Onboarding Call 2 - Becoming an Expert, Sales Demo, Sales Prospecting and Your Input.
+- Remove `NOT($User.ByPassVR__c)` from every Validation Rule that uses it.
+- Delete the **ByPassVR** (`ByPassVR__c`) checkbox field on the User object.
+- Every custom field and Validation Rule on the object must have a description.
+- Fix **Any_Further_Feedback_Mandatory** and **Next_Steps_Date_Mandatory** so they compare Survey Completed to the picklist's actual value, `Yes`.
+- Give access to the object and its fields in the **Beacon … - Object, Tab, FLS** permission sets:
+  - **Read**: Consulting, Executive, Marketing, Product, ResOps and Tech.
+  - **Read, Create and Edit**: Customer Success and Sales.
+  - **Read, Create, Edit, Delete, View All, Modify All and View All Fields**: Salesforce Admin.
+- Change the object's API name from `BeaconFeedback__c` to `Beacon_Feedback__c`.
+- Deactivate every record type except Sales Demo, Sales Prospecting, Onboarding Call 1 - Kick Off and Customer Call.
+- Add the Beacon Feedback related list to the Opportunity page layout.
+- Create an **Opportunity - On Create - After Save** flow that creates Beacon Feedback surveys based on the Opportunity's record type, in this order:
+  - **Subscription New**: Sales Demo, then Sales Prospecting.
+  - **Subscription Renewal**: Onboarding Call 1 - Kick Off (due 15 days after Close Date), then Customer Call (due 45 days after Close Date).
+  - Each survey is owned by the Opportunity Owner, has its Survey Type set to match its record type, and is linked to the Opportunity.
+  - The flow must obey the **On/Off Switch** custom setting (**Run Flows**).
+
+## Release Notes
+
+### Beacon Feedback object
+
+The **Beacon Feedback** object was built in the org and pulled into this branch with Gearset as `BeaconFeedback__c`. Its API name was then changed to `Beacon_Feedback__c` (see below). It includes:
+
+- **91 custom fields** that hold the survey questions and answers, plus supporting fields:
+  - **Opportunity** (`Opportunity__c`) links each survey to an Opportunity.
+  - **Beacon Feedback Name** (`Beacon_Feedback_Name__c`) is a formula: Opportunity Name - Survey Type.
+  - **Due Date** (`Due_Date__c`) sets when the survey is due. **Survey Notification Date** (`Survey_Notification_Date__c`) is a formula set to 7 days before it, and **Survey Notification Today** (`Survey_Notification_Today__c`) is checked on that date.
+  - **Survey Completed** (`Survey_Completed__c`) marks the survey as done.
+  - The 1-5 rating fields are Number fields, limited to 1-5 by Validation Rules.
+- **7 record types** (4 active) and **8 page layouts**: one per survey type, plus the default Beacon Feedback Layout.
+- **10 Validation Rules**: 7 keep the rating fields within range, and 2 make a field required when a Sales Prospecting or Sales Demo survey is marked complete.
+
+### Object API name changed
+
+The object's API name was changed from `BeaconFeedback__c` to `Beacon_Feedback__c`. The label (**Beacon Feedback**) is unchanged. In the branch this meant:
+
+- Renaming the object folder and file to `objects/Beacon_Feedback__c/Beacon_Feedback__c.object-meta.xml`.
+- Renaming the 8 page layouts from `BeaconFeedback__c-<name>` to `Beacon_Feedback__c-<name>`.
+- Updating the object and field permissions in the 9 permission sets to the new name.
+
+Fields, record types and Validation Rules don't include the object name in their own files, so they didn't change. Nothing else in the repository referenced the old name.
+
+### Record types deactivated
+
+Only four record types stay active: **Customer Call**, **Onboarding Call 1 - Kick Off**, **Sales Demo** and **Sales Prospecting**. **Intelligence**, **Onboarding Call 2 - Becoming an Expert** and **Your Input** were deactivated. Their record types and page layouts stay in the branch so they can be turned back on later, but users can't create new records with them. The matching values in the **Survey Type** picklist weren't changed.
+
+### Opportunity related list
+
+A **Beacon Feedback** related list was added to the **Opportunity Layout**, directly under **Contact Roles**. It shows the Beacon Feedback records whose **Opportunity** field points to the Opportunity, with these columns: Beacon Feedback Number, Beacon Feedback Name, Record Type, Survey Completed and Due Date. The **Beacon Opportunity Record Page** Lightning page shows related lists as quick links that come from the page layout, so the new list shows up there with no change to the Lightning page.
+
+### Opportunity - On Create - After Save flow
+
+A new record-triggered flow, **Opportunity - On Create - After Save** (`Opportunity_On_Create_After_Save`), creates the Beacon Feedback surveys when an Opportunity is created. It runs after save, so the Opportunity Id is available to link the surveys to.
+
+**Entry criteria.** The flow only starts when both of these are true:
+
+- **Run Flows** is checked on the **On/Off Switch** custom setting (`{!$Setup.On_Off_Switch__c.Run_Flows__c}`). The setting is resolved at the User, then Profile, then Org Default level, so an admin can turn the flow off for one user (for example, during a data load) or for everyone. This is the first flow in the org to check the switch, following the pattern in the On-Off-Switch release notes.
+- The Opportunity's record type is **Subscription New** or **Subscription Renewal**. Consulting Opportunities don't start it.
+
+**What it creates.** A Decision on the record type picks the surveys:
+
+| Opportunity Record Type | Beacon Feedback created (in order) | Survey Type | Due Date Days | Due Date |
+|-------------------------|------------------------------------|-------------|---------------|----------|
+| Subscription New | 1. Sales Demo | Sales Demo | — | — |
+| Subscription New | 2. Sales Prospecting | Sales Prospecting | — | — |
+| Subscription Renewal | 1. Onboarding Call 1 - Kick Off | Onboarding Call 1 - Kick Off | 15 | Close Date + 15 days |
+| Subscription Renewal | 2. Customer Call | Customer Call | 45 | Close Date + 45 days |
+
+Every survey gets **Owner** = Opportunity Owner and **Opportunity** = the new Opportunity.
+
+**How it was built.**
+
+- **Record type Ids aren't hardcoded or stored anywhere.** Each branch has one Get Records per Beacon Feedback record type, filtered by `SobjectType = Beacon_Feedback__c` and the record type's developer name. They sit outside any loop, and Salesforce runs matching Gets together when many Opportunities are created at once, so a bulk load still uses only a few queries.
+- **One Assignment per survey** sets its fields and adds it to a single list (`colBeaconFeedback`). Each survey has its own record variable, so values from one never carry into another.
+- **One Create Records** saves the whole list. Records are added to the list in the required order, so they're created and numbered (BFB-xxxx) in that order.
+- **Due dates** use constants for the days (`conOnboardingCall1DueDateDays` = 15, `conCustomerCallDueDateDays` = 45) and date formulas that add them to the Close Date. The constant is also written to **Due Date Days**, so the number used is visible on the record. To change a due date later, change the constant.
+- **Errors.** If the save fails, the flow goes to the existing **Fault Path Subflow**, which emails the fault message, as in the other flows.
+- The flow and every element in it have a description.
+
+### Validation Rule bypass removed
+
+`NOT($User.ByPassVR__c)` was used by only one Validation Rule, **Any_Further_Feedback_Mandatory**. It was removed from that rule's formula, and the rest of the formula is unchanged. No other Validation Rule, flow, layout, profile or permission set in the repository references the field.
+
+### ByPassVR field deleted (User)
+
+Once nothing referenced it, the `ByPassVR__c` checkbox on User was deleted from the branch. The org-wide way to switch off Validation Rules is the **On/Off Switch** custom setting (`On_Off_Switch__c`, **Run Validation Rules**), added in the On-Off-Switch branch.
+
+### Survey Completed check fixed
+
+**Any_Further_Feedback_Mandatory** and **Next_Steps_Date_Mandatory** checked `TEXT(Survey_Completed__c) = "YES"`, but the picklist value is `Yes`. Text comparisons in formulas are case-sensitive, so neither rule could fire. Both now check `"Yes"`. The rest of each formula is unchanged.
+
+### Permission sets
+
+Access to Beacon Feedback was added to nine **Beacon … - Object, Tab, FLS** permission sets:
+
+| Permission Set | Object Access | Field Access |
+|----------------|---------------|--------------|
+| Beacon Consulting, Executive, Marketing, Product, ResOps, Tech | Read | Read |
+| Beacon Customer Success, Sales | Read, Create, Edit | Read, Edit |
+| Beacon Salesforce Admin | Read, Create, Edit, Delete, View All, Modify All, View All Fields | Read, Edit |
+
+Each permission set gets field access for 90 of the 91 fields:
+
+- **Opportunity** (`Opportunity__c`) is left out because it's a required field. Salesforce gives everyone with object access read and edit access to required fields, and won't deploy field permissions for them.
+- The three formula fields (**Beacon Feedback Name**, **Survey Notification Date**, **Survey Notification Today**) are read-only in every permission set, because formula fields can't be edited.
+
+### Descriptions
+
+90 of the 91 fields had no description; only **Any Further Feedback Posted To Teams** did. A description was added to each of the 90 fields and to all 10 Validation Rules. Each description says what the field holds and, where it applies, which survey layouts show it and which Validation Rule checks it.
+
+### Things to know
+
+- The flow runs in system context, so it creates the surveys even if the user creating the Opportunity can't create Beacon Feedback records. However, **the Opportunity Owner must have at least Read access to Beacon Feedback**, because Salesforce won't let a record be owned by a user who can't read that object. All nine Beacon permission sets give Read. If an owner has none of them, the Opportunity save fails and the Fault Path Subflow sends its email.
+- The flow only runs when an Opportunity is created. Changing an existing Opportunity's record type later doesn't create surveys.
+- The **Rate Beacon User Friendliness (1-5)** and **Rate Monthly Digest's Usefulness (1-5)** fields are only on the Your Input layout, which is now inactive. Their Validation Rules still apply if the fields are filled in another way, for example through Data Loader.
+- 26 fields are not on any page layout: Agree Curating Module Specific Data?, Agree With Search Filters In The Spec?, Agree With The Scope Of The Module(s)?, Any Further Feedback Posted To Teams, Comment On The Layout/Appearance, Data Comprehensiveness (1-5), Did Client Understand How To Run Search, Did They Recommend Any Platform Changes, Disease Areas Are They Interested In?, Functionality They Least/Most Interested In?, If Disease Area Is Other, If Growth Factor Is Other, If Interest In New Module, If Risk Factor Is Other, If They Found Data From Other Source, If They Would Like More Info, Overall Demo Rank (1-5), Prospect's Thoughts On The Pricing?, Quality Of Data (1-5), Satisfied With The Accuracy Of Our Data?, Show Interest In Any Other Modules?, Sourcing Data Prior To Beacon?, Speed Of Platform (1-5), Usability Of Platform (1-5) and Would They Like More Information?.
+
+## Acceptance Criteria
+
+1. In **Setup → Object Manager → Beacon Feedback**, confirm the object's API name is `Beacon_Feedback__c` and the record name format is **BFB-{0000}**.
+2. Open **Fields & Relationships** and confirm all 91 custom fields exist. Open several of them and confirm each has a **Description**.
+3. Open **Record Types** and confirm the 7 record types exist. Confirm **Customer Call**, **Onboarding Call 1 - Kick Off**, **Sales Demo** and **Sales Prospecting** are active, and **Intelligence**, **Onboarding Call 2 - Becoming an Expert** and **Your Input** are inactive.
+4. Open **Validation Rules** and confirm the 10 rules exist, are active and each has a **Description**.
+5. Open **Any_Further_Feedback_Mandatory** and confirm the formula no longer contains `$User.ByPassVR__c`.
+6. Create a Beacon Feedback record with an Opportunity and a Survey Type. Confirm only the four active record types can be chosen. Confirm **Beacon Feedback Name** shows `<Opportunity Name>-<Survey Type>`.
+7. Set **Due Date** to 7 days from today and save. Confirm **Survey Notification Date** is today and **Survey Notification Today** is checked.
+8. On a **Customer Call** or **Onboarding Call 1 - Kick Off** record, enter 0 in **Number Of Customers On Call** and save. Confirm the error "Select a number between 1 and 200".
+9. On a **Customer Call** record, enter 201 in **Number Of Customers On Call** and confirm the error "Select a number between 1 and 200". Enter 10 and confirm it saves.
+10. On a **Sales Prospecting** record, leave **Any Further Feedback** blank and change **Survey Completed** to **Yes**. Confirm the error "Please complete the Any Further Feedback field" appears on Survey Completed. Fill in Any Further Feedback and confirm it saves.
+11. On a **Sales Demo** record, leave **Next Steps Date** blank and change **Survey Completed** to **Yes**. Confirm the error "Please fill in the Next Steps Date field when completing the survey" appears. Fill in Next Steps Date and confirm it saves.
+12. Log in as (or assign the permission sets to) a test user. With **Beacon Consulting - Object, Tab, FLS**, confirm the user can view Beacon Feedback records and fields but has no New or Edit button. With **Beacon Sales - Object, Tab, FLS** or **Beacon Customer Success - Object, Tab, FLS**, confirm the user can create and edit records but not delete them. With **Beacon Salesforce Admin - Object, Tab, FLS**, confirm the user can delete records and see all records.
+13. In each of the nine permission sets, open **Object Settings → Beacon Feedback** and confirm the object and field access match the table in the Release Notes.
+14. Open an Opportunity. Confirm a **Beacon Feedback** related list appears under **Contact Roles** in the related list quick links, and it shows the Beacon Feedback created in step 6 with the columns Beacon Feedback Number, Beacon Feedback Name, Record Type, Survey Completed and Due Date. Click **New** in the related list and confirm the Opportunity is filled in.
+15. Create an Opportunity with the **Subscription New** record type. In its **Beacon Feedback** related list, confirm two records were created: first **Sales Demo**, then **Sales Prospecting** (the Sales Demo record has the lower BFB number). For each, confirm the record type and Survey Type match, the Owner is the Opportunity Owner, the Opportunity is the new Opportunity, and Due Date and Due Date Days are blank.
+16. Create an Opportunity with the **Subscription Renewal** record type and a Close Date of, for example, 1 March. Confirm two records were created: first **Onboarding Call 1 - Kick Off** with Due Date Days 15 and Due Date 16 March, then **Customer Call** with Due Date Days 45 and Due Date 15 April. Confirm the record type, Survey Type, Owner and Opportunity on each.
+17. Create an Opportunity with the **Consulting** record type and confirm no Beacon Feedback records are created.
+18. Create a Subscription New Opportunity owned by a user who has none of the Beacon permission sets. Confirm the save fails with an error and the Fault Path Subflow email is sent. Then assign the user a Beacon permission set and confirm the Opportunity saves.
+19. Load several Subscription New and Subscription Renewal Opportunities at once with Data Loader. Confirm each gets the right surveys.
+20. In **Setup → Custom Settings → On/Off Switch → Manage**, create a User level record for your user with **Run Flows** unchecked. Create a Subscription New Opportunity and confirm no Beacon Feedback records are created. Confirm another user still gets the surveys. Then delete your User level record (or check **Run Flows**) and confirm the surveys are created again.
+21. In **Object Manager → User → Fields & Relationships**, confirm **ByPassVR** no longer exists. Also check **Deleted Fields** and erase it there if it is listed.
+
+## Post Deployment Items
+
+- **Object rename:** check whether `BeaconFeedback__c` already exists in the target org. If it does, deploying this branch creates a second, empty object named `Beacon_Feedback__c`. It won't rename the old one. Instead, rename the API name in **Setup → Object Manager → Beacon Feedback → Edit** to `Beacon_Feedback__c` before deploying, so existing records are kept. If the org doesn't have the object yet, no action is needed.
+- Delete the **ByPassVR** (`ByPassVR__c`) field on User in each target org where it exists. Deploy the updated **Any_Further_Feedback_Mandatory** Validation Rule first, then delete the field. In Gearset, include the deleted field in the comparison. Otherwise, delete it in **Object Manager → User → Fields & Relationships**. Any values stored in the field are lost.
+- Grant record type access where needed. Only **Beacon Marketing** and **Beacon Salesforce Admin** have record type settings today, and this branch doesn't add any for Beacon Feedback. Users without access to a record type can't create records of that type.
+- Add a Beacon Feedback tab if users need one. This branch doesn't include a tab.
+- Make sure the **On/Off Switch** **Org Default** record exists with **Run Flows** checked (see the On-Off-Switch release notes). The flow only runs when Run Flows resolves to checked for the user creating the Opportunity.
+- Activate **Opportunity - On Create - After Save** after deployment if your deployment tool deploys flows as inactive. The flow file is set to Active.
+- Make sure every user who owns Subscription New or Subscription Renewal Opportunities has one of the Beacon permission sets, so they can own the Beacon Feedback records the flow creates.
+
+## Component Manifest
+
+Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Beacon-Feedback
+
+| # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
+|---|----------------|--------|----------|-------|-------------------------|--------------|
+| 1 | CustomObject | Beacon_Feedback__c | Beacon_Feedback__c | Beacon Feedback | Created | API name changed from BeaconFeedback__c to Beacon_Feedback__c. Stores Beacon feedback/surveys. Replaces the Jotform-based Beacon_Feeback process. Auto-number name BFB-{0000}. |
+| 2 | CustomField | Beacon_Feedback__c | Account_Manager__c | Account Manager | Created | Lookup. The Account Manager (User) responsible for the prospect on a Sales Prospecting survey. |
+| 3 | CustomField | Beacon_Feedback__c | Agree_Curating_Module_Specific_Data__c | Agree Curating Module Specific Data? | Created | Picklist. Records how happy the client was with how module-specific data is being curated in the specification. |
+| 4 | CustomField | Beacon_Feedback__c | Agree_With_Search_Filters_In_The_Spec__c | Agree With Search Filters In The Spec? | Created | Picklist. Records how happy the client was with the search filters in the specification. |
+| 5 | CustomField | Beacon_Feedback__c | Agree_With_The_Scope_Of_The_Module_s__c | Agree With The Scope Of The Module(s)? | Created | Picklist. Records whether the client agreed with the scope of the module(s) discussed. |
+| 6 | CustomField | Beacon_Feedback__c | Any_Additional_Users_Interested__c | Any Additional Users Interested? | Created | Picklist. Records whether any additional users at the client are interested in Beacon. Used on Customer Call and Onboarding Call 1 - Kick Off surveys. |
+| 7 | CustomField | Beacon_Feedback__c | Any_Challenges_Faced__c | Any Challenges Faced | Created | Picklist. Records whether the client has faced any challenges using Beacon. Used on Customer Call surveys. |
+| 8 | CustomField | Beacon_Feedback__c | Any_Further_Feedback_Posted_To_Teams__c | Any Further Feedback Posted To Teams | Created | Checkbox. Used as a flag to check when the 'Any Further Feedback' field is filled in and the survey gets completed if the value has been sent to the MS Teams Channel. |
+| 9 | CustomField | Beacon_Feedback__c | Any_Further_Feedback__c | Any Further Feedback | Created | LongTextArea. Free-text field for any further feedback from the client. Required on Sales Prospecting surveys when Survey Completed is set to Yes (Any_Further_Feedback_Mandatory validation rule). |
+| 10 | CustomField | Beacon_Feedback__c | Any_Other_Projects_That_We_Can_Support__c | Any Other Projects That We Can Support | Created | LongTextArea. Free-text field for any other client projects the Beacon team could support. Used on Customer Call surveys. |
+| 11 | CustomField | Beacon_Feedback__c | Beacon_Feedback_Name__c | Beacon Feedback Name | Created | Text (Formula). Formula that builds a readable name for the survey from the related Opportunity name and the Survey Type (Opportunity Name - Survey Type). |
+| 12 | CustomField | Beacon_Feedback__c | Business_Context__c | Business Context | Created | LongTextArea. Free-text field describing the business context of the client's request. Used on Intelligence surveys. |
+| 13 | CustomField | Beacon_Feedback__c | Call_Type__c | Call Type | Created | Picklist. The type of customer call that took place (e.g. 121 Training, Webinar, QBR). Used on Customer Call surveys. |
+| 14 | CustomField | Beacon_Feedback__c | Client_Background__c | Client Background | Created | LongTextArea. Free-text field describing the client's background. Used on Intelligence surveys. |
+| 15 | CustomField | Beacon_Feedback__c | Comment_On_The_Layout_Appearance__c | Comment On The Layout/Appearance | Created | LongTextArea. Free-text field for any comments the client made about the layout or appearance of Beacon. |
+| 16 | CustomField | Beacon_Feedback__c | Confident_To_Get_Started_With_Beacon__c | Confident To Get Started With Beacon? | Created | Picklist. Records whether the client feels confident to get started with Beacon. Used on Onboarding Call 1 - Kick Off surveys. |
+| 17 | CustomField | Beacon_Feedback__c | Current_Solution__c | Current Solution | Created | Picklist. The solution the prospect currently uses for this data (e.g. Citeline, Clarivate, GlobalData, Manual). Used on Sales Prospecting surveys. |
+| 18 | CustomField | Beacon_Feedback__c | Data_Comprehensiveness__c | Data Comprehensiveness (1-5) | Created | Number. The client's rating of how comprehensive Beacon's data is, on a scale of 1 to 5. Limited to 1-5 by the Data_Comprehensiveness validation rule. |
+| 19 | CustomField | Beacon_Feedback__c | Did_Client_Understand_How_To_Run_Search__c | Did Client Understand How To Run Search | Created | Picklist. Records whether the client understood how to run a search in Beacon. |
+| 20 | CustomField | Beacon_Feedback__c | Did_They_Recommend_Any_Platform_Changes__c | Did They Recommend Any Platform Changes | Created | LongTextArea. Free-text field for any changes to the Beacon platform the client recommended. |
+| 21 | CustomField | Beacon_Feedback__c | Disease_Areas_Are_They_Interested_In__c | Disease Areas Are They Interested In? | Created | MultiselectPicklist. The disease areas the client is interested in. If Other is selected, list it in If Disease Area Is Other, List Here. |
+| 22 | CustomField | Beacon_Feedback__c | Drug_Trial_Pages_Easy_To_Navigate__c | Drug/Trial Pages Easy To Navigate | Created | Picklist. Records whether the client found the drug and trial pages easy to navigate and locate data on. Used on Your Input surveys. |
+| 23 | CustomField | Beacon_Feedback__c | Due_Date_Days__c | Due Date Days | Created | Number. The number of days used to work out when the survey is due. |
+| 24 | CustomField | Beacon_Feedback__c | Due_Date__c | Due Date | Created | Date. The date the survey is due to be completed. Survey Notification Date is calculated as 7 days before this date. |
+| 25 | CustomField | Beacon_Feedback__c | Expressed_Interest_In_Any_Other_Modules__c | Expressed Interest In Any Other Modules? | Created | Picklist. Records whether the client expressed interest in any other Beacon modules. Used on Customer Call and Onboarding Call 1 - Kick Off surveys. |
+| 26 | CustomField | Beacon_Feedback__c | Expressed_Interest_In_Other_Modules__c | Expressed Interest In Other Modules? | Created | MultiselectPicklist. The other Beacon modules the client has expressed interest in. Used on Onboarding Call 2 - Becoming an Expert surveys. |
+| 27 | CustomField | Beacon_Feedback__c | Functionality_They_Least_Interested_In__c | Functionality They Least Interested In? | Created | Picklist. The area of Beacon functionality the client is least interested in (Drugs, Trials, Analysis Tab, Deals, Companies). |
+| 28 | CustomField | Beacon_Feedback__c | Functionality_They_Most_Interested_In__c | Functionality They Most Interested In? | Created | Picklist. The area of Beacon functionality the client is most interested in (Drugs, Trials, Analysis Tab, Deals, Companies). |
+| 29 | CustomField | Beacon_Feedback__c | Growth_Factors_For_The_Account__c | Growth Factors For The Account? | Created | MultiselectPicklist. The growth factors identified for the account. More than one can be selected. If Other is selected, list it in If Growth Factor Is Other Please List. Used on Sales Demo surveys. |
+| 30 | CustomField | Beacon_Feedback__c | Has_Completed_The_Onboarding_Checklist__c | Has Completed The Onboarding Checklist? | Created | MultiselectPicklist. The onboarding checklist steps the client has completed (e.g. logged in, conducted a search, saved a search). Used on Onboarding Call 2 - Becoming an Expert surveys. |
+| 31 | CustomField | Beacon_Feedback__c | Have_Set_Up_Their_Own_Saved_Searches__c | Have Set Up Their Own Saved Searches? | Created | Picklist. Records whether the client has set up their own saved searches. Used on Onboarding Call 2 - Becoming an Expert surveys. |
+| 32 | CustomField | Beacon_Feedback__c | Have_They_Completed_The_Onboarding__c | Have They Completed The Onboarding? | Created | Picklist. Records whether the client has completed onboarding. Used on Onboarding Call 1 - Kick Off surveys. |
+| 33 | CustomField | Beacon_Feedback__c | Have_They_Used_The_Milestones_Tool__c | Have They Used The Milestones Tool? | Created | Picklist. Records whether the client has used the Milestones tool. Used on Onboarding Call 2 - Becoming an Expert surveys. |
+| 34 | CustomField | Beacon_Feedback__c | Have_Used_The_Download_Functionality__c | Have Used The Download Functionality? | Created | Picklist. Records whether the client has used the download functionality. Used on Onboarding Call 2 - Becoming an Expert surveys. |
+| 35 | CustomField | Beacon_Feedback__c | How_Beacon_Compares_To_Current_Process__c | How Beacon Compares To Current Process? | Created | LongTextArea. Free-text field describing how Beacon compares to the user's current process. Used on Your Input surveys. |
+| 36 | CustomField | Beacon_Feedback__c | How_Did_They_Find_Onboarding_Process__c | How Did They Find Onboarding Process? | Created | Picklist. The client's overall rating of their Beacon onboarding process, from Very Good to Very Poor. Used on Your Input surveys. |
+| 37 | CustomField | Beacon_Feedback__c | How_Often_Used_Download_Functionality__c | How Often Used Download Functionality? | Created | Picklist. How often the client has used the download functionality. Used on Onboarding Call 2 - Becoming an Expert surveys. |
+| 38 | CustomField | Beacon_Feedback__c | How_Often_Used_The_Milestones_Tool__c | How Often Used The Milestones Tool? | Created | Picklist. How often the client has used the Milestones tool. Used on Onboarding Call 2 - Becoming an Expert surveys. |
+| 39 | CustomField | Beacon_Feedback__c | How_Satisfied_Are_You_With_Support__c | How Satisfied Are You With Support? | Created | Picklist. The client's satisfaction with support from the Beacon Customer Success team, from Very Satisfied to Very Dissatisfied. Used on Your Input surveys. |
+| 40 | CustomField | Beacon_Feedback__c | How_Useful_Is_Monthly_Digest_Content__c | Rate Monthly Digest’s Usefulness (1-5) | Created | Number. The client's rating of how useful the Monthly Digest content is, on a scale of 1 (not useful) to 5 (extremely useful). Limited to 1-5 by the Monthly_Digest_Content validation rule. Used on Your Input surveys. |
+| 41 | CustomField | Beacon_Feedback__c | How_User_Friendly_Do_You_Find_Beacon__c | Rate Beacon User Friendliness (1-5) | Created | Number. The client's rating of how user-friendly Beacon is, on a scale of 1 (complex) to 5 (easy). Limited to 1-5 by the User_Friendly_Beacon validation rule. Used on Your Input surveys. |
+| 42 | CustomField | Beacon_Feedback__c | If_Disease_Area_Is_Other_List_Here__c | If Disease Area Is Other, List Here | Created | TextArea. Lists the disease area when Other is selected in Disease Areas Are They Interested In. |
+| 43 | CustomField | Beacon_Feedback__c | If_Growth_Factor_Is_Other_Please_List__c | If Growth Factor Is Other Please List | Created | TextArea. Lists the growth factor when Other is selected in Growth Factors For The Account. |
+| 44 | CustomField | Beacon_Feedback__c | If_Interest_In_New_Module_List_It_Here__c | If Interest In New Module, List It Here | Created | TextArea. Lists any new module the client is interested in. |
+| 45 | CustomField | Beacon_Feedback__c | If_Risk_Factor_Is_Other_Please_List_Here__c | If Risk Factor Is Other Please List Here | Created | TextArea. Lists the risk factor when Other is selected in What Are Risk Factors For The Account. |
+| 46 | CustomField | Beacon_Feedback__c | If_There_Was_Missing_Data_What_Was__c | If There Was Missing Data, What Was | Created | TextArea. Describes what data was missing when missing data is identified in Was Any Missing Data Identified. Used on Sales Demo and Your Input surveys. |
+| 47 | CustomField | Beacon_Feedback__c | If_They_Found_Data_From_Other_Source__c | If They Found Data From Other Source | Created | TextArea. Lists the other source the client found data from. |
+| 48 | CustomField | Beacon_Feedback__c | If_They_Would_Like_More_Info_List_Here__c | If They Would Like More Info, List Here | Created | TextArea. Lists the sector information the client would like when Would They Like More Information is Yes. |
+| 49 | CustomField | Beacon_Feedback__c | Is_This_A_Large_Onboarding__c | Is This A Large Onboarding? | Created | Picklist. Records whether this is a large onboarding. Used on Onboarding Call 1 - Kick Off surveys. |
+| 50 | CustomField | Beacon_Feedback__c | Job_Focus__c | Job Focus | Created | Picklist. The prospect's job focus (Clinical, Commercial, Preclinical, Translational). Used on Sales Prospecting surveys. |
+| 51 | CustomField | Beacon_Feedback__c | Key_Challenges__c | Key Challenges | Created | Picklist. The prospect's key challenge (e.g. timely, accurate data or benchmarking). Used on Sales Prospecting surveys. |
+| 52 | CustomField | Beacon_Feedback__c | Main_Functionalities_Most_Valuable__c | Main Functionalities Most Valuable? | Created | LongTextArea. Free-text field for the Beacon functionality the client finds most valuable, and why. Used on Onboarding Call 2 - Becoming an Expert surveys. |
+| 53 | CustomField | Beacon_Feedback__c | Matched_Use_Cases_Since_Onboarding__c | Matched Use Cases Since Onboarding? | Created | Picklist. Records whether the client's use of Beacon has matched the use cases set at onboarding. Used on Customer Call surveys. |
+| 54 | CustomField | Beacon_Feedback__c | Milestones__c | Milestones | Created | Picklist. The prospect's latest milestone (Funding, Partnerships, Progressing Asset). Used on Sales Prospecting surveys. |
+| 55 | CustomField | Beacon_Feedback__c | Modules_Interested_In_SDR_Prospecting__c | Modules Interested In (SDR Prospecting) | Created | Picklist. The Beacon module the prospect is interested in, as recorded by the SDR. Used on Sales Prospecting and Intelligence surveys. |
+| 56 | CustomField | Beacon_Feedback__c | Next_Steps_Date__c | Next Steps Date | Created | Date. The date of the agreed next steps. Required on Sales Demo surveys when Survey Completed is set to Yes (Next_Steps_Date_Mandatory validation rule). |
+| 57 | CustomField | Beacon_Feedback__c | Next_Steps__c | Next Steps | Created | LongTextArea. Free-text field for the agreed next steps. Used on Sales Demo surveys. |
+| 58 | CustomField | Beacon_Feedback__c | Number_Of_Customers_On_Call__c | Number Of Customers On Call | Created | Number. The number of customer attendees on the call. Limited to 1-200 by the Number_Of_Customers_On_Call validation rule. Used on Customer Call and Onboarding Call 1 - Kick Off surveys. |
+| 59 | CustomField | Beacon_Feedback__c | Opportunity__c | Opportunity | Created | Lookup. The Opportunity this survey is for. Also used to build the Beacon Feedback Name. |
+| 60 | CustomField | Beacon_Feedback__c | Other_comments__c | Other comments | Created | LongTextArea. Free-text field for any other comments. Used on Intelligence surveys. |
+| 61 | CustomField | Beacon_Feedback__c | Overall_Demo_Rank__c | Overall Demo Rank (1-5) | Created | Number. The client's overall rating of the demo, on a scale of 1 to 5. Limited to 1-5 by the Overall_Demo_Rank validation rule. |
+| 62 | CustomField | Beacon_Feedback__c | Overall_Sentiment__c | Overall Sentiment | Created | LongTextArea. Free-text field describing the client's overall sentiment. Used on Customer Call surveys. |
+| 63 | CustomField | Beacon_Feedback__c | Primary_Use_Cases_For_The_Account__c | Primary Use Cases For The Account? | Created | LongTextArea. Free-text field for the account's primary use cases for Beacon. Used on Intelligence surveys. |
+| 64 | CustomField | Beacon_Feedback__c | Product_Feedback__c | Product Feedback | Created | LongTextArea. Free-text field for feedback on the Beacon product. Used on Customer Call surveys. |
+| 65 | CustomField | Beacon_Feedback__c | Proposed_Solution__c | Proposed Solution | Created | LongTextArea. Free-text field describing the solution proposed to the client. Used on Intelligence surveys. |
+| 66 | CustomField | Beacon_Feedback__c | Prospect_s_Thoughts_On_The_Pricing__c | Prospect's Thoughts On The Pricing? | Created | Picklist. The prospect's view of the pricing (Reasonable, Expensive But Within Expectation, Overpriced, Not Explored). |
+| 67 | CustomField | Beacon_Feedback__c | Quality_Of_Data__c | Quality Of Data (1-5) | Created | Number. The client's rating of the quality of Beacon's data, on a scale of 1 to 5. Limited to 1-5 by the Quality_Of_Data validation rule. |
+| 68 | CustomField | Beacon_Feedback__c | ResOps_Feedback__c | ResOps Feedback | Created | LongTextArea. Free-text field for feedback for the Research Operations (ResOps) team. Used on Customer Call surveys. |
+| 69 | CustomField | Beacon_Feedback__c | Res_Ops_Support__c | Res Ops Support | Created | Text. Text field for the Research Operations (ResOps) support team to use. Used on Sales Demo surveys. |
+| 70 | CustomField | Beacon_Feedback__c | Research_Questions__c | Research Questions | Created | LongTextArea. Free-text field for the client's research questions. Used on Intelligence surveys. |
+| 71 | CustomField | Beacon_Feedback__c | SDR_Notes__c | SDR Notes | Created | LongTextArea. Free-text field for the Sales Development Rep's (SDR) notes. Used on Sales Prospecting surveys. |
+| 72 | CustomField | Beacon_Feedback__c | Satisfied_With_Initial_Kick_Off__c | Satisfied With Initial Kick-Off? | Created | Picklist. Records whether the client was satisfied with the initial kick-off onboarding session. Used on Onboarding Call 2 - Becoming an Expert surveys. |
+| 73 | CustomField | Beacon_Feedback__c | Satisfied_With_The_Accuracy_Of_Our_Data__c | Satisfied With The Accuracy Of Our Data? | Created | Picklist. Records whether the client was satisfied with the accuracy of Beacon's data. |
+| 74 | CustomField | Beacon_Feedback__c | Show_Interest_In_Any_Other_Modules__c | Show Interest In Any Other Modules? | Created | MultiselectPicklist. The other Beacon modules or therapy areas the client showed interest in. |
+| 75 | CustomField | Beacon_Feedback__c | Sourcing_Data_Prior_To_Beacon__c | Sourcing Data Prior To Beacon? | Created | MultiselectPicklist. Where the client sourced their data before Beacon (e.g. PubMed, Google, Clinicaltrials.gov). |
+| 76 | CustomField | Beacon_Feedback__c | Specific_requirements__c | Specific requirements | Created | LongTextArea. Free-text field for the client's specific requirements. Used on Intelligence surveys. |
+| 77 | CustomField | Beacon_Feedback__c | Speed_Of_Platform__c | Speed Of Platform (1-5) | Created | Number. The client's rating of the speed of the Beacon platform, on a scale of 1 to 5. Limited to 1-5 by the Speed_Of_Platform validation rule. |
+| 78 | CustomField | Beacon_Feedback__c | Survey_Completed__c | Survey Completed | Created | Picklist. Records whether the survey has been completed. Setting it to Yes triggers the Any_Further_Feedback_Mandatory (Sales Prospecting) and Next_Steps_Date_Mandatory (Sales Demo) validation rules. |
+| 79 | CustomField | Beacon_Feedback__c | Survey_Notification_Date__c | Survey Notification Date | Created | Date (Formula). Formula that sets the notification date to 7 days before the Due Date. |
+| 80 | CustomField | Beacon_Feedback__c | Survey_Notification_Today__c | Survey Notification Today | Created | Checkbox (Formula). Formula that is checked when today is the Survey Notification Date. |
+| 81 | CustomField | Beacon_Feedback__c | Survey_Type__c | Survey Type | Created | Picklist. The type of survey (e.g. Intelligence, Sales Demo, Customer Call). Also used to build the Beacon Feedback Name. |
+| 82 | CustomField | Beacon_Feedback__c | Timeliness_and_pricing__c | Timeliness and pricing | Created | LongTextArea. Free-text field for the client's timeline and pricing requirements. Used on Intelligence surveys. |
+| 83 | CustomField | Beacon_Feedback__c | Topic_Area_of_Interest__c | Topic Area of Interest | Created | LongTextArea. Free-text field for the client's topic area of interest. Used on Intelligence surveys. |
+| 84 | CustomField | Beacon_Feedback__c | Usability_Of_Platform__c | Usability Of Platform (1-5) | Created | Number. The client's rating of the usability of the Beacon platform, on a scale of 1 to 5. Limited to 1-5 by the Usability_Of_Platform validation rule. |
+| 85 | CustomField | Beacon_Feedback__c | Was_Any_Missing_Data_Identified__c | Was Any Missing Data Identified? | Created | MultiselectPicklist. The areas where the client identified missing data (Trial, Data with Trial, Drug, Data within Drug, None). Describe it in If There Was Missing Data, What Was. Used on Sales Demo and Your Input surveys. |
+| 86 | CustomField | Beacon_Feedback__c | What_Are_Risk_Factors_For_The_Account__c | What Are Risk Factors For The Account? | Created | Picklist. The risk factor identified for the account. If Other is selected, list it in If Risk Factor Is Other Please List Here. Used on Sales Demo surveys. |
+| 87 | CustomField | Beacon_Feedback__c | What_Are_The_User_Personas__c | What Are The User Personas? | Created | Picklist. The client's user persona (e.g. Research Scientist, Clinical, Business Development). Used on Customer Call surveys. |
+| 88 | CustomField | Beacon_Feedback__c | What_Are_Their_Main_Use_Cases__c | What Are Their Main Use Cases? | Created | LongTextArea. Free-text field for the client's main use cases. Used on Intelligence surveys. |
+| 89 | CustomField | Beacon_Feedback__c | What_Did_They_Like_Most_About_Beacon__c | What Did They Like Most About Beacon? | Created | LongTextArea. Free-text field for what the client liked most about Beacon. Used on Your Input surveys. |
+| 90 | CustomField | Beacon_Feedback__c | What_Was_The_Outcome_Of_The_Demo__c | What Was The Outcome Of The Demo? | Created | Picklist. The outcome of the demo, including interest in a paid subscription or founding partnership. Founding Partner question only. Used on Intelligence surveys. |
+| 91 | CustomField | Beacon_Feedback__c | What_is_AAA_Intelligence_need__c | What is AAA/Intelligence need? | Created | LongTextArea. Free-text field describing the client's AAA/Intelligence need. Used on Customer Call surveys. |
+| 92 | CustomField | Beacon_Feedback__c | Would_They_Like_More_Information__c | Would They Like More Information? | Created | Picklist. Records whether the client would like more information on the sector as a whole (company info, location data, trends etc.). |
+| 93 | RecordType | Beacon_Feedback__c | Customer_Call | Customer Call | Created | Record type for Customer Call surveys. |
+| 94 | RecordType | Beacon_Feedback__c | Intelligence | Intelligence | Created | Market research opportunities feedback. Deactivated. |
+| 95 | RecordType | Beacon_Feedback__c | Onboarding_Call_1_Kick_Off | Onboarding Call 1 - Kick Off | Created | Record type for Onboarding Call 1 - Kick Off surveys. |
+| 96 | RecordType | Beacon_Feedback__c | Onboarding_Call_2_Becoming_an_Expert | Onboarding Call 2 - Becoming an Expert | Created | Record type for Onboarding Call 2 - Becoming an Expert surveys. Deactivated. |
+| 97 | RecordType | Beacon_Feedback__c | Sales_Demo | Sales Demo | Created | Record type for Sales Demo surveys. |
+| 98 | RecordType | Beacon_Feedback__c | Sales_Prospecting | Sales Prospecting | Created | Record type for Sales Prospecting surveys. |
+| 99 | RecordType | Beacon_Feedback__c | Your_Input | Your Input | Created | Record type for Your Input surveys. Deactivated. |
+| 100 | ValidationRule | Beacon_Feedback__c | Any_Further_Feedback_Mandatory | Any_Further_Feedback_Mandatory | Created | On Sales Prospecting surveys, requires Any Further Feedback to be filled in when Survey Completed is changed to Yes. Fixed the check to use the picklist value "Yes" instead of "YES". Removed the NOT($User.ByPassVR__c) bypass. |
+| 101 | ValidationRule | Beacon_Feedback__c | Data_Comprehensiveness | Data_Comprehensiveness | Created | Makes sure Data Comprehensiveness is a number between 1 and 5. |
+| 102 | ValidationRule | Beacon_Feedback__c | Monthly_Digest_Content | Monthly_Digest_Content | Created | Makes sure the Monthly Digest usefulness rating is a number between 1 and 5. |
+| 103 | ValidationRule | Beacon_Feedback__c | Next_Steps_Date_Mandatory | Next_Steps_Date_Mandatory | Created | On Sales Demo surveys, requires Next Steps Date to be filled in when Survey Completed is changed to Yes. Fixed the check to use the picklist value "Yes" instead of "YES". |
+| 104 | ValidationRule | Beacon_Feedback__c | Number_Of_Customers_On_Call | Number_Of_Customers_On_Call | Created | Makes sure Number Of Customers On Call is a number between 1 and 200. |
+| 105 | ValidationRule | Beacon_Feedback__c | Overall_Demo_Rank | Overall_Demo_Rank | Created | Makes sure Overall Demo Rank is a number between 1 and 5. |
+| 106 | ValidationRule | Beacon_Feedback__c | Quality_Of_Data | Quality_Of_Data | Created | Makes sure Quality Of Data is a number between 1 and 5. |
+| 107 | ValidationRule | Beacon_Feedback__c | Speed_Of_Platform | Speed_Of_Platform | Created | Makes sure Speed Of Platform is a number between 1 and 5. |
+| 108 | ValidationRule | Beacon_Feedback__c | Usability_Of_Platform | Usability_Of_Platform | Created | Makes sure Usability Of Platform is a number between 1 and 5. |
+| 109 | ValidationRule | Beacon_Feedback__c | User_Friendly_Beacon | User_Friendly_Beacon | Created | Makes sure the Beacon user-friendliness rating is a number between 1 and 5. |
+| 110 | Layout | Beacon_Feedback__c | Beacon_Feedback__c-Beacon Feedback Layout | Beacon Feedback Layout | Created | Default layout for Beacon Feedback records. |
+| 111 | Layout | Beacon_Feedback__c | Beacon_Feedback__c-Customer Call | Customer Call | Created | Page layout for the Customer Call survey. |
+| 112 | Layout | Beacon_Feedback__c | Beacon_Feedback__c-Intelligence Feedback Layout | Intelligence Feedback Layout | Created | Page layout for the Intelligence survey. |
+| 113 | Layout | Beacon_Feedback__c | Beacon_Feedback__c-Onboarding Call 1 - Kick Off | Onboarding Call 1 - Kick Off | Created | Page layout for the Onboarding Call 1 - Kick Off survey. |
+| 114 | Layout | Beacon_Feedback__c | Beacon_Feedback__c-Onboarding Call 2 - Becoming an Expert | Onboarding Call 2 - Becoming an Expert | Created | Page layout for the Onboarding Call 2 - Becoming an Expert survey. |
+| 115 | Layout | Beacon_Feedback__c | Beacon_Feedback__c-Sales Demo | Sales Demo | Created | Page layout for the Sales Demo survey. |
+| 116 | Layout | Beacon_Feedback__c | Beacon_Feedback__c-Sales Prospecting | Sales Prospecting | Created | Page layout for the Sales Prospecting survey. |
+| 117 | Layout | Beacon_Feedback__c | Beacon_Feedback__c-Your Input | Your Input | Created | Page layout for the Your Input survey. |
+| 118 | CustomField | User | ByPassVR__c | ByPassVR | Deleted | Checkbox that let a user skip validation rules. Removed along with its only reference in Any_Further_Feedback_Mandatory. |
+| 119 | PermissionSet | Beacon_Feedback__c | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added Read access to Beacon Feedback, and read access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
+| 120 | PermissionSet | Beacon_Feedback__c | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added Read, Create, Edit access to Beacon Feedback, and read and edit access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
+| 121 | PermissionSet | Beacon_Feedback__c | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added Read access to Beacon Feedback, and read access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
+| 122 | PermissionSet | Beacon_Feedback__c | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added Read access to Beacon Feedback, and read access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
+| 123 | PermissionSet | Beacon_Feedback__c | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added Read access to Beacon Feedback, and read access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
+| 124 | PermissionSet | Beacon_Feedback__c | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added Read access to Beacon Feedback, and read access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
+| 125 | PermissionSet | Beacon_Feedback__c | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added Read, Create, Edit access to Beacon Feedback, and read and edit access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
+| 126 | PermissionSet | Beacon_Feedback__c | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added Read, Create, Edit, Delete, View All, Modify All, View All Fields access to Beacon Feedback, and read and edit access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
+| 127 | PermissionSet | Beacon_Feedback__c | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added Read access to Beacon Feedback, and read access to 90 of its fields (formula fields read-only; required Opportunity__c excluded). |
+| 128 | Layout | Opportunity | Opportunity-Opportunity Layout | Opportunity Layout | Updated | Added the Beacon Feedback related list under Contact Roles. |
+| 129 | Flow | Opportunity | Opportunity_On_Create_After_Save | Opportunity - On Create - After Save | Created | Record-triggered (after save, on create) flow for Subscription New and Subscription Renewal Opportunities. Creates Sales Demo and Sales Prospecting surveys for Subscription New, and Onboarding Call 1 - Kick Off (due Close Date + 15 days) and Customer Call (due Close Date + 45 days) surveys for Subscription Renewal. Each survey is owned by the Opportunity Owner and linked to the Opportunity. Only runs when Run Flows is checked on the On/Off Switch custom setting. |
