@@ -546,6 +546,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Contact.Active_Beacon_Subscription__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Contact.Blacklisted_Reason__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -567,6 +572,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Contact.Created_Through_Lead_Conversion__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Contact.Customer_Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -632,6 +642,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Lead.Blacklisted__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.Customer_Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -732,6 +747,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Opportunity.Created_Through_Lead_Conversion__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.Customer_Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Continues only when Run Flows is checked on the On/Off Switch custom setting and the Contact&apos;s Account Type is Customer. Active Beacon Subscription is only used by Customer Status when the Account Type is Customer, so other Contacts are skipped.</description>
+        <name>Run_Flows_And_Customer</name>
+        <label>Run Flows and Customer Account?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Skip</defaultConnectorLabel>
+        <rules>
+            <name>Flows_On_And_Customer</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Setup.On_Off_Switch__c.Run_Flows__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Account.Type</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Customer</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Active_Beacon_Subscription</targetReference>
+            </connector>
+            <label>Flows On and Customer</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Compares whether the Contact has an active Beacon Subscription with the current value of Active Beacon Subscription, so the Contact is only updated when the value needs to change.</description>
+        <name>Active_Beacon_Subscription_Changed</name>
+        <label>Active Beacon Subscription Changed?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No Change</defaultConnectorLabel>
+        <rules>
+            <name>Changed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formHasActiveBeaconSubscription</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>$Record.Active_Beacon_Subscription__c</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Active_Beacon_Subscription</targetReference>
+            </connector>
+            <label>Changed</label>
+        </rules>
+    </decisions>
+    <description>Runs daily for Contacts whose Account Type is Customer and sets Active Beacon Subscription to checked when the Contact has at least one Beacon Subscription whose Active field is true, otherwise unchecked. The Contact is only updated when the value changes. Active Beacon Subscription is used by the Contact Customer Status formula to show Customer - User or Customer - Non-User. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>True when Get Active Beacon Subscription found at least one active Beacon Subscription for the Contact.</description>
+        <name>formHasActiveBeaconSubscription</name>
+        <dataType>Boolean</dataType>
+        <expression>NOT( ISBLANK( {!Get_Active_Beacon_Subscription.Id} ) )</expression>
+    </formulas>
+    <interviewLabel>Contact - Active Beacon Subscriptions - Scheduled {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Contact - Active Beacon Subscriptions - Scheduled</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Looks for one Beacon Subscription linked to this Contact whose Active field is true. Active is checked on the subscription itself, so the active rule (dates and Date Access Removed) stays in one place.</description>
+        <name>Get_Active_Beacon_Subscription</name>
+        <label>Get Active Beacon Subscription</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Active_Beacon_Subscription_Changed</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Contact__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Active__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Beacon_Subscription__c</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Sets Active Beacon Subscription on the Contact to whether it has an active Beacon Subscription.</description>
+        <name>Update_Active_Beacon_Subscription</name>
+        <label>Update Active Beacon Subscription</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Active_Beacon_Subscription__c</field>
+            <value>
+                <elementReference>formHasActiveBeaconSubscription</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Contact</object>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Run_Flows_And_Customer</targetReference>
+        </connector>
+        <object>Contact</object>
+        <schedule>
+            <frequency>Daily</frequency>
+            <startDate>2026-10-29</startDate>
+            <startTime>01:00:00.000Z</startTime>
+        </schedule>
+        <triggerType>Scheduled</triggerType>
+    </start>
+    <status>Active</status>
+    <subflows>
+        <description>Used to send email notification</description>
+        <name>Fault_Path_Subflow</name>
+        <label>Fault Path Subflow</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>Fault_Path_Subflow</flowName>
+        <inputAssignments>
+            <name>varFaultMessage</name>
+            <value>
+                <elementReference>$Flow.FaultMessage</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+</Flow>

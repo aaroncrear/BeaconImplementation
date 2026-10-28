@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Active_Beacon_Subscription__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Checked when the Contact has at least one Beacon Subscription whose Active field is true. Set daily by the Contact - Active Beacon Subscriptions - Scheduled flow; do not edit manually. Used by the Customer Status formula.</description>
+    <inlineHelpText>Updated automatically each night from the Contact&apos;s Beacon Subscriptions.</inlineHelpText>
+    <label>Active Beacon Subscription</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>
