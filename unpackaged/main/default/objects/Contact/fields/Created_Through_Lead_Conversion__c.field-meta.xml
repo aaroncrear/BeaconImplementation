@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Created_Through_Lead_Conversion__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Checked when this Contact was created through the conversion of a Lead. Set automatically by the Lead - On Conversion - After Save flow. Not a formula so it can also be populated through historic data loads.</description>
+    <label>Created Through Lead Conversion</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>
