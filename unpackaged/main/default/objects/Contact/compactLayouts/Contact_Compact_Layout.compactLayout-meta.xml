@@ -8,5 +8,6 @@
     <fields>MobilePhone</fields>
     <fields>Email</fields>
     <fields>Engagement_Status__c</fields>
+    <fields>Customer_Status__c</fields>
     <label>Contact Compact Layout</label>
 </CompactLayout>

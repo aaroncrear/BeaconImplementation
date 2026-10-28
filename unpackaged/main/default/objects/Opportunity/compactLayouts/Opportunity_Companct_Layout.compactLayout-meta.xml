@@ -7,5 +7,6 @@
     <fields>CloseDate</fields>
     <fields>OwnerId</fields>
     <fields>Engagement_Status__c</fields>
+    <fields>Customer_Status__c</fields>
     <label>Opportunity Compact Layout</label>
 </CompactLayout>
