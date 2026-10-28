@@ -4,7 +4,6 @@
     <fields>Name</fields>
     <fields>Company</fields>
     <fields>Title</fields>
-    <fields>LeadSource</fields>
     <fields>Phone</fields>
     <fields>MobilePhone</fields>
     <fields>Email</fields>

@@ -16,6 +16,7 @@
 - Add an **Active Beacon Subscription** field on Contacts, kept up to date by a daily scheduled flow, so the Contact formula can read it. The flow only needs to run on Contacts whose Account Type is Customer.
 - Give read access to the new fields in the ten **Beacon … - Object, Tab, FLS** permission sets: Consulting, Customer Success, Executive, Finance, Marketing, Product, ResOps, Sales, Salesforce Admin and Tech.
 - Add **Customer Status** right after **Engagement Status** on the custom compact layouts for Leads, Contacts and Opportunities.
+- Remove **Lead Source** from the Lead compact layout.
 
 ## Release Notes
 
@@ -106,10 +107,12 @@ Some things to know about how this behaves:
 
 | Object | Compact Layout | Fields after the change |
 |--------|----------------|-------------------------|
-| Lead | Leads Custom Compact Layout | Name, Company, Title, Lead Source, Phone, Mobile, Email, Engagement Status, Customer Status |
+| Lead | Leads Custom Compact Layout | Name, Company, Title, Phone, Mobile, Email, Engagement Status, Customer Status |
 | Contact | Contact Compact Layout | Name, Account, Title, Phone, Mobile, Email, Engagement Status, Customer Status |
 | Opportunity | New Awesome Compact Layout | Name, Account, Close Date, Amount, Owner, Engagement Status, Customer Status |
 | Opportunity | Opportunity Compact Layout | Name, Account, Amount, Close Date, Owner, Engagement Status, Customer Status |
+
+**Lead Source** was also removed from the Lead compact layout. It now has the same number of fields as the Contact layout, so the header doesn't get more crowded.
 
 Opportunity has two custom compact layouts, and both were updated so the field shows whichever one is assigned. This matches how Engagement Status was added in the Traffic Light System build.
 
@@ -159,7 +162,7 @@ Opportunity has two custom compact layouts, and both were updated so the field s
 
 **Compact layouts**
 
-25. Open a Lead, a Contact and an Opportunity in Lightning. Confirm **Customer Status** shows in the highlights panel at the top of the record, right after Engagement Status.
+25. Open a Lead, a Contact and an Opportunity in Lightning. Confirm **Customer Status** shows in the highlights panel at the top of the record, right after Engagement Status. On the Lead, also confirm **Lead Source** no longer shows in the highlights panel.
 26. In **Setup → Object Manager → Opportunity → Compact Layouts**, confirm both custom compact layouts list Customer Status right after Engagement Status.
 
 ## Post Deployment Items
@@ -169,7 +172,6 @@ Opportunity has two custom compact layouts, and both were updated so the field s
 - After deploying, populate **Active Beacon Subscription** straight away, instead of waiting for the first nightly run. Either run the flow from Flow Builder's Debug tool, or update the field with a data load. Until then, every Customer Contact shows "Customer - Non-User".
 - Confirm the flow's schedule in **Setup → Scheduled Jobs**. It's set to run daily at 01:00 in the org's default time zone, starting 29 October 2026. If the deployment happens after that date, open the flow and set a new start date. Activating it schedules the next run.
 - The flow starts once per Contact each day, and Salesforce allows 250,000 scheduled flow interviews per 24 hours (or 200 per user license, if that's higher). Contacts on non-Customer Accounts end straight away, but they still count. Check the Contact count in production before deploying.
-- Confirm Customer Status is visible in the Lead highlights panel. The Lead compact layout now has nine fields, and Lightning shows only a limited number of fields in the header. If it's cut off, move it up or remove a field.
 - Add **Customer Status** to page layouts or list views if users should see it there. This build only adds it to the compact layouts.
 
 ## Component Manifest
@@ -190,7 +192,7 @@ Github Branch: [Customer-Status](https://github.com/aaroncrear/BeaconImplementat
 | 10 | CustomField | Opportunity | Customer_Status__c | Customer Status | Created | Formula (Text). The Type of the Opportunity's Account. |
 | 11 | Flow | Contact | Contact_Active_Beacon_Subscriptions_Scheduled | Contact - Active Beacon Subscriptions - Scheduled | Created | Daily schedule-triggered flow. For Contacts whose Account Type is Customer, sets Active Beacon Subscription from their active Beacon Subscriptions, and only updates when it changes. |
 | 12 | CompactLayout | Contact | Contact_Compact_Layout | Contact Compact Layout | Updated | Added Customer_Status__c right after Engagement_Status__c. |
-| 13 | CompactLayout | Lead | Leads_Custom_Compact_Layout | Leads Custom Compact Layout | Updated | Added Customer_Status__c right after Engagement_Status__c. |
+| 13 | CompactLayout | Lead | Leads_Custom_Compact_Layout | Leads Custom Compact Layout | Updated | Added Customer_Status__c right after Engagement_Status__c and removed LeadSource. |
 | 14 | CompactLayout | Opportunity | New_Awesome_Companct_Layout | New Awesome Compact Layout | Updated | Added Customer_Status__c right after Engagement_Status__c. |
 | 15 | CompactLayout | Opportunity | Opportunity_Companct_Layout | Opportunity Compact Layout | Updated | Added Customer_Status__c right after Engagement_Status__c. |
 | 16 | PermissionSet | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
