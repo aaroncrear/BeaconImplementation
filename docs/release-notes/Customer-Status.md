@@ -15,6 +15,7 @@
   - On Contacts, show the Account's Type, except when it's **Customer**. Then show **Customer - User** if the Contact has an active Beacon Subscription, or **Customer - Non-User** if not.
 - Add an **Active Beacon Subscription** field on Contacts, kept up to date by a daily scheduled flow, so the Contact formula can read it. The flow only needs to run on Contacts whose Account Type is Customer.
 - Give read access to the new fields in the ten **Beacon … - Object, Tab, FLS** permission sets: Consulting, Customer Success, Executive, Finance, Marketing, Product, ResOps, Sales, Salesforce Admin and Tech.
+- Add **Customer Status** right after **Engagement Status** on the custom compact layouts for Leads, Contacts and Opportunities.
 
 ## Release Notes
 
@@ -99,6 +100,19 @@ Some things to know about how this behaves:
 - **Updated once a day.** If a subscription starts, ends or has its access removed during the day, Customer Status changes after the next nightly run.
 - **When an Account stops being a Customer**, its Contacts aren't checked anymore, so their Active Beacon Subscription value can be out of date. This doesn't affect Customer Status, which only reads the field when the Type is Customer. If the Account becomes a Customer again, the next run fixes the value.
 
+### Compact layouts
+
+**Customer Status** was added right after **Engagement Status**, the last field, on each object's custom compact layout. In the record highlights panel, it shows to the right of Engagement Status:
+
+| Object | Compact Layout | Fields after the change |
+|--------|----------------|-------------------------|
+| Lead | Leads Custom Compact Layout | Name, Company, Title, Lead Source, Phone, Mobile, Email, Engagement Status, Customer Status |
+| Contact | Contact Compact Layout | Name, Account, Title, Phone, Mobile, Email, Engagement Status, Customer Status |
+| Opportunity | New Awesome Compact Layout | Name, Account, Close Date, Amount, Owner, Engagement Status, Customer Status |
+| Opportunity | Opportunity Compact Layout | Name, Account, Amount, Close Date, Owner, Engagement Status, Customer Status |
+
+Opportunity has two custom compact layouts, and both were updated so the field shows whichever one is assigned. This matches how Engagement Status was added in the Traffic Light System build.
+
 ## Acceptance Criteria
 
 **Account Type**
@@ -143,6 +157,11 @@ Some things to know about how this behaves:
 
 24. Log in as, or check a user with, each of the ten Beacon … - Object, Tab, FLS permission sets. Confirm they can see Customer Status on Leads, Contacts and Opportunities, and Active Beacon Subscription on Contacts, and can't edit Active Beacon Subscription.
 
+**Compact layouts**
+
+25. Open a Lead, a Contact and an Opportunity in Lightning. Confirm **Customer Status** shows in the highlights panel at the top of the record, right after Engagement Status.
+26. In **Setup → Object Manager → Opportunity → Compact Layouts**, confirm both custom compact layouts list Customer Status right after Engagement Status.
+
 ## Post Deployment Items
 
 - In each target org, run a report or query to find Accounts whose Type is Analyst, Integrator, Investor or Press, and decide whether to update them to an active value. None exist in the dev org (Beacon HTC DEV). Deactivated values stay on existing records until someone changes them.
@@ -150,7 +169,8 @@ Some things to know about how this behaves:
 - After deploying, populate **Active Beacon Subscription** straight away, instead of waiting for the first nightly run. Either run the flow from Flow Builder's Debug tool, or update the field with a data load. Until then, every Customer Contact shows "Customer - Non-User".
 - Confirm the flow's schedule in **Setup → Scheduled Jobs**. It's set to run daily at 01:00 in the org's default time zone, starting 29 October 2026. If the deployment happens after that date, open the flow and set a new start date. Activating it schedules the next run.
 - The flow starts once per Contact each day, and Salesforce allows 250,000 scheduled flow interviews per 24 hours (or 200 per user license, if that's higher). Contacts on non-Customer Accounts end straight away, but they still count. Check the Contact count in production before deploying.
-- Add **Customer Status** to page layouts, compact layouts or list views if users should see it there. This build only adds the fields and their access.
+- Confirm Customer Status is visible in the Lead highlights panel. The Lead compact layout now has nine fields, and Lightning shows only a limited number of fields in the header. If it's cut off, move it up or remove a field.
+- Add **Customer Status** to page layouts or list views if users should see it there. This build only adds it to the compact layouts.
 
 ## Component Manifest
 
@@ -169,13 +189,17 @@ Github Branch: [Customer-Status](https://github.com/aaroncrear/BeaconImplementat
 | 9 | CustomField | Lead | Customer_Status__c | Customer Status | Created | Formula (Text). The Type of the Account in the Lead's Account lookup. |
 | 10 | CustomField | Opportunity | Customer_Status__c | Customer Status | Created | Formula (Text). The Type of the Opportunity's Account. |
 | 11 | Flow | Contact | Contact_Active_Beacon_Subscriptions_Scheduled | Contact - Active Beacon Subscriptions - Scheduled | Created | Daily schedule-triggered flow. For Contacts whose Account Type is Customer, sets Active Beacon Subscription from their active Beacon Subscriptions, and only updates when it changes. |
-| 12 | PermissionSet | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
-| 13 | PermissionSet | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
-| 14 | PermissionSet | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
-| 15 | PermissionSet | N/A | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
-| 16 | PermissionSet | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
-| 17 | PermissionSet | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
-| 18 | PermissionSet | N/A | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
-| 19 | PermissionSet | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
-| 20 | PermissionSet | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
-| 21 | PermissionSet | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
+| 12 | CompactLayout | Contact | Contact_Compact_Layout | Contact Compact Layout | Updated | Added Customer_Status__c right after Engagement_Status__c. |
+| 13 | CompactLayout | Lead | Leads_Custom_Compact_Layout | Leads Custom Compact Layout | Updated | Added Customer_Status__c right after Engagement_Status__c. |
+| 14 | CompactLayout | Opportunity | New_Awesome_Companct_Layout | New Awesome Compact Layout | Updated | Added Customer_Status__c right after Engagement_Status__c. |
+| 15 | CompactLayout | Opportunity | Opportunity_Companct_Layout | Opportunity Compact Layout | Updated | Added Customer_Status__c right after Engagement_Status__c. |
+| 16 | PermissionSet | N/A | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
+| 17 | PermissionSet | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
+| 18 | PermissionSet | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
+| 19 | PermissionSet | N/A | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
+| 20 | PermissionSet | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
+| 21 | PermissionSet | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
+| 22 | PermissionSet | N/A | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
+| 23 | PermissionSet | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
+| 24 | PermissionSet | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
+| 25 | PermissionSet | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added read access to Customer_Status__c on Contact, Lead and Opportunity, and to Active_Beacon_Subscription__c on Contact. |
