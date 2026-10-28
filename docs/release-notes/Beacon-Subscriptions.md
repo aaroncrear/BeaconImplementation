@@ -29,9 +29,9 @@ the object description, the business need is:
 A new custom object, `Beacon_Subscription__c` ("Beacon Subscription" / "Beacon Subscriptions"),
 was created as a **junction object** between `Account` and `Asset`. Each record represents one
 purchased seat on an Asset, so an Asset with a quantity of 10 can have up to 10 Beacon
-Subscription records. The subscriber's Contact is added to each seat once it is known. This keeps `Asset` as the commercial record (product,
-quantity, dates) and holds the per-user detail on the child object, so Assets don't have to be
-split into one line item per user.
+Subscription records. The subscriber's Contact is added to each seat once it is known. This
+keeps `Asset` as the commercial record (product, quantity, dates) and holds the per-user detail
+on the child object, so Assets don't have to be split into one line item per user.
 
 Object settings:
 
@@ -107,9 +107,9 @@ Account.
 
 A page layout, `Beacon Subscription Layout`, was created. Its **Information** section shows Name
 (read-only), Account (required), Asset (required) and Contact in the left column, and Currency in
-the right column. Status and Active (both read-only), Start Date,
-End Date and Date Access Removed were added to the right column above Currency. Its **System Information** section shows the standard created/modified fields.
-The layout is assigned to all 25 profiles in the repo. (Gearset also moved the `<userLicense>`
+the right column. Status and Active (both read-only), Start Date, End Date and Date Access
+Removed were added to the right column above Currency. Its **System Information** section shows
+the standard created/modified fields. The layout is assigned to all 25 profiles in the repo. (Gearset also moved the `<userLicense>`
 element higher in the `Beacon Standard User` profile. This is a reorder only; nothing changed.)
 
 **Permission sets.** Access was added to the persona "Object, Tab, FLS" permission sets, following
@@ -132,12 +132,16 @@ need Read access to the parent Account and Asset to see a subscription. Every pe
 already granted Read on Account. **Read on Asset was added to every persona set**, and full
 access to Asset (Create, Read, Edit, Delete, View All, Modify All) was added to the Salesforce
 Admin set, matching its access to the other objects. Without this, the deploy failed with
-"Permission Read Beacon_Subscription__c depends on permission(s): Read Asset". Read on Asset in
-turn requires Read on **Product** (`Product2`). In the org, every profile and permission set
-that can read Asset can also read Product, and none of the Beacon sets had Product, so the Asset
-access was dropped and the same error came back. **Read on Product was therefore added to every
-persona set**, with full access for the Salesforce Admin set. The persona sets can now read
-Asset and Product records but can't create, edit or delete them.
+"Permission Read Beacon_Subscription__c depends on permission(s): Read Asset". **Read on
+Product** (`Product2`) was also added to every persona set, with full access for the Salesforce
+Admin set. In the org, every profile and permission set that can read Asset can also read
+Product, so Asset access appears to require it. The persona sets can now read Asset and Product
+records but can't create, edit or delete them.
+
+When deploying with Gearset, the **Asset** and **Product2** objects must be included in the
+comparison alongside the permission sets. Gearset only deploys the parts of a permission set
+that relate to objects in the comparison. Without them, it strips the Asset and Product access
+and the "depends on Read Asset" error comes back.
 
 ## Acceptance Criteria
 
@@ -198,9 +202,9 @@ Asset and Product records but can't create, edit or delete them.
 
 ## Post Deployment Items
 
-The branch contains the object, its fields, its layout, the profile layout assignments and the
-persona permission set access. The following are **not** in this branch and must be done in the target org (or added to this
-branch in a later deploy):
+The branch contains the object, its fields, its layout, the static resources, the profile
+layout assignments and the persona permission set access. The following are **not** in this
+branch and must be done in the target org (or added to this branch in a later deploy):
 
 1. **Deployment order (orgs where the object already exists):** Salesforce allows only two
    master-detail fields at a time, and it won't create a new master-detail on an object that
@@ -213,18 +217,24 @@ branch in a later deploy):
 
    **Status:** done by hand in the HTCDEV sandbox on 2026-10-25. The test record
    `Beacon Subs - 000001` was deleted, `Contact__c` changed to Lookup(Contact) and `Account__c`
-   created as Master-Detail(Account). The object doesn't exist in UAT yet, so a first deploy
-   there creates the fields in their final form and these steps aren't needed.
-2. **Related lists:** Add the Beacon Subscriptions related list to the Account, Asset and
+   created as Master-Detail(Account). The full branch was then deployed to HTCDEV; confirmed on
+   2026-10-28 (all fields, both static resources and the permission set access are in the org).
+   The object doesn't exist in UAT yet, so a first deploy there creates the fields in their
+   final form and these steps aren't needed.
+2. **Gearset comparison:** When deploying to the next org, include the **Asset** and **Product2**
+   objects in the Gearset comparison with the Beacon permission sets (see Release Notes above).
+   Otherwise the deploy fails with "Permission Read Beacon_Subscription__c depends on
+   permission(s): Read Asset".
+3. **Related lists:** Add the Beacon Subscriptions related list to the Account, Asset and
    Contact page layouts or Lightning record pages so users can create and see subscriptions.
-3. **Tab (optional):** No custom tab was created. Add one, and add it to the Beacon app, if users
+4. **Tab (optional):** No custom tab was created. Add one, and add it to the Beacon app, if users
    need a list view of all subscriptions.
-4. **Field history (optional):** Object-level history is on, but no fields are tracked. Turn on
-   tracking for `Account__c`, `Asset__c`, `Contact__c`, the date fields
-   and `Date_Access_Removed__c` if an audit trail is needed.
-5. **Date population (optional):** Start Date and End Date are entered by hand. If they should
+5. **Field history (optional):** Object-level history is on, but no fields are tracked. Turn on
+   tracking for `Account__c`, `Asset__c`, `Contact__c`, `Start_Date__c`, `End_Date__c` and
+   `Date_Access_Removed__c` if an audit trail is needed.
+6. **Date population (optional):** Start Date and End Date are entered by hand. If they should
    default from the Asset's current time period, that needs a flow (not in this branch).
-6. **Data load (optional):** If subscriptions already exist on Assets, load one Beacon
+7. **Data load (optional):** If subscriptions already exist on Assets, load one Beacon
    Subscription record per purchased seat (Account and Asset required, Contact where known).
 
 ## Component Manifest
