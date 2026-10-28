@@ -347,6 +347,9 @@
         <layout>AccountPlanObjectiveMeasure-Account Plan Objective Measure Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
+        <layout>Beacon_Subscription__c-Beacon Subscription Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
         <layout>Campaign-Campaign Layout</layout>
         <recordType>Campaign.Parent_Campaign</recordType>
     </layoutAssignments>

@@ -34,6 +34,10 @@
                 <field>Segment__c</field>
             </layoutItems>
             <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Tier__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Required</behavior>
                 <field>Type</field>
             </layoutItems>
@@ -52,6 +56,10 @@
             <layoutItems>
                 <behavior>Required</behavior>
                 <field>CurrencyIsoCode</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Funding__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
@@ -90,6 +98,14 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>NAICS_Description__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>ABM_Flag__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Active_Drug_Count__c</field>
             </layoutItems>
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>
@@ -295,6 +311,16 @@
         <relatedList>RelatedOpportunityList</relatedList>
     </relatedLists>
     <relatedLists>
+        <fields>ASSET.NAME</fields>
+        <fields>ASSET.SERIAL_NUMBER</fields>
+        <fields>ASSET.INSTALL_DATE</fields>
+        <fields>ASSET.QUANTITY</fields>
+        <fields>CONTACT.NAME</fields>
+        <fields>ASSET.STATUS</fields>
+        <fields>ASSET.IS_COMPETITOR_PRODUCT</fields>
+        <relatedList>RelatedAssetList</relatedList>
+    </relatedLists>
+    <relatedLists>
         <fields>CAMPAIGN.NAME</fields>
         <fields>CAMPAIGN.CAMPAIGN_TYPE</fields>
         <fields>CAMPAIGN.START_DATE</fields>
@@ -338,6 +364,14 @@
         <fields>Owner</fields>
         <fields>StartDate</fields>
         <relatedList>ActionPlan</relatedList>
+    </relatedLists>
+    <relatedLists>
+        <fields>Asset.NAME</fields>
+        <fields>Contact__c</fields>
+        <fields>End_Date__c</fields>
+        <fields>Start_Date__c</fields>
+        <fields>Status__c</fields>
+        <relatedList>Beacon_Subscription__c.Account__c</relatedList>
     </relatedLists>
     <relatedLists>
         <relatedList>RelatedContentNoteList</relatedList>
