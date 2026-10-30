@@ -95,16 +95,10 @@ Run these in the target sandbox after the Post Deployment activation steps.
 
 ## Post Deployment Items
 
-- **Enable User Access Policies** in the target org first (Setup → User Management Settings →
-  *Enable User Access Policies* and *Enhanced Interface for User Access Policies*). At the time
-  of this build the feature is enabled only in Beacon HTC Dev. Beacon UAT and Beacon Prod
-  reject `UserAccessPolicy` queries, which means the feature is off there and this deployment
-  will fail until it is switched on.
-- **Deploy dependencies first or together:** `User.Persona__c`, the `Beacon_Baseline`
-  permission set group and its two Baseline permission sets, and all ten
-  `Beacon_<Persona>_Object_Tab_FLS` permission sets. `Beacon_Baseline` exists in Beacon Prod
-  but was **not found in Beacon HTC Dev or Beacon UAT** when this build was written, so it must
-  be deployed to those orgs before (or with) these policies.
+- **Prerequisites (completed 30 Oct 2026):** User Access Policies are enabled, and the
+  `Beacon_Baseline` permission set group is deployed, in Beacon HTC Dev, Beacon UAT and Beacon
+  Prod. Before deploying to any other org, confirm the same, plus `User.Persona__c` and all ten
+  `Beacon_<Persona>_Object_Tab_FLS` permission sets.
 - **Validate the metadata format before the first real deploy.** The policy XML follows the
   Metadata API shape for `UserAccessPolicy` (`userAccessPolicyActions` with `action`/`target`/
   `type`, and `userAccessPolicyFilters` with `columnName`/`operation`/`sortOrder`/`target`/
