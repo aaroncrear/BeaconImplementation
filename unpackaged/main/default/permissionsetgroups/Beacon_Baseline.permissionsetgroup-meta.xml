@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Contains permission sets for system, object and field level access that all users receive.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Beacon - Baseline</label>
+    <permissionSets>Beacon_Baseline_Standard_Field_Access</permissionSets>
+    <permissionSets>Beacon_Baseline_System_App_Access</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>
