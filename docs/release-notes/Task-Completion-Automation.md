@@ -6,9 +6,9 @@ When a rep completes an activity with a Lead or Contact, the Lead or Contact sho
 
 - When a Task is **created** with a Status of `Completed` and is related to a Lead or Contact, set the Lead `Status` or the Contact `Contact Status` to `Working`.
 - Only change the status when its current value is `New`. Leads and Contacts in any other status are left alone.
-- Only do this when the Task Subtype is **not** `Task` (for example Calls, Emails and other logged activities count; plain to-do Tasks do not).
+- Only do this when the Task Subtype is filled in and is **not** `Task` (for example Calls, Emails and other logged activities count; plain to-do Tasks and Tasks with no Task Subtype do not).
 - Build this in a new `Task - On Create - After Save` flow.
-- Build a new `Task - On Update - After Save` flow that does the same when a Task is updated.
+- Build a new `Task - On Update - After Save` flow that does the same when a Task is updated to `Completed`. Moving a Task that is already Completed to a different Lead or Contact should not update anything.
 
 ## Release Notes
 
@@ -23,11 +23,12 @@ Two new record-triggered flows were added on Task. No fields or picklist values 
   AND(
       {!$Setup.On_Off_Switch__c.Run_Flows__c},
       ISPICKVAL({!$Record.Status}, "Completed"),
+      NOT(ISBLANK(TEXT({!$Record.TaskSubtype}))),
       NOT(ISPICKVAL({!$Record.TaskSubtype}, "Task")),
       NOT(ISBLANK({!$Record.WhoId}))
   )
   ```
-  Tasks that are not Completed, have a Task Subtype of `Task`, or have no Name (Lead/Contact) don't start the flow.
+  Tasks that are not Completed, have no Task Subtype, have a Task Subtype of `Task`, or have no Name (Lead/Contact) don't start the flow.
 - **Decision `Related To Lead Or Contact?`:** checks the Task's Name (`WhoId`). Ids that start with `00Q` are Leads, and ids that start with `003` are Contacts.
 - **`Update Lead Status To Working`:** updates the Lead where `Id = WhoId`, `Status = New` and `IsConverted = false`, setting `Status` to `Working`.
 - **`Update Contact Status To Working`:** updates the Contact where `Id = WhoId` and `Contact Status = New`, setting `Contact Status` to `Working`.
@@ -37,27 +38,26 @@ Two new record-triggered flows were added on Task. No fields or picklist values 
 
 ### Task - On Update - After Save (`Task_On_Update_After_Save`)
 
-Same elements and logic as the create flow. The entry formula adds one more condition so the flow only runs when something relevant changed:
+Same elements and logic as the create flow. The entry formula adds one more condition, `ISCHANGED(Status)`, so the flow only runs when the Task is changed to Completed:
 
 ```
 AND(
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
     ISPICKVAL({!$Record.Status}, "Completed"),
+    NOT(ISBLANK(TEXT({!$Record.TaskSubtype}))),
     NOT(ISPICKVAL({!$Record.TaskSubtype}, "Task")),
     NOT(ISBLANK({!$Record.WhoId})),
-    OR(
-        ISCHANGED({!$Record.Status}),
-        ISCHANGED({!$Record.WhoId})
-    )
+    ISCHANGED({!$Record.Status})
 )
 ```
 
-- The flow runs when a Task is changed **to** `Completed`, or when a Task that is already `Completed` is moved to a different Lead or Contact.
+- The flow runs only when a Task is changed **to** `Completed`.
+- Moving a Task that is already Completed to a different Lead or Contact (changing Name) does not start the flow.
 - Editing other fields (Subject, Comments, etc.) on a Task that is already Completed does not start the flow.
 
 ### Notes
 
-- **Task Subtype:** a Task with a blank Task Subtype is treated as "not equal to Task" and will update the Lead or Contact. Salesforce normally sets Task Subtype on every Task (`Task`, `Call`, `Email`, `List Email`, `Cadence`, `LinkedIn`), so this should be rare.
+- **Task Subtype:** a Task with a blank Task Subtype does not start either flow. The formula checks `NOT(ISBLANK(TEXT(TaskSubtype)))` on its own, because `NOT(ISPICKVAL(TaskSubtype, "Task"))` is true for a blank value. Salesforce normally sets Task Subtype on every Task created in the UI (`Task`, `Call`, `Email`, `List Email`, `Cadence`, `LinkedIn`), but Tasks inserted through the API or integrations can have it blank.
 - **Shared Activities:** if a Task is related to more than one Contact, only the primary Contact (the Task's `WhoId`) is updated.
 - **Related To (`WhatId`) is not used.** A Task logged on an Account or Opportunity with no Name (Lead/Contact) does not update anything.
 - Updating the Lead or Contact starts the existing `Lead - On Update - Before Save` and `Contact - On Update - Before Save` flows. Neither of them changes Status based on a Status change, so they don't conflict.
@@ -77,16 +77,17 @@ Use a test Lead and a test Contact. Before each test, set the Lead `Status` or t
 8. **Create – No Name:** Log a Call on an Account with no Contact selected in Name. Confirm no error and no Lead or Contact changes.
 9. **Update – Changed to Completed:** Set a Contact to `New`. Using Data Loader or inline edit, create a Task on the Contact with Task Subtype `Call` and Status `Open`. Confirm the Contact Status stays `New`. Change the Task's Status to `Completed`. Confirm the Contact Status is now `Working`. Repeat for a Lead.
 10. **Update – Task Subtype is Task:** Create an open Task with **New Task** on a `New` Lead. Change its Status to `Completed`. Confirm the Lead's Status stays `New`.
-11. **Update – Name changed on a Completed Task:** Log a Call on Contact A. Set Contact B's Contact Status to `New`. Edit the Call and change Name from Contact A to Contact B. Confirm Contact B's Contact Status is now `Working`.
+11. **Update – Name changed on a Completed Task:** Log a Call on Contact A. Set Contact B's Contact Status to `New`. Edit the Call and change Name from Contact A to Contact B. Confirm Contact B's Contact Status stays `New`.
 12. **Update – other field edits:** Set a Contact to `New` with an existing Completed Call already on it. Edit only the Call's Subject. Confirm the Contact Status stays `New`.
-13. **Converted Lead:** Convert a Lead, then log a Call on the converted Lead's new Contact while its Contact Status is `New`. Confirm the Contact Status is `Working` and no fault email is sent.
-14. **Bulk:** With Data Loader, insert 200 Completed Tasks with Task Subtype `Call` against 200 Leads and Contacts in `New`. Confirm they all move to `Working` and no fault emails are sent.
-15. **On/Off Switch:** Create a User level On/Off Switch record for your user with `Run Flows` unchecked. Log a Call on a `New` Lead and confirm the Status stays `New`. Delete the User level record afterwards.
+13. **No Task Subtype:** With Data Loader, insert a Task on a `New` Lead with Status `Completed` and Task Subtype left blank. Confirm the Lead's Status stays `New`. Insert an open Task with a blank Task Subtype on a `New` Contact, then change its Status to `Completed`. Confirm the Contact Status stays `New`.
+14. **Converted Lead:** Convert a Lead, then log a Call on the converted Lead's new Contact while its Contact Status is `New`. Confirm the Contact Status is `Working` and no fault email is sent.
+15. **Bulk:** With Data Loader, insert 200 Completed Tasks with Task Subtype `Call` against 200 Leads and Contacts in `New`. Confirm they all move to `Working` and no fault emails are sent.
+16. **On/Off Switch:** Create a User level On/Off Switch record for your user with `Run Flows` unchecked. Log a Call on a `New` Lead and confirm the Status stays `New`. Delete the User level record afterwards.
 
 ## Post Deployment Items
 
 - Confirm both flows are **Active** in the target org after deployment.
-- **Optional backfill:** the flows only run when a Task is created or updated. Leads and Contacts that are still `New` but already have Completed, non-`Task` subtype activities are not updated. If the business wants them fixed, export Completed Tasks where `TaskSubtype != 'Task'` and `WhoId` is not blank, match them to Leads with `Status = 'New'` (and `IsConverted = false`) and Contacts with `Contact_Status__c = 'New'`, set the status to `Working` and update with Data Loader. Confirm with the business before running it.
+- **Optional backfill:** the flows only run when a Task is created or updated. Leads and Contacts that are still `New` but already have Completed, non-`Task` subtype activities are not updated. If the business wants them fixed, export Completed Tasks where `TaskSubtype` is not blank and not `'Task'` and `WhoId` is not blank, match them to Leads with `Status = 'New'` (and `IsConverted = false`) and Contacts with `Contact_Status__c = 'New'`, set the status to `Working` and update with Data Loader. Confirm with the business before running it.
 
 ## Component Manifest
 
@@ -94,5 +95,5 @@ Github Branch: [Task-Completion-Automation](https://github.com/aaroncrear/Beacon
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Flow | Task | Task_On_Create_After_Save | Task - On Create - After Save | Created | When a Completed Task with a Task Subtype other than Task is created on a Lead or Contact, sets the Lead Status or Contact Status from New to Working. |
-| 2 | Flow | Task | Task_On_Update_After_Save | Task - On Update - After Save | Created | When a Task with a Task Subtype other than Task is changed to Completed (or a Completed Task's Name changes), sets the related Lead Status or Contact Status from New to Working. |
+| 1 | Flow | Task | Task_On_Create_After_Save | Task - On Create - After Save | Created | When a Completed Task with a Task Subtype that is not blank and not Task is created on a Lead or Contact, sets the Lead Status or Contact Status from New to Working. |
+| 2 | Flow | Task | Task_On_Update_After_Save | Task - On Update - After Save | Created | When a Task with a Task Subtype that is not blank and not Task is changed to Completed, sets the related Lead Status or Contact Status from New to Working. |

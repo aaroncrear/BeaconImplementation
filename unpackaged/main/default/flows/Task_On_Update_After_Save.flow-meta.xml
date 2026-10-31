@@ -40,7 +40,7 @@
             <label>Related To Contact</label>
         </rules>
     </decisions>
-    <description>When a Task is updated to a Status of Completed (or a Completed Task&apos;s Name is changed), the Lead Status or Contact Status of the related Lead or Contact (Name) is set to Working, but only when its current status is New. Tasks with a Task Subtype of Task are skipped. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>When a Task is updated to a Status of Completed, the Lead Status or Contact Status of the related Lead or Contact (Name) is set to Working, but only when its current status is New. Tasks with a Task Subtype of Task, or with no Task Subtype, are skipped. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Task - On Update - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Task - On Update - After Save</label>
@@ -143,12 +143,10 @@
         <filterFormula>AND(
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
     ISPICKVAL({!$Record.Status}, &quot;Completed&quot;),
+    NOT(ISBLANK(TEXT({!$Record.TaskSubtype}))),
     NOT(ISPICKVAL({!$Record.TaskSubtype}, &quot;Task&quot;)),
     NOT(ISBLANK({!$Record.WhoId})),
-    OR(
-        ISCHANGED({!$Record.Status}),
-        ISCHANGED({!$Record.WhoId})
-    )
+    ISCHANGED({!$Record.Status})
 )</filterFormula>
         <object>Task</object>
         <recordTriggerType>Update</recordTriggerType>
