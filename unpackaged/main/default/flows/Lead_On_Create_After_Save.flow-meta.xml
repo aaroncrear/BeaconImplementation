@@ -171,6 +171,7 @@
         <connector>
             <targetReference>Get_Matching_Account_by_Domain_and_Country</targetReference>
         </connector>
+        <filterFormula>{!$Setup.On_Off_Switch__c.Run_Flows__c}</filterFormula>
         <object>Lead</object>
         <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
