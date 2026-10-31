@@ -48,7 +48,7 @@ Salesforce's standard Change Owner action on Account only moves Contacts owned b
 
 ### Production sync
 
-`Account - On Update - After Save`, `Contact - On Create - Before Save`, `Contact - On Update - Before Save` and `Account - On Update - Before Save` were retrieved from Production and committed to this branch before the changes above were made. The three flows changed in this build were behind Production in the repo: Production already had the On/Off Switch in their entry formulas (the Account flow's field conditions had been converted to a formula) and a sentence about it in their descriptions. The ownership changes were rebuilt on the Production versions, so nothing in Production is lost on deploy. `Account - On Update - Before Save` has no functional change; the retrieve only reordered its formulas.
+`Account - On Update - After Save`, `Contact - On Create - Before Save` and `Contact - On Update - Before Save` were retrieved from Production and committed to this branch before the changes above were made. The repo copies were behind Production: Production already had the On/Off Switch in their entry formulas (the Account flow's field conditions had been converted to a formula) and a sentence about it in their descriptions. The ownership changes were rebuilt on the Production versions, so nothing in Production is lost on deploy.
 
 ### On/Off Switch
 
@@ -89,4 +89,3 @@ Github Branch: [Contact-Ownership-Automation](https://github.com/aaroncrear/Beac
 | 1 | Flow | Account | Account_On_Update_After_Save | Account - On Update - After Save | Updated | Now also runs when the Account Owner changes and sets the Owner of all related Contacts to the new Account Owner. Skips the Lead and Opportunity updates when no compliance field changed. |
 | 2 | Flow | Contact | Contact_On_Create_Before_Save | Contact - On Create - Before Save | Updated | Now also runs for Contacts created with an Account and sets the Contact Owner to the Account Owner. Seniority Level logic unchanged. |
 | 3 | Flow | Contact | Contact_On_Update_Before_Save | Contact - On Update - Before Save | Updated | Now also runs when the Contact's Account changes to a non-blank value and sets the Contact Owner to the new Account's Owner. |
-| 4 | Flow | Account | Account_On_Update_Before_Save | Account - On Update - Before Save | Updated | Synced from Production. No functional change; the formulas were reordered by the retrieve. |
