@@ -282,15 +282,18 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
             <targetReference>Do_Not_Engage_Criteria_Met</targetReference>
         </connector>
         <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
-        <filterFormula>OR(
-    AND(
-        OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
-        NOT(OR(PRIORVALUE({!$Record.Blacklisted__c}), AND(PRIORVALUE({!$Record.DoNotCall}), PRIORVALUE({!$Record.HasOptedOutOfEmail}))))
-    ),
-    ISCHANGED({!$Record.Title}),
-    AND(
-        ISCHANGED({!$Record.AccountId}),
-        NOT(ISBLANK({!$Record.AccountId}))
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    OR(
+        AND(
+            OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
+            NOT(OR(PRIORVALUE({!$Record.Blacklisted__c}), AND(PRIORVALUE({!$Record.DoNotCall}), PRIORVALUE({!$Record.HasOptedOutOfEmail}))))
+        ),
+        ISCHANGED({!$Record.Title}),
+        AND(
+            ISCHANGED({!$Record.AccountId}),
+            NOT(ISBLANK({!$Record.AccountId}))
+        )
     )
 )</filterFormula>
         <object>Contact</object>

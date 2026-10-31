@@ -17,7 +17,8 @@ Three existing record-triggered flows were updated. No new flows or fields were 
 
 This flow has to stay **after-save** because it updates other records (the related Contacts). Before-save flows can only change the record being saved.
 
-- **Entry criteria:** `Account Owner (OwnerId) Is Changed` was added as a fifth condition, so the flow now runs when any compliance field **or** the Owner changes (`1 OR 2 OR 3 OR 4 OR 5`).
+- **Entry criteria:** changed from field conditions to a formula so the On/Off Switch could be included, and `ISCHANGED(OwnerId)` was added. The flow now runs when `Run Flows` is on and any compliance field **or** the Owner changes:
+  `AND({!$Setup.On_Off_Switch__c.Run_Flows__c}, OR(ISCHANGED(Blacklisted__c), ISCHANGED(Blacklisted_Reason__c), ISCHANGED(Do_Not_Call__c), ISCHANGED(Email_Opt_Out__c), ISCHANGED(OwnerId)))`
 - **Contact loop:** a new decision, `Owner Changed?`, runs for each Contact. When the Account Owner changed, a new assignment, `Assign Contact Owner`, sets the Contact's `OwnerId` to the Account's new `OwnerId`. The Contact then goes through the existing `Assign Contact Values` assignment and is added to the same bulk `Update Contacts` element. The Owner is only set when the Account Owner changed, so a compliance-only change does not reset Contact Owners that were set by hand.
 - **New decision `Compliance Fields Changed?`:** placed after the Contacts are updated (or after no Contacts were found). Leads and open Opportunities only receive the compliance fields, so when only the Owner changed the flow ends here and skips the Lead and Opportunity queries and updates. When any compliance field changed, the flow continues to the Leads and Opportunities as before.
 - When only the Owner changes, the Contacts' compliance fields are still set to the Account's current values in the same update. These are the values the flow already keeps in sync, so no data changes unless a Contact had drifted from its Account.
@@ -29,7 +30,7 @@ Salesforce's standard Change Owner action on Account only moves Contacts owned b
 
 **Before-save** was used because the flow only changes the Contact being saved, which needs no extra DML.
 
-- **Entry criteria:** changed from `Title Is Null = false` to a formula, `OR(NOT(ISBLANK(Title)), NOT(ISBLANK(AccountId)))`, so the flow now also runs for Contacts created with an Account and no Title.
+- **Entry criteria:** changed from `Title Is Null = false` to a formula, `AND({!$Setup.On_Off_Switch__c.Run_Flows__c}, OR(NOT(ISBLANK(Title)), NOT(ISBLANK(AccountId))))`, so the flow now also runs for Contacts created with an Account and no Title.
 - **New decision `Title Populated?`:** keeps the existing Seniority Level logic for Contacts with a Title. Contacts without a Title skip it.
 - **New decision `Account Populated?`** and assignment **`Assign Contact Owner`:** when the Contact has an Account, sets `OwnerId` to `Account.OwnerId`. The Account Owner is read through the `$Record.Account.OwnerId` relationship, which before-save flows support without a Get Records element.
 - Contacts created without an Account keep the Owner they were created with.
@@ -39,7 +40,7 @@ Salesforce's standard Change Owner action on Account only moves Contacts owned b
 
 **Before-save** was used for the same reason.
 
-- **Entry criteria formula:** a third condition was added, `AND(ISCHANGED(AccountId), NOT(ISBLANK(AccountId)))`, so the flow now also runs when the Contact moves to a different Account.
+- **Entry criteria formula:** a third condition was added inside the existing `OR`, `AND(ISCHANGED(AccountId), NOT(ISBLANK(AccountId)))`, so the flow now also runs when the Contact moves to a different Account. The whole formula is wrapped in `AND({!$Setup.On_Off_Switch__c.Run_Flows__c}, ...)`.
 - **New decision `Account Changed?`** and assignment **`Assign Contact Owner`:** placed after the existing Do Not Engage and Title checks. When the Account changed to a non-blank value, sets `OwnerId` to the new Account's Owner.
 - Removing the Account from a Contact (clearing `AccountId`) leaves the Owner unchanged.
 - Changing only the Contact Owner does not start this logic, so a Contact Owner can still be changed by hand. It will be set again the next time the Contact's Account, or the Account's Owner, changes.
@@ -47,7 +48,7 @@ Salesforce's standard Change Owner action on Account only moves Contacts owned b
 
 ### On/Off Switch
 
-These three flows did not check the On/Off Switch (`{!$Setup.On_Off_Switch__c.Run_Flows__c}`) before this change, and it was not added. Adding it would also turn off their existing compliance, Seniority Level and Do Not Engage logic when the switch is off, which is outside the scope of this build.
+All three flows check the On/Off Switch (`{!$Setup.On_Off_Switch__c.Run_Flows__c}`) in their entry formula, which matches the versions active in Production. When `Run Flows` is off for a user, none of the logic in these flows runs for that user: the new Contact Owner sync, and also the existing compliance sync, Seniority Level and Do Not Engage logic.
 
 ## Acceptance Criteria
 
@@ -69,6 +70,7 @@ Use two active test users, **User A** and **User B**, who both have access to Ac
 14. **Existing Contact logic:** Change a Contact's Title to `CFO`. Confirm Seniority Level is `Executive` and the Owner does not change. Check `Blacklisted` on a Contact and confirm Status is `Do Not Engage`.
 15. **Lead conversion:** Convert a Lead into an existing Account owned by User A while logged in as User B. Confirm the new Contact is owned by User A.
 16. **Bulk:** With Data Loader, change the Owner of 200 Accounts that have Contacts. Confirm all of their Contacts get the new Owners and no fault emails are sent.
+17. **On/Off Switch:** Create a User level On/Off Switch record for your user with `Run Flows` unchecked. Change the Owner of an Account with Contacts, create a Contact on an Account owned by another user, and move a Contact to another Account. Confirm no Contact Owners change. Delete the User level record afterwards.
 
 ## Post Deployment Items
 

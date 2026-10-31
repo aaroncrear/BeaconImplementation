@@ -222,9 +222,12 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
         <connector>
             <targetReference>Title_Populated</targetReference>
         </connector>
-        <filterFormula>OR(
-    NOT(ISBLANK({!$Record.Title})),
-    NOT(ISBLANK({!$Record.AccountId}))
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    OR(
+        NOT(ISBLANK({!$Record.Title})),
+        NOT(ISBLANK({!$Record.AccountId}))
+    )
 )</filterFormula>
         <object>Contact</object>
         <recordTriggerType>Create</recordTriggerType>
