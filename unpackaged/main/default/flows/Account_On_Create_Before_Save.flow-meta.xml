@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Sets the Account Domain to the domain from the Website, returned by the formDomain formula.</description>
+        <name>Assign_Domain_from_Website</name>
+        <label>Assign Domain from Website</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Domain__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formDomain</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>Sets the Domain from the Website (everything after &quot;www.&quot;) when an Account is created with a Website and no Domain. A Domain entered manually on create is kept.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>The Website with surrounding spaces removed and any protocol (e.g. https://) stripped off the front.</description>
+        <name>formWebsiteNoProtocol</name>
+        <dataType>String</dataType>
+        <expression>IF(
+    CONTAINS(TRIM({!$Record.Website}), &quot;://&quot;),
+    MID(TRIM({!$Record.Website}), FIND(&quot;://&quot;, TRIM({!$Record.Website})) + 3, LEN(TRIM({!$Record.Website}))),
+    TRIM({!$Record.Website})
+)</expression>
+    </formulas>
+    <formulas>
+        <description>The Website without its protocol and with everything up to and including &quot;www.&quot; removed. Websites without &quot;www.&quot; are returned unchanged.</description>
+        <name>formWebsiteNoWww</name>
+        <dataType>String</dataType>
+        <expression>IF(
+    BEGINS(LOWER({!formWebsiteNoProtocol}), &quot;www.&quot;),
+    MID({!formWebsiteNoProtocol}, 5, LEN({!formWebsiteNoProtocol})),
+    {!formWebsiteNoProtocol}
+)</expression>
+    </formulas>
+    <formulas>
+        <description>The domain from the Website: everything after &quot;www.&quot;, in lower case, with any page path, query string or port (anything from the first / ? # or :) removed so it can be matched to a Lead&apos;s Email Domain.</description>
+        <name>formDomain</name>
+        <dataType>String</dataType>
+        <expression>LOWER(
+    LEFT(
+        {!formWebsiteNoWww},
+        MIN(
+            IF(CONTAINS({!formWebsiteNoWww}, &quot;/&quot;), FIND(&quot;/&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww})),
+            IF(CONTAINS({!formWebsiteNoWww}, &quot;?&quot;), FIND(&quot;?&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww})),
+            IF(CONTAINS({!formWebsiteNoWww}, &quot;#&quot;), FIND(&quot;#&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww})),
+            IF(CONTAINS({!formWebsiteNoWww}, &quot;:&quot;), FIND(&quot;:&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww}))
+        )
+    )
+)</expression>
+    </formulas>
+    <interviewLabel>Account - On Create - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Account - On Create - Before Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Assign_Domain_from_Website</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    NOT(ISBLANK({!$Record.Website})),
+    ISBLANK({!$Record.Domain__c})
+)</filterFormula>
+        <object>Account</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
