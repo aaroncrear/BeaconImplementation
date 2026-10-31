@@ -3,6 +3,23 @@
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
+        <description>Sets the Owner of the current Contact in the loop to the new Account Owner. Only reached when the Account Owner changed on this update.</description>
+        <name>Assign_Contact_Owner</name>
+        <label>Assign Contact Owner</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>Loop_Contacts.OwnerId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Assign_Contact_Values</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
         <description>Sets the compliance fields on the current Contact in the loop to match the triggering Account, then adds it to the Contacts to Update collection for a single bulk update.</description>
         <name>Assign_Contact_Values</name>
         <label>Assign Contact Values</label>
@@ -11,27 +28,37 @@
         <assignmentItems>
             <assignToReference>Loop_Contacts.Blacklisted__c</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Blacklisted__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Blacklisted__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Loop_Contacts.Blacklisted_Reason__c</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Blacklisted_Reason__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Blacklisted_Reason__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Loop_Contacts.DoNotCall</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Do_Not_Call__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Do_Not_Call__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Loop_Contacts.HasOptedOutOfEmail</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Email_Opt_Out__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Email_Opt_Out__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Contacts_to_Update</assignToReference>
             <operator>Add</operator>
-            <value><elementReference>Loop_Contacts</elementReference></value>
+            <value>
+                <elementReference>Loop_Contacts</elementReference>
+            </value>
         </assignmentItems>
         <connector>
             <isGoTo>true</isGoTo>
@@ -47,27 +74,37 @@
         <assignmentItems>
             <assignToReference>Loop_Leads.Blacklisted__c</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Blacklisted__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Blacklisted__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Loop_Leads.Blacklisted_Reason__c</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Blacklisted_Reason__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Blacklisted_Reason__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Loop_Leads.DoNotCall</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Do_Not_Call__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Do_Not_Call__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Loop_Leads.HasOptedOutOfEmail</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Email_Opt_Out__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Email_Opt_Out__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Leads_to_Update</assignToReference>
             <operator>Add</operator>
-            <value><elementReference>Loop_Leads</elementReference></value>
+            <value>
+                <elementReference>Loop_Leads</elementReference>
+            </value>
         </assignmentItems>
         <connector>
             <isGoTo>true</isGoTo>
@@ -83,27 +120,37 @@
         <assignmentItems>
             <assignToReference>Loop_Opportunities.Blacklisted__c</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Blacklisted__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Blacklisted__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Loop_Opportunities.Blacklisted_Reason__c</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Blacklisted_Reason__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Blacklisted_Reason__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Loop_Opportunities.Do_Not_Call__c</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Do_Not_Call__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Do_Not_Call__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Loop_Opportunities.Email_Opt_Out__c</assignToReference>
             <operator>Assign</operator>
-            <value><elementReference>$Record.Email_Opt_Out__c</elementReference></value>
+            <value>
+                <elementReference>$Record.Email_Opt_Out__c</elementReference>
+            </value>
         </assignmentItems>
         <assignmentItems>
             <assignToReference>Opportunities_to_Update</assignToReference>
             <operator>Add</operator>
-            <value><elementReference>Loop_Opportunities</elementReference></value>
+            <value>
+                <elementReference>Loop_Opportunities</elementReference>
+            </value>
         </assignmentItems>
         <connector>
             <isGoTo>true</isGoTo>
@@ -111,13 +158,57 @@
         </connector>
     </assignments>
     <decisions>
-        <description>Checks whether the Get Contacts element returned any related Contacts. When records were found the flow enters the Contact loop; otherwise it skips ahead to the Leads.</description>
+        <description>Checks whether any of the compliance fields changed on this update. The Leads and open Opportunities only hold the compliance fields, so when only the Account Owner changed the flow ends here and skips their updates.</description>
+        <name>Compliance_Fields_Changed</name>
+        <label>Compliance Fields Changed?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Compliance Fields Not Changed</defaultConnectorLabel>
+        <rules>
+            <name>Compliance_Fields_Are_Changed</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Blacklisted__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Blacklisted_Reason__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Do_Not_Call__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Email_Opt_Out__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Leads</targetReference>
+            </connector>
+            <label>Compliance Fields Are Changed</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks whether the Get Contacts element returned any related Contacts. When records were found the flow enters the Contact loop; otherwise it skips ahead to the Compliance Fields Changed check.</description>
         <name>Contacts_Found</name>
         <label>Contacts Found?</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <defaultConnector>
-            <targetReference>Get_Leads</targetReference>
+            <targetReference>Compliance_Fields_Changed</targetReference>
         </defaultConnector>
         <defaultConnectorLabel>No Contacts Found</defaultConnectorLabel>
         <rules>
@@ -126,12 +217,40 @@
             <conditions>
                 <leftValueReference>Get_Contacts</leftValueReference>
                 <operator>IsNull</operator>
-                <rightValue><booleanValue>false</booleanValue></rightValue>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
             </conditions>
             <connector>
                 <targetReference>Loop_Contacts</targetReference>
             </connector>
             <label>Contacts Exist</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks whether the Account Owner changed on this update. When it did, the current Contact&apos;s Owner is set to the new Account Owner before its compliance fields are set.</description>
+        <name>Owner_Changed</name>
+        <label>Owner Changed?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Assign_Contact_Values</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Owner Not Changed</defaultConnectorLabel>
+        <rules>
+            <name>Owner_Is_Changed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.OwnerId</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Contact_Owner</targetReference>
+            </connector>
+            <label>Owner Is Changed</label>
         </rules>
     </decisions>
     <decisions>
@@ -150,7 +269,9 @@
             <conditions>
                 <leftValueReference>Get_Leads</leftValueReference>
                 <operator>IsNull</operator>
-                <rightValue><booleanValue>false</booleanValue></rightValue>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
             </conditions>
             <connector>
                 <targetReference>Loop_Leads</targetReference>
@@ -171,7 +292,9 @@
             <conditions>
                 <leftValueReference>Get_Open_Opportunities</leftValueReference>
                 <operator>IsNull</operator>
-                <rightValue><booleanValue>false</booleanValue></rightValue>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
             </conditions>
             <connector>
                 <targetReference>Loop_Opportunities</targetReference>
@@ -179,12 +302,12 @@
             <label>Open Opportunities Exist</label>
         </rules>
     </decisions>
-    <description>When any of the compliance fields (Blacklisted, Blacklisted Reason, Do Not Call, Email Opt Out) is changed on an Account, this after-save flow copies the new values to the corresponding fields on all related Contacts, all related Leads (Account lookup), and all open Opportunities. After each Get Records a decision checks whether any records were found before looping, and each update routes its fault path to the reusable Fault Path Subflow, which emails an automation-failure notification.</description>
+    <description>When any of the compliance fields (Blacklisted, Blacklisted Reason, Do Not Call, Email Opt Out) is changed on an Account, this after-save flow copies the new values to the corresponding fields on all related Contacts, all related Leads (Account lookup), and all open Opportunities. After each Get Records a decision checks whether any records were found before looping, and each update routes its fault path to the reusable Fault Path Subflow, which emails an automation-failure notification. When the Account Owner is changed, it also sets the Owner of all related Contacts to the new Account Owner; if only the Owner changed, the Lead and Opportunity updates are skipped. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Account - On Update - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Account - On Update - After Save</label>
     <loops>
-        <description>Iterates over the related Contacts so each one's compliance fields can be set to match the Account.</description>
+        <description>Iterates over the related Contacts so each one&apos;s compliance fields, and Owner when the Account Owner changed, can be set to match the Account.</description>
         <name>Loop_Contacts</name>
         <label>Loop Contacts</label>
         <locationX>0</locationX>
@@ -192,14 +315,14 @@
         <collectionReference>Get_Contacts</collectionReference>
         <iterationOrder>Asc</iterationOrder>
         <nextValueConnector>
-            <targetReference>Assign_Contact_Values</targetReference>
+            <targetReference>Owner_Changed</targetReference>
         </nextValueConnector>
         <noMoreValuesConnector>
             <targetReference>Update_Contacts</targetReference>
         </noMoreValuesConnector>
     </loops>
     <loops>
-        <description>Iterates over the related Leads so each one's compliance fields can be set to match the Account.</description>
+        <description>Iterates over the related Leads so each one&apos;s compliance fields can be set to match the Account.</description>
         <name>Loop_Leads</name>
         <label>Loop Leads</label>
         <locationX>0</locationX>
@@ -214,7 +337,7 @@
         </noMoreValuesConnector>
     </loops>
     <loops>
-        <description>Iterates over the related open Opportunities so each one's compliance fields can be set to match the Account.</description>
+        <description>Iterates over the related open Opportunities so each one&apos;s compliance fields can be set to match the Account.</description>
         <name>Loop_Opportunities</name>
         <label>Loop Opportunities</label>
         <locationX>0</locationX>
@@ -230,19 +353,25 @@
     </loops>
     <processMetadataValues>
         <name>BuilderType</name>
-        <value><stringValue>LightningFlowBuilder</stringValue></value>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
     </processMetadataValues>
     <processMetadataValues>
         <name>CanvasMode</name>
-        <value><stringValue>AUTO_LAYOUT_CANVAS</stringValue></value>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
     </processMetadataValues>
     <processMetadataValues>
         <name>OriginBuilderType</name>
-        <value><stringValue>LightningFlowBuilder</stringValue></value>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
     <recordLookups>
-        <description>Retrieves all Contacts related to the triggering Account so their compliance fields can be synced.</description>
+        <description>Retrieves all Contacts related to the triggering Account so their compliance fields and Owner can be synced.</description>
         <name>Get_Contacts</name>
         <label>Get Contacts</label>
         <locationX>0</locationX>
@@ -255,7 +384,9 @@
         <filters>
             <field>AccountId</field>
             <operator>EqualTo</operator>
-            <value><elementReference>$Record.Id</elementReference></value>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
         </filters>
         <getFirstRecordOnly>false</getFirstRecordOnly>
         <object>Contact</object>
@@ -275,7 +406,9 @@
         <filters>
             <field>Account__c</field>
             <operator>EqualTo</operator>
-            <value><elementReference>$Record.Id</elementReference></value>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
         </filters>
         <getFirstRecordOnly>false</getFirstRecordOnly>
         <object>Lead</object>
@@ -295,26 +428,30 @@
         <filters>
             <field>AccountId</field>
             <operator>EqualTo</operator>
-            <value><elementReference>$Record.Id</elementReference></value>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
         </filters>
         <filters>
             <field>IsClosed</field>
             <operator>EqualTo</operator>
-            <value><booleanValue>false</booleanValue></value>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
         </filters>
         <getFirstRecordOnly>false</getFirstRecordOnly>
         <object>Opportunity</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordUpdates>
-        <description>Bulk-updates all related Contacts with the synced compliance field values.</description>
+        <description>Bulk-updates all related Contacts with the synced compliance field values and Owner.</description>
         <name>Update_Contacts</name>
         <label>Update Contacts</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
             <isGoTo>true</isGoTo>
-            <targetReference>Get_Leads</targetReference>
+            <targetReference>Compliance_Fields_Changed</targetReference>
         </connector>
         <faultConnector>
             <isGoTo>true</isGoTo>
@@ -355,27 +492,16 @@
         <connector>
             <targetReference>Get_Contacts</targetReference>
         </connector>
-        <filterLogic>1 OR 2 OR 3 OR 4</filterLogic>
-        <filters>
-            <field>Blacklisted__c</field>
-            <operator>IsChanged</operator>
-            <value><booleanValue>true</booleanValue></value>
-        </filters>
-        <filters>
-            <field>Blacklisted_Reason__c</field>
-            <operator>IsChanged</operator>
-            <value><booleanValue>true</booleanValue></value>
-        </filters>
-        <filters>
-            <field>Do_Not_Call__c</field>
-            <operator>IsChanged</operator>
-            <value><booleanValue>true</booleanValue></value>
-        </filters>
-        <filters>
-            <field>Email_Opt_Out__c</field>
-            <operator>IsChanged</operator>
-            <value><booleanValue>true</booleanValue></value>
-        </filters>
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    OR(
+        ISCHANGED({!$Record.Blacklisted__c}),
+        ISCHANGED({!$Record.Blacklisted_Reason__c}),
+        ISCHANGED({!$Record.Do_Not_Call__c}),
+        ISCHANGED({!$Record.Email_Opt_Out__c}),
+        ISCHANGED({!$Record.OwnerId})
+    )
+)</filterFormula>
         <object>Account</object>
         <recordTriggerType>Update</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
@@ -390,11 +516,13 @@
         <flowName>Fault_Path_Subflow</flowName>
         <inputAssignments>
             <name>varFaultMessage</name>
-            <value><elementReference>$Flow.FaultMessage</elementReference></value>
+            <value>
+                <elementReference>$Flow.FaultMessage</elementReference>
+            </value>
         </inputAssignments>
     </subflows>
     <variables>
-        <description>Collection of related Contacts to bulk-update with the synced compliance field values.</description>
+        <description>Collection of related Contacts to bulk-update with the synced compliance field values and Owner.</description>
         <name>Contacts_to_Update</name>
         <dataType>SObject</dataType>
         <isCollection>true</isCollection>
