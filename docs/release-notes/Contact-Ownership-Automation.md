@@ -17,7 +17,7 @@ Three existing record-triggered flows were updated. No new flows or fields were 
 
 This flow has to stay **after-save** because it updates other records (the related Contacts). Before-save flows can only change the record being saved.
 
-- **Entry criteria:** changed from field conditions to a formula so the On/Off Switch could be included, and `ISCHANGED(OwnerId)` was added. The flow now runs when `Run Flows` is on and any compliance field **or** the Owner changes:
+- **Entry criteria:** `ISCHANGED(OwnerId)` was added to the existing entry formula. The flow now runs when `Run Flows` is on and any compliance field **or** the Owner changes:
   `AND({!$Setup.On_Off_Switch__c.Run_Flows__c}, OR(ISCHANGED(Blacklisted__c), ISCHANGED(Blacklisted_Reason__c), ISCHANGED(Do_Not_Call__c), ISCHANGED(Email_Opt_Out__c), ISCHANGED(OwnerId)))`
 - **Contact loop:** a new decision, `Owner Changed?`, runs for each Contact. When the Account Owner changed, a new assignment, `Assign Contact Owner`, sets the Contact's `OwnerId` to the Account's new `OwnerId`. The Contact then goes through the existing `Assign Contact Values` assignment and is added to the same bulk `Update Contacts` element. The Owner is only set when the Account Owner changed, so a compliance-only change does not reset Contact Owners that were set by hand.
 - **New decision `Compliance Fields Changed?`:** placed after the Contacts are updated (or after no Contacts were found). Leads and open Opportunities only receive the compliance fields, so when only the Owner changed the flow ends here and skips the Lead and Opportunity queries and updates. When any compliance field changed, the flow continues to the Leads and Opportunities as before.
@@ -48,7 +48,7 @@ Salesforce's standard Change Owner action on Account only moves Contacts owned b
 
 ### Production sync
 
-`Contact - On Create - Before Save`, `Contact - On Update - Before Save` and `Account - On Update - Before Save` were retrieved from Production and committed to this branch before the changes above were made. The two Contact flows in the repo were behind Production: Production already had the On/Off Switch in their entry formulas and a sentence about it in their descriptions. The ownership changes were rebuilt on the Production versions, so nothing in Production is lost on deploy. `Account - On Update - Before Save` has no functional change; the retrieve only reordered its formulas.
+`Account - On Update - After Save`, `Contact - On Create - Before Save`, `Contact - On Update - Before Save` and `Account - On Update - Before Save` were retrieved from Production and committed to this branch before the changes above were made. The three flows changed in this build were behind Production in the repo: Production already had the On/Off Switch in their entry formulas (the Account flow's field conditions had been converted to a formula) and a sentence about it in their descriptions. The ownership changes were rebuilt on the Production versions, so nothing in Production is lost on deploy. `Account - On Update - Before Save` has no functional change; the retrieve only reordered its formulas.
 
 ### On/Off Switch
 
