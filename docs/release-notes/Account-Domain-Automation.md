@@ -8,6 +8,7 @@ The `Domain` field on Account (`Domain__c`) is matched against the `Email Domain
 - When the `Website` on an existing Account changes, set `Domain` again the same way.
 - Keep `Domain` as an editable text field set by automation, not a formula, so users can overwrite it manually.
 - Update the description of the `Domain` field to explain that it is set by automation.
+- When the `Country` on a Lead changes, try again to relate the Lead to an Account by matching its `Email Domain` and `Country`, as `Lead - On Create - After Save` does when a Lead is created.
 
 ## Release Notes
 
@@ -54,6 +55,21 @@ The description of `Account.Domain__c` was changed to:
 
 No change was made to the field's type, length, page layout placement or field-level security.
 
+### Lead - On Update - After Save (`Lead_On_Update_After_Save`)
+
+A Lead's `Country` is often blank or wrong when the Lead is created and corrected later, so the create flow's Domain + Country match may not have been possible at the time. This new after-save flow re-runs the match when `Country` changes. It is after-save, like the create flow, because it queries Accounts and updates the Lead's `Account__c` lookup.
+
+- **Runs when:** a Lead is updated, the On/Off Switch `Run Flows` setting is on, `Country` changed on this save, `Email Domain` is not blank and the Lead is not converted.
+- **Pass 1 – Domain + Country:** `Get Matching Account by Domain and Country` finds the first Account whose `Domain__c` equals the Lead's `Email_Domain__c` and whose `BillingCountry` equals the Lead's new `Country`. If one is found and it is not already the Lead's Account, `Update Lead Account` sets `Account__c` to it. This **replaces** an existing Account, because a Domain + Country match is the strongest match available and the Country has just changed.
+- **Pass 2 – Domain only:** if pass 1 finds no new match, `Lead Account Blank?` checks whether the Lead has an Account. Only if `Account__c` is blank, `Get Matching Account by Domain Only` finds the first Account with a matching `Domain__c`, ignoring Country, and `Relate Lead to Account` sets `Account__c` to it. A weaker domain-only match never replaces an Account that is already set, whether automation or a user set it.
+- If neither pass finds a match, `Account__c` is left as it is. The flow never clears it.
+- Both update elements route their fault path to the existing `Fault Path Subflow`, which emails the fault message.
+- The flow's own update to `Account__c` does not change `Country`, so it does not re-trigger itself.
+
+The element names, lookups and descriptions mirror `Lead - On Create - After Save`, with two differences: the `Lead Account Blank?` check before the fallback, and the domain-only decision checks the result of `Get Matching Account by Domain Only`.
+
+> **Note on the create flow:** in the existing `Lead - On Create - After Save` flow, the `Matching Domain Account Found?` decision checks `Get_Matching_Account_by_Domain_and_Country.Id` instead of `Get_Matching_Account_by_Domain_Only.Id`. That check is always false when it is reached, so the create flow's domain-only fallback never relates the Lead. The create flow was not changed in this build.
+
 ## Acceptance Criteria
 
 1. **Create with `www.`:** Create an Account with Website `www.acme-test.com` and Domain blank. Save. Confirm Domain is `acme-test.com`.
@@ -66,7 +82,19 @@ No change was made to the field's type, length, page layout placement or field-l
 8. **Other edits:** On the same Account, change a field other than Website (such as Phone). Save. Confirm Domain stays `override.com`.
 9. **Website cleared:** On the same Account, clear Website. Save. Confirm Domain is unchanged.
 10. **On/Off Switch:** Set `Run Flows` to unchecked on an On/Off Switch record for your user. Create an Account with Website `www.switch-test.com`. Confirm Domain is blank. Check `Run Flows` again afterwards.
-11. **Lead match:** Create an Account with Website `https://www.lead-match-test.com`. Confirm Domain is `lead-match-test.com`. Create a Lead with Email `jane@lead-match-test.com`. Confirm the Lead's Account field is set to that Account.
+11. **Lead match on create:** Create an Account with Website `https://www.lead-match-test.com`. Confirm Domain is `lead-match-test.com`. Create a Lead with Email `jane@lead-match-test.com`. Confirm the Lead's Account field is set to that Account.
+
+**Lead - On Update - After Save**
+
+Set up two Accounts first: Account A with Website `www.country-test.com` and Billing Country `United Kingdom`, and Account B with Website `www.country-test.com` and Billing Country `United States`. Confirm both have Domain `country-test.com`.
+
+12. **Country change matches Domain + Country:** Create a Lead with Email `sam@country-test.com` and Country `France`. Open the Lead and change Country to `United Kingdom`. Save. Confirm the Lead's Account is Account A.
+13. **Country change replaces the Account:** On the same Lead, change Country to `United States`. Save. Confirm the Lead's Account is now Account B.
+14. **No Domain + Country match keeps an existing Account:** On the same Lead, change Country to `Germany`. Save. Confirm the Lead's Account is still Account B.
+15. **Domain-only fallback:** Create a Lead with Email `alex@country-test.com` and no Country, then clear its Account field if it was set. Change Country to `Germany`. Save. Confirm the Lead's Account is set to Account A or Account B (the first domain match found).
+16. **Other edits:** On a Lead with an Account, change a field other than Country (such as Phone). Save. Confirm the Account does not change.
+17. **No match:** Create a Lead with Email `pat@no-account-domain.com`. Change its Country. Save. Confirm the Account stays blank and no error appears.
+18. **On/Off Switch:** Uncheck `Run Flows` on an On/Off Switch record for your user. Repeat test 12 with a new Lead. Confirm the Account is not set. Check `Run Flows` again afterwards.
 
 ## Post Deployment Items
 
@@ -80,4 +108,5 @@ Github Branch: [Account-Domain-Automation](https://github.com/aaroncrear/BeaconI
 |---|----------------|--------|----------|-------|-------------------------|--------------|
 | 1 | Flow | Account | Account_On_Create_Before_Save | Account - On Create - Before Save | Created | Before-save flow that sets Domain from the Website when an Account is created with a Website and no Domain. |
 | 2 | Flow | Account | Account_On_Update_Before_Save | Account - On Update - Before Save | Created | Before-save flow that sets Domain from the Website when the Website changes to a non-blank value. |
-| 3 | Custom Field | Account | Domain__c | Domain | Updated | Description updated to explain that the field is set by automation from the Website and can be overwritten manually. |
+| 3 | Flow | Lead | Lead_On_Update_After_Save | Lead - On Update - After Save | Created | After-save flow that re-matches a Lead to an Account by Email Domain and Country when the Lead's Country changes, with a domain-only fallback when the Lead has no Account. |
+| 4 | Custom Field | Account | Domain__c | Domain | Updated | Description updated to explain that the field is set by automation from the Website and can be overwritten manually. |
