@@ -2,7 +2,70 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <description>Sets the Seniority Level based on the Title when a Contact is created with a Title.</description>
+    <assignments>
+        <description>Sets the Contact Owner to the Owner of the Contact's Account.</description>
+        <name>Assign_Contact_Owner</name>
+        <label>Assign Contact Owner</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.OwnerId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Account.OwnerId</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Checks whether the Contact is created with an Account. When it is, the Contact Owner is set to the Account Owner.</description>
+        <name>Account_Populated</name>
+        <label>Account Populated?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No Account</defaultConnectorLabel>
+        <rules>
+            <name>Account_Is_Populated</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.AccountId</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Contact_Owner</targetReference>
+            </connector>
+            <label>Account Is Populated</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks whether the Contact is created with a Title. When it is, the Seniority Level is set from the Title.</description>
+        <name>Title_Populated</name>
+        <label>Title Populated?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Account_Populated</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No Title</defaultConnectorLabel>
+        <rules>
+            <name>Title_Is_Populated</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Title</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Seniority_Level</targetReference>
+            </connector>
+            <label>Title Is Populated</label>
+        </rules>
+    </decisions>
+    <description>Sets the Seniority Level based on the Title when a Contact is created with a Title. Sets the Contact Owner to the Account Owner when a Contact is created with an Account.</description>
     <environments>Default</environments>
     <formulas>
         <description>Returns the Seniority Level picklist API name based on the Title. Checks the Title against the Seniority Ranking keywords in order; the first keyword the Title contains sets the level. Scores 0-1 and Titles with no matching keyword return blank, which clears the field.</description>
@@ -142,6 +205,9 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
         <label>Update Seniority Level</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
+        <connector>
+            <targetReference>Account_Populated</targetReference>
+        </connector>
         <inputAssignments>
             <field>TitleType</field>
             <value>
@@ -154,16 +220,12 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Update_Seniority_Level</targetReference>
+            <targetReference>Title_Populated</targetReference>
         </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Title</field>
-            <operator>IsNull</operator>
-            <value>
-                <booleanValue>false</booleanValue>
-            </value>
-        </filters>
+        <filterFormula>OR(
+    NOT(ISBLANK({!$Record.Title})),
+    NOT(ISBLANK({!$Record.AccountId}))
+)</filterFormula>
         <object>Contact</object>
         <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordBeforeSave</triggerType>
