@@ -19,22 +19,6 @@
     <description>Sets the Domain from the Website (everything after &quot;www.&quot;) when the Website changes to a new, non-blank value. Edits to the Domain alone are not overwritten, so the Domain can be set manually.</description>
     <environments>Default</environments>
     <formulas>
-        <description>The domain from the Website: everything after &quot;www.&quot;, in lower case, with any page path, query string or port (anything from the first / ? # or :) removed so it can be matched to a Lead&apos;s Email Domain.</description>
-        <name>formDomain</name>
-        <dataType>String</dataType>
-        <expression>LOWER(
-    LEFT(
-        {!formWebsiteNoWww},
-        MIN(
-            IF(CONTAINS({!formWebsiteNoWww}, &quot;/&quot;), FIND(&quot;/&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww})),
-            IF(CONTAINS({!formWebsiteNoWww}, &quot;?&quot;), FIND(&quot;?&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww})),
-            IF(CONTAINS({!formWebsiteNoWww}, &quot;#&quot;), FIND(&quot;#&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww})),
-            IF(CONTAINS({!formWebsiteNoWww}, &quot;:&quot;), FIND(&quot;:&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww}))
-        )
-    )
-)</expression>
-    </formulas>
-    <formulas>
         <description>The Website with surrounding spaces removed and any protocol (e.g. https://) stripped off the front.</description>
         <name>formWebsiteNoProtocol</name>
         <dataType>String</dataType>
@@ -52,6 +36,22 @@
     BEGINS(LOWER({!formWebsiteNoProtocol}), &quot;www.&quot;),
     MID({!formWebsiteNoProtocol}, 5, LEN({!formWebsiteNoProtocol})),
     {!formWebsiteNoProtocol}
+)</expression>
+    </formulas>
+    <formulas>
+        <description>The domain from the Website: everything after &quot;www.&quot;, in lower case, with any page path, query string or port (anything from the first / ? # or :) removed so it can be matched to a Lead&apos;s Email Domain.</description>
+        <name>formDomain</name>
+        <dataType>String</dataType>
+        <expression>LOWER(
+    LEFT(
+        {!formWebsiteNoWww},
+        MIN(
+            IF(CONTAINS({!formWebsiteNoWww}, &quot;/&quot;), FIND(&quot;/&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww})),
+            IF(CONTAINS({!formWebsiteNoWww}, &quot;?&quot;), FIND(&quot;?&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww})),
+            IF(CONTAINS({!formWebsiteNoWww}, &quot;#&quot;), FIND(&quot;#&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww})),
+            IF(CONTAINS({!formWebsiteNoWww}, &quot;:&quot;), FIND(&quot;:&quot;, {!formWebsiteNoWww}) - 1, LEN({!formWebsiteNoWww}))
+        )
+    )
 )</expression>
     </formulas>
     <interviewLabel>Account - On Update - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
@@ -81,6 +81,7 @@
         <connector>
             <targetReference>Assign_Domain_from_Website</targetReference>
         </connector>
+        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
     ISCHANGED({!$Record.Website}),
