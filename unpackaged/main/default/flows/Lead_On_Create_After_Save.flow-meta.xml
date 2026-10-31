@@ -29,7 +29,7 @@
         </rules>
     </decisions>
     <decisions>
-        <description>Checks whether the Get Matching Account lookup found an Account record, so the Account field is only updated when a matching Account is found.</description>
+        <description>Checks whether the Get Matching Account by Domain Only lookup found an Account record, so the Account field is only updated when a matching Account is found.</description>
         <name>Matching_Domain_Account_Found</name>
         <label>Matching Domain Account Found?</label>
         <locationX>0</locationX>
@@ -39,7 +39,7 @@
             <name>Domain_Matching_Account_Found</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Get_Matching_Account_by_Domain_and_Country.Id</leftValueReference>
+                <leftValueReference>Get_Matching_Account_by_Domain_Only.Id</leftValueReference>
                 <operator>IsNull</operator>
                 <rightValue>
                     <booleanValue>false</booleanValue>
@@ -171,6 +171,7 @@
         <connector>
             <targetReference>Get_Matching_Account_by_Domain_and_Country</targetReference>
         </connector>
+        <filterFormula>{!$Setup.On_Off_Switch__c.Run_Flows__c}</filterFormula>
         <object>Lead</object>
         <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
