@@ -3,20 +3,6 @@
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
-        <description>Sets the Contact Owner to the Owner of the Contact's Account.</description>
-        <name>Assign_Contact_Owner</name>
-        <label>Assign Contact Owner</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>$Record.OwnerId</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>$Record.Account.OwnerId</elementReference>
-            </value>
-        </assignmentItems>
-    </assignments>
-    <assignments>
         <description>Sets the Contact Seniority Level field to the value returned by the formSeniorityLevel formula.</description>
         <name>Assign_Seniority_Level</name>
         <label>Assign Seniority Level</label>
@@ -29,9 +15,6 @@
                 <elementReference>formSeniorityLevel</elementReference>
             </value>
         </assignmentItems>
-        <connector>
-            <targetReference>Account_Changed</targetReference>
-        </connector>
     </assignments>
     <assignments>
         <description>Sets the Contact Status to Do Not Engage.</description>
@@ -50,36 +33,6 @@
             <targetReference>Title_Changed</targetReference>
         </connector>
     </assignments>
-    <decisions>
-        <description>Checks whether the Account on the Contact changed to a new, non-blank Account on this update. When it did, the Contact Owner is set to the new Account&apos;s Owner.</description>
-        <name>Account_Changed</name>
-        <label>Account Changed?</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <defaultConnectorLabel>Account Not Changed</defaultConnectorLabel>
-        <rules>
-            <name>Account_Is_Changed</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>$Record.AccountId</leftValueReference>
-                <operator>IsChanged</operator>
-                <rightValue>
-                    <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record.AccountId</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Assign_Contact_Owner</targetReference>
-            </connector>
-            <label>Account Is Changed</label>
-        </rules>
-    </decisions>
     <decisions>
         <description>Checks whether the record was just marked Blacklisted, or Do Not Call and Email Opt Out, on this update. Only then is the Status set to Do Not Engage, matching the flow&apos;s original entry criteria.</description>
         <name>Do_Not_Engage_Criteria_Met</name>
@@ -112,9 +65,6 @@
         <label>Title Changed?</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>Account_Changed</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Title Not Changed</defaultConnectorLabel>
         <rules>
             <name>Title_Is_Changed</name>
@@ -132,7 +82,7 @@
             <label>Title Is Changed</label>
         </rules>
     </decisions>
-    <description>Sets the Status to Do Not Engage if the record is Blacklisted or DNC and Email Opt Out. Sets the Seniority Level based on the Title when the Title changes. Sets the Contact Owner to the Account Owner when the Account on the Contact changes.</description>
+    <description>Sets the Status to Do Not Engage if the record is Blacklisted or DNC and Email Opt Out. Sets the Seniority Level based on the Title when the Title changes. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <formulas>
         <description>True when the record is now Blacklisted, or Do Not Call and Email Opt Out, and was not before this update.</description>
@@ -281,7 +231,6 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
         <connector>
             <targetReference>Do_Not_Engage_Criteria_Met</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
     OR(
@@ -289,11 +238,7 @@ CONTAINS({!$Record.Title},&quot;Owner&quot;)
             OR({!$Record.Blacklisted__c}, AND({!$Record.DoNotCall}, {!$Record.HasOptedOutOfEmail})),
             NOT(OR(PRIORVALUE({!$Record.Blacklisted__c}), AND(PRIORVALUE({!$Record.DoNotCall}), PRIORVALUE({!$Record.HasOptedOutOfEmail}))))
         ),
-        ISCHANGED({!$Record.Title}),
-        AND(
-            ISCHANGED({!$Record.AccountId}),
-            NOT(ISBLANK({!$Record.AccountId}))
-        )
+        ISCHANGED({!$Record.Title})
     )
 )</filterFormula>
         <object>Contact</object>
