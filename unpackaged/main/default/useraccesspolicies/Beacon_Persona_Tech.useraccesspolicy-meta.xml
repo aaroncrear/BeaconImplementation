@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UserAccessPolicy xmlns="http://soap.sforce.com/2006/04/metadata">
     <booleanFilter>1</booleanFilter>
-    <description>Persona = Tech: grants the Beacon - Baseline permission set group and the Beacon_Tech_Object_Tab_FLS permission set, and revokes the other nine Beacon persona Object, Tab, FLS permission sets so access follows Persona changes.</description>
+    <description>Persona = Tech: grants the Beacon - Baseline permission set group, the Beacon_Tech_Object_Tab_FLS permission set and the Beacon_Tech_Integrations permission set group, and revokes the other nine Beacon persona Object, Tab, FLS permission sets and the other nine Beacon persona Integrations permission set groups so access follows Persona changes.</description>
     <masterLabel>Beacon Persona - Tech</masterLabel>
     <order>10</order>
     <status>Design</status>
@@ -15,6 +15,11 @@
         <action>Grant</action>
         <target>Beacon_Tech_Object_Tab_FLS</target>
         <type>PermissionSet</type>
+    </userAccessPolicyActions>
+    <userAccessPolicyActions>
+        <action>Grant</action>
+        <target>Beacon_Tech_Integrations</target>
+        <type>PermissionSetGroup</type>
     </userAccessPolicyActions>
     <userAccessPolicyActions>
         <action>Revoke</action>
@@ -60,6 +65,51 @@
         <action>Revoke</action>
         <target>Beacon_Salesforce_Admin_Object_Tab_FLS</target>
         <type>PermissionSet</type>
+    </userAccessPolicyActions>
+    <userAccessPolicyActions>
+        <action>Revoke</action>
+        <target>Beacon_Consulting_Integrations</target>
+        <type>PermissionSetGroup</type>
+    </userAccessPolicyActions>
+    <userAccessPolicyActions>
+        <action>Revoke</action>
+        <target>Beacon_Customer_Success_Integrations</target>
+        <type>PermissionSetGroup</type>
+    </userAccessPolicyActions>
+    <userAccessPolicyActions>
+        <action>Revoke</action>
+        <target>Beacon_Executive_Integrations</target>
+        <type>PermissionSetGroup</type>
+    </userAccessPolicyActions>
+    <userAccessPolicyActions>
+        <action>Revoke</action>
+        <target>Beacon_Finance_Integrations</target>
+        <type>PermissionSetGroup</type>
+    </userAccessPolicyActions>
+    <userAccessPolicyActions>
+        <action>Revoke</action>
+        <target>Beacon_Marketing_Integrations</target>
+        <type>PermissionSetGroup</type>
+    </userAccessPolicyActions>
+    <userAccessPolicyActions>
+        <action>Revoke</action>
+        <target>Beacon_Product_Integrations</target>
+        <type>PermissionSetGroup</type>
+    </userAccessPolicyActions>
+    <userAccessPolicyActions>
+        <action>Revoke</action>
+        <target>Beacon_ResOps_Integrations</target>
+        <type>PermissionSetGroup</type>
+    </userAccessPolicyActions>
+    <userAccessPolicyActions>
+        <action>Revoke</action>
+        <target>Beacon_Sales_Integrations</target>
+        <type>PermissionSetGroup</type>
+    </userAccessPolicyActions>
+    <userAccessPolicyActions>
+        <action>Revoke</action>
+        <target>Beacon_Salesforce_Admin_Integrations</target>
+        <type>PermissionSetGroup</type>
     </userAccessPolicyActions>
     <userAccessPolicyFilters>
         <columnName>Persona__c</columnName>
