@@ -74,9 +74,16 @@ Aaron):
 `Opportunity_On_Update_After_Save` already created the Contract Cleanup ResOps Request Case
 when a Subscription New Opportunity moved to Contract. That part is unchanged. The changes are:
 
-- **Entry criteria** (formula) widened. It still requires Run Flows on the On/Off Switch, record
-  type **Subscription New** and a Stage change. The Stage must now be **Contract**, *or*
-  **Closed Won** with Closed Won Automation Complete unchecked.
+- **Entry criteria** (formula) widened. It still requires Run Flows on the On/Off Switch and
+  record type **Subscription New**. The Stage must now be **Contract**, *or* **Closed Won** with
+  Closed Won Automation Complete unchecked.
+- **"Only when a record is updated to meet the condition requirements"** is now on. Salesforce
+  requires it for a flow with a Run Asynchronously path, and it can't be combined with
+  `ISCHANGED`, so `ISCHANGED(StageName)` was removed from the formula. The flow still only
+  runs when the record *moves into* the criteria, for example the Stage changing to Contract or
+  Closed Won. Editing other fields on an Opportunity that's already at Contract or Closed Won
+  doesn't re-trigger it. One new behaviour: **unchecking Closed Won Automation Complete on a
+  Closed Won Opportunity re-runs the automation**.
 - **Run immediately path:** unchanged. The `Opportunity Stage` decision sends Contract to the
   ResOps Case steps. Closed Won falls through to "Other Stage" and does nothing here.
 - **New Run Asynchronously path:** the `Closed Won Automation Needed?` decision checks Stage =
@@ -137,7 +144,9 @@ Asset Order Event** (`CreateAssetOrderEvent`). It only runs on the final event f
 2. Finds the Assets created from the Order: Order Products → Asset Action Sources
    (`ReferenceEntityItemId`) → Asset Actions → Asset Ids. Asset has no direct link to its Order,
    so this is the reliable path.
-3. Calls the native **Create Renewal Quote** flow once with all of the Asset Ids. Renewal dates
+3. Calls the native **Create Renewal Quote** flow once with all of the Asset Ids. It's called as
+   a **flow Action**, not a Subflow element, because platform event-triggered flows can't
+   contain Subflow elements. Renewal dates
    are left to the action's defaults (the term after the current one). This creates the renewal
    Opportunity and renewal Quote.
 4. Sets up the renewal Opportunity:
@@ -155,9 +164,8 @@ Asset Order Event** (`CreateAssetOrderEvent`). It only runs on the final event f
 
 If Create Renewal Quote reports a failure (`isSuccess` false), or any other step faults, the error
 is written to Closed Won Automation Error on the original Opportunity and sent through the Fault
-Path Subflow. Salesforce doesn't allow a fault path on a subflow element. If Create Renewal Quote
-throws an unhandled error instead of returning `isSuccess` false, the interview fails with the
-standard flow error email.
+Path Subflow. The Create Renewal Quote action has its own fault path, so an unhandled error in
+it is handled the same way.
 
 ### Asset - On Create or Update - After Save (new flow)
 
@@ -261,19 +269,21 @@ existing Assets.
     Automation Complete is unchecked, and the fault email arrives.
 12. **Re-run:** on that Opportunity, set the Quote to Accepted. Move the Opportunity off Closed
     Won and back. Confirm the automation completes and the error is cleared.
+13. **No re-trigger on other edits:** on a completed Closed Won Opportunity, edit another field
+    (e.g. Next Step). Confirm nothing new is created.
 
 **Scope checks**
 
-13. Close Won a **Subscription Renewal** Opportunity. Confirm the automation doesn't run.
-14. Raise an Asset's Current Quantity from 1 to 3 (as an admin, in a sandbox). Confirm exactly
+14. Close Won a **Subscription Renewal** Opportunity. Confirm the automation doesn't run.
+15. Raise an Asset's Current Quantity from 1 to 3 (as an admin, in a sandbox). Confirm exactly
     two more Beacon Subscriptions. Lower it and confirm none are deleted.
-15. Confirm no Beacon Subscription is created on a Platform Bundle Asset.
-16. Uncheck Run Flows, Close Won a test Opportunity, and confirm nothing runs. Re-check Run Flows
+16. Confirm no Beacon Subscription is created on a Platform Bundle Asset.
+17. Uncheck Run Flows, Close Won a test Opportunity, and confirm nothing runs. Re-check Run Flows
     afterwards.
 
 **Access**
 
-17. As a Beacon Salesforce Admin, confirm the four new Opportunity fields can be edited. As a
+18. As a Beacon Salesforce Admin, confirm the four new Opportunity fields can be edited. As a
     persona user (e.g. Beacon Sales), confirm they're visible and read-only.
 
 ## Post Deployment Items
@@ -293,9 +303,10 @@ existing Assets.
    permissions.
 5. **Create Contract override:** `Beacon - Create Contract From Quote` overrides the managed
    Create Contract From Quote flow. Confirm this is wanted before deploying it to UAT and Prod.
-6. **Re-running a failed deal:** fix the cause shown in Closed Won Automation Error. Make sure
-   Closed Won Automation Complete is unchecked, then move the Opportunity off Closed Won and
-   back. If the renewal step failed (the Contract and Order are done), raise it with the admin
+6. **Re-running a failed deal:** fix the cause shown in Closed Won Automation Error, then move
+   the Opportunity off Closed Won and back. Alternatively, an admin can check and then uncheck
+   Closed Won Automation Complete; unchecking it on a Closed Won Opportunity re-runs the
+   automation. Existing Contracts and Orders are reused, so nothing is duplicated. If the renewal step failed (the Contract and Order are done), raise it with the admin
    team: it needs Renewal Opportunity blank and a new Create Asset Order Event, or a manual
    Renew from the Assets.
 7. **Review `Order - Create Assets`:** see the note above about its Test element.
