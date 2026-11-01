@@ -39,9 +39,11 @@ Quote Accepted → Opportunity Stage = Contract → Opportunity Stage = Closed W
                  └─ Order - Create Assets (existing, async) → Assets created
                       ├─ Asset - On Create or Update - After Save → Beacon Subscriptions
                       └─ Create Asset Order Event (native platform event)
-                           └─ Order - Assets Created - Create Renewal
-                                └─ Create Renewal Quote (native) → renewal Opportunity + Quote
-                                     → set up renewal Opportunity, link both Opportunities
+                           └─ Create Asset Order Event - Mark Order Assets Created
+                                └─ Order.Assets_Created__c = true
+                                     └─ Order - Assets Created - Create Renewal (async path)
+                                          └─ Create Renewal Quote (native) → renewal Opp + Quote
+                                               → set up renewal Opp, link both Opportunities
 ```
 
 ### What changed from the original design
@@ -53,9 +55,15 @@ Aaron):
    (`quotingAI__createRenewalQuote`) takes **Asset Ids**. It has no Opportunity input, and it
    creates its **own** "Renewal Opportunity" along with the "Renewal Quote". So it can't be
    called on a renewal Opportunity we create from the Contract, and it can't run until the
-   Assets exist. The Contract side now ends at Activate Contract. The renewal runs off the
+   Assets exist. The Contract side now ends at Activate Contract. The renewal is started by the
    native **Create Asset Order Event**, which Revenue Cloud publishes once an Order's Assets have
    been created.
+5. **The renewal is handed from the event to an Order flow.** Salesforce doesn't allow a
+   platform event-triggered flow to call another flow, either as a Subflow element or as a flow
+   Action (both were rejected at validation). The event flow therefore only checks a new
+   **Assets Created** box on the Order. A record-triggered flow on Order does the renewal work,
+   because record-triggered flows can call `createRenewalQuote` and the Fault Path Subflow as
+   subflows.
 2. **Seat count is `Asset.CurrentQuantity`, not `Asset.Quantity`.** On Revenue Cloud assets,
    `Quantity` is blank. The seat count lives on the Asset State Period and is rolled up to
    `CurrentQuantity` just after the Asset is inserted. The Asset flow therefore runs on create
@@ -131,24 +139,36 @@ the standard `Fault Path Subflow` email. Steps that already succeeded are not ro
 Because the Contract and Order are reused when they already exist, an admin can fix the cause,
 re-run the automation, and it carries on where it stopped (see Post Deployment Items).
 
+### Create Asset Order Event - Mark Order Assets Created (new flow)
+
+`Create_Asset_Order_Event_Mark_Order_Assets_Created` is a platform-event-triggered flow on the
+native **Create Asset Order Event** (`CreateAssetOrderEvent`). It only runs on the final event
+for an Order (`IsLastEvent` = true), and only when Run Flows is checked. It checks **Assets
+Created** on the Order named in the event (`OrderIdentifier`) if it isn't already checked.
+Nothing else happens here. The flow only listens to the event, so Revenue Cloud and any other
+subscribers still receive it as normal.
+
 ### Order - Assets Created - Create Renewal (new flow)
 
-`Order_Assets_Created_Create_Renewal` is a platform-event-triggered flow on the native **Create
-Asset Order Event** (`CreateAssetOrderEvent`). It only runs on the final event for an Order
-(`IsLastEvent` = true), and only when Run Flows is checked. It then:
+`Order_Assets_Created_Create_Renewal` is a record-triggered after-save flow on Order update. It
+runs on the **Run Asynchronously** path when all of these are true:
 
-1. Gets the Order (`OrderIdentifier`), its Quote and the Quote's Opportunity. It only continues
-   when that Opportunity is **Subscription New**, Closed Won Automation Complete is checked, and
-   **Renewal Opportunity is blank**. This means each deal gets one renewal, and Orders from
-   renewal or amendment quotes and manual Orders are skipped.
+- Run Flows is checked
+- Assets Created is checked (it only runs when the box *becomes* checked)
+- the Order has a Quote
+
+It then:
+
+1. Gets the Order's Quote and the Quote's Opportunity. It only continues when that Opportunity
+   is **Subscription New**, Closed Won Automation Complete is checked, and **Renewal
+   Opportunity is blank**. This means each deal gets one renewal, and Orders from renewal or
+   amendment quotes and manual Orders are skipped.
 2. Finds the Assets created from the Order: Order Products → Asset Action Sources
    (`ReferenceEntityItemId`) → Asset Actions → Asset Ids. Asset has no direct link to its Order,
    so this is the reliable path.
-3. Calls the native **Create Renewal Quote** flow once with all of the Asset Ids. It's called as
-   a **flow Action**, not a Subflow element, because platform event-triggered flows can't
-   contain Subflow elements. The Fault Path Subflow is called the same way in this flow. Renewal dates
-   are left to the action's defaults (the term after the current one). This creates the renewal
-   Opportunity and renewal Quote.
+3. Calls the native **Create Renewal Quote** flow (as a subflow) once with all of the Asset Ids.
+   Renewal dates are left to the flow's defaults (the term after the current one). This creates
+   the renewal Opportunity and renewal Quote.
 4. Sets up the renewal Opportunity:
 
    | Field | Value |
@@ -164,8 +184,9 @@ Asset Order Event** (`CreateAssetOrderEvent`). It only runs on the final event f
 
 If Create Renewal Quote reports a failure (`isSuccess` false), or any other step faults, the error
 is written to Closed Won Automation Error on the original Opportunity and sent through the Fault
-Path Subflow. The Create Renewal Quote action has its own fault path, so an unhandled error in
-it is handled the same way.
+Path Subflow. Salesforce doesn't allow a fault path on a Subflow element. If Create Renewal Quote
+throws an unhandled error instead of returning `isSuccess` false, the interview fails with the
+standard flow error email.
 
 ### Asset - On Create or Update - After Save (new flow)
 
@@ -241,6 +262,8 @@ existing Assets.
    both products and the Contract filled in.
 5. On the Account, confirm one Asset per product with Lifecycle Start/End Dates and Current
    Quantity 1.
+   Then open the Order and confirm **Assets Created** is checked. If it isn't, the Create Asset
+   Order Event wasn't received as the final event, and no renewal will be created.
 6. On each Asset, confirm one Beacon Subscription with Account and Asset filled in, Contact blank,
    Start Date = the Asset's Lifecycle Start Date and End Date = its Current Lifecycle End Date.
 7. Back on the original Opportunity, confirm **Renewal Opportunity** is filled in. Open it and
@@ -288,8 +311,8 @@ existing Assets.
 
 ## Post Deployment Items
 
-1. **Deploy order:** deploy the four Opportunity fields and permission sets first, then the
-   flows. The flows reference the new fields. `Closed_Won_Revenue_Automation` must be deployed
+1. **Deploy order:** deploy the four Opportunity fields, the Order **Assets Created** field and
+   the permission sets first, then the flows. The flows reference the new fields. `Closed_Won_Revenue_Automation` must be deployed
    before (or with) `Opportunity_On_Update_After_Save`.
 2. **Merging with `ResOps-automation`:** both branches change
    `Opportunity_On_Update_After_Save`. If `ResOps-automation` merges first, this branch's copy
@@ -307,7 +330,7 @@ existing Assets.
    the Opportunity off Closed Won and back. Alternatively, an admin can check and then uncheck
    Closed Won Automation Complete; unchecking it on a Closed Won Opportunity re-runs the
    automation. Existing Contracts and Orders are reused, so nothing is duplicated. If the renewal step failed (the Contract and Order are done), raise it with the admin
-   team: it needs Renewal Opportunity blank and a new Create Asset Order Event, or a manual
+   team: with Renewal Opportunity blank, uncheck and re-check **Assets Created** on the Order, or do a manual
    Renew from the Assets.
 7. **Review `Order - Create Assets`:** see the note above about its Test element.
 8. **Existing deals:** Assets and Opportunities from before this build don't get subscriptions or
@@ -322,20 +345,22 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Renewal-A
 |---|----------------|--------|----------|-------|-------------------------|--------------|
 | 1 | Flow | Opportunity | Opportunity_On_Update_After_Save | Opportunity - On Update - After Save | Updated | Entry criteria widened to Contract or Closed Won (automation not complete). Added a Run Asynchronously path that calls Closed Won Revenue Automation for Closed Won. ResOps Contract Cleanup Case path unchanged. |
 | 2 | Flow | Opportunity | Closed_Won_Revenue_Automation | Closed Won Revenue Automation | Created | Autolaunched subflow. Creates (or reuses) and activates the Contract (native createContract, net unit prices) and Order (native createOrdersFromQuote) from the Accepted Quote, then marks the Opportunity complete. Errors go to the Opportunity and the fault email. |
-| 3 | Flow | CreateAssetOrderEvent | Order_Assets_Created_Create_Renewal | Order - Assets Created - Create Renewal | Created | Platform-event flow. After an Order's Assets are created, calls native Create Renewal Quote with the Order's Assets, sets up the renewal Opportunity and links it to the original. |
-| 4 | Flow | Asset | Asset_On_Create_Or_Update_After_Save | Asset - On Create or Update - After Save | Created | Record-triggered flow. Creates one Beacon Subscription per missing seat (Current Quantity minus existing) with Asset, Account, Start and End Date. Excludes Platform Bundle Assets. |
-| 5 | Flow | Quote | Beacon_Create_Contract_From_Quote | Beacon - Create Contract From Quote | Created | Unmanaged clone of rev_contracts__CreateCntrFromQuote (screen flow, overrides it). Added by Aaron so the createContract action could be read. Not called by the automation. |
-| 6 | Field | Opportunity | Closed_Won_Automation_Complete__c | Closed Won Automation Complete | Created | Checkbox. Set once the Contract and Order are created and activated. Prevents duplicate runs. |
-| 7 | Field | Opportunity | Closed_Won_Automation_Error__c | Closed Won Automation Error | Created | Long Text Area. Error from the last failed run. |
-| 8 | Field | Opportunity | Renewal_Opportunity__c | Renewal Opportunity | Created | Lookup(Opportunity), Set Null. On the original Opportunity, its renewal Opportunity. |
-| 9 | Field | Opportunity | Previous_Opportunity__c | Previous Opportunity | Created | Lookup(Opportunity), Set Null. On a renewal Opportunity, the Opportunity it renews. |
-| 10 | Permission Set | Opportunity | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
-| 11 | Permission Set | Opportunity | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
-| 12 | Permission Set | Opportunity | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
-| 13 | Permission Set | Opportunity | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
-| 14 | Permission Set | Opportunity | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
-| 15 | Permission Set | Opportunity | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
-| 16 | Permission Set | Opportunity | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
-| 17 | Permission Set | Opportunity | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
-| 18 | Permission Set | Opportunity | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Read + Edit FLS on the four new Opportunity fields. |
-| 19 | Permission Set | Opportunity | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
+| 3 | Flow | CreateAssetOrderEvent | Create_Asset_Order_Event_Mark_Order_Assets_Created | Create Asset Order Event - Mark Order Assets Created | Created | Platform-event flow. On the final Create Asset Order Event for an Order, checks Assets Created on the Order. |
+| 4 | Flow | Order | Order_Assets_Created_Create_Renewal | Order - Assets Created - Create Renewal | Created | Record-triggered flow (async path). When Assets Created becomes checked, calls native Create Renewal Quote with the Order's Assets, sets up the renewal Opportunity and links it to the original. |
+| 5 | Field | Order | Assets_Created__c | Assets Created | Created | Checkbox. Checked when Revenue Cloud has created the Order's Assets. Hands off from the platform event flow to the renewal flow. |
+| 6 | Flow | Asset | Asset_On_Create_Or_Update_After_Save | Asset - On Create or Update - After Save | Created | Record-triggered flow. Creates one Beacon Subscription per missing seat (Current Quantity minus existing) with Asset, Account, Start and End Date. Excludes Platform Bundle Assets. |
+| 7 | Flow | Quote | Beacon_Create_Contract_From_Quote | Beacon - Create Contract From Quote | Created | Unmanaged clone of rev_contracts__CreateCntrFromQuote (screen flow, overrides it). Added by Aaron so the createContract action could be read. Not called by the automation. |
+| 8 | Field | Opportunity | Closed_Won_Automation_Complete__c | Closed Won Automation Complete | Created | Checkbox. Set once the Contract and Order are created and activated. Prevents duplicate runs. |
+| 9 | Field | Opportunity | Closed_Won_Automation_Error__c | Closed Won Automation Error | Created | Long Text Area. Error from the last failed run. |
+| 10 | Field | Opportunity | Renewal_Opportunity__c | Renewal Opportunity | Created | Lookup(Opportunity), Set Null. On the original Opportunity, its renewal Opportunity. |
+| 11 | Field | Opportunity | Previous_Opportunity__c | Previous Opportunity | Created | Lookup(Opportunity), Set Null. On a renewal Opportunity, the Opportunity it renews. |
+| 12 | Permission Set | Opportunity | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
+| 13 | Permission Set | Opportunity | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
+| 14 | Permission Set | Opportunity | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
+| 15 | Permission Set | Opportunity | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
+| 16 | Permission Set | Opportunity | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
+| 17 | Permission Set | Opportunity | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
+| 18 | Permission Set | Opportunity | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
+| 19 | Permission Set | Opportunity | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
+| 20 | Permission Set | Opportunity | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Read + Edit FLS on the four new Opportunity fields. |
+| 21 | Permission Set | Opportunity | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |

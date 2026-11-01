@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Assets_Created__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Checked automatically by Create Asset Order Event - Mark Order Assets Created when Revenue Cloud reports that the Order&apos;s Assets have been created (final Create Asset Order Event). Checking it starts Order - Assets Created - Create Renewal. Platform event-triggered flows can&apos;t call subflows, so this field hands off from the event to a record-triggered flow.</description>
+    <inlineHelpText>Checked automatically once Revenue Cloud has created this Order&apos;s Assets.</inlineHelpText>
+    <label>Assets Created</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>
