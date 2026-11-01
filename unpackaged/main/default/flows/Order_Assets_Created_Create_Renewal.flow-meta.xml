@@ -42,6 +42,24 @@
             <name>renewalQuoteId</name>
         </outputParameters>
     </actionCalls>
+    <actionCalls>
+        <description>Sends the fault email through the Fault Path Subflow. Called as a flow action because platform event-triggered flows can&apos;t contain Subflow elements.</description>
+        <name>Fault_Path_Subflow</name>
+        <label>Fault Path Subflow</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>Fault_Path_Subflow</actionName>
+        <actionType>flow</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>varFaultMessage</name>
+            <value>
+                <elementReference>varErrorMessage</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>Fault_Path_Subflow</nameSegment>
+        <offset>0</offset>
+    </actionCalls>
     <apiVersion>68.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
@@ -717,20 +735,6 @@
         <triggerType>PlatformEvent</triggerType>
     </start>
     <status>Active</status>
-    <subflows>
-        <description>Used to send email notification</description>
-        <name>Fault_Path_Subflow</name>
-        <label>Fault Path Subflow</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <flowName>Fault_Path_Subflow</flowName>
-        <inputAssignments>
-            <name>varFaultMessage</name>
-            <value>
-                <elementReference>varErrorMessage</elementReference>
-            </value>
-        </inputAssignments>
-    </subflows>
     <variables>
         <description>Ids of the Asset Actions linked to the Order&apos;s products.</description>
         <name>varAssetActionIds</name>

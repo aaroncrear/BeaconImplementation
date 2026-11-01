@@ -146,7 +146,7 @@ Asset Order Event** (`CreateAssetOrderEvent`). It only runs on the final event f
    so this is the reliable path.
 3. Calls the native **Create Renewal Quote** flow once with all of the Asset Ids. It's called as
    a **flow Action**, not a Subflow element, because platform event-triggered flows can't
-   contain Subflow elements. Renewal dates
+   contain Subflow elements. The Fault Path Subflow is called the same way in this flow. Renewal dates
    are left to the action's defaults (the term after the current one). This creates the renewal
    Opportunity and renewal Quote.
 4. Sets up the renewal Opportunity:
