@@ -210,7 +210,7 @@
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
     NOT( ISBLANK( {!$Record.AccountId} ) ),
     NOT( ISBLANK( {!$Record.Product2Id} ) ),
-    NOT( ISPICKVAL( {!$Record.ProductFamily}, &quot;Platform Bundle&quot; ) ),
+    NOT( ISPICKVAL( {!$Record.Product2.Family}, &quot;Platform Bundle&quot; ) ),
     {!$Record.CurrentQuantity} &gt;= 1,
     OR(
         ISNEW(),

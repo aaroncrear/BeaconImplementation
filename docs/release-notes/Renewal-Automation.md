@@ -153,8 +153,11 @@ Asset Order Event** (`CreateAssetOrderEvent`). It only runs on the final event f
 
 5. Sets **Renewal Opportunity** on the original Opportunity.
 
-If Create Renewal Quote fails, or any step faults, the error is written to Closed Won Automation
-Error on the original Opportunity and sent through the Fault Path Subflow.
+If Create Renewal Quote reports a failure (`isSuccess` false), or any other step faults, the error
+is written to Closed Won Automation Error on the original Opportunity and sent through the Fault
+Path Subflow. Salesforce doesn't allow a fault path on a subflow element. If Create Renewal Quote
+throws an unhandled error instead of returning `isSuccess` false, the interview fails with the
+standard flow error email.
 
 ### Asset - On Create or Update - After Save (new flow)
 
@@ -163,7 +166,7 @@ create and update when all of these are true:
 
 - Run Flows is checked
 - the Asset has an Account and a Product
-- the Product Family is not **Platform Bundle** (subscriptions are created on the module Assets)
+- the Asset's Product's Family is not **Platform Bundle** (subscriptions are created on the module Assets)
 - Current Quantity is 1 or more
 - the Asset is new, or Current Quantity has changed
 

@@ -676,7 +676,7 @@
     </start>
     <status>Active</status>
     <subflows>
-        <description>Native Revenue Cloud Create Renewal Quote flow. Creates the renewal Opportunity and renewal Quote for the Assets. Renewal dates are left to the action&apos;s defaults (the term after the Assets&apos; current term).</description>
+        <description>Native Revenue Cloud Create Renewal Quote flow. Creates the renewal Opportunity and renewal Quote for the Assets. Renewal dates are left to the action&apos;s defaults (the term after the Assets&apos; current term). Subflow elements can&apos;t have a fault path; Create Renewal Quote catches its own errors and returns them in isSuccess / errorMessage, which Renewal Created? checks.</description>
         <name>Create_Renewal_Quote</name>
         <label>Create Renewal Quote</label>
         <locationX>0</locationX>
@@ -684,9 +684,6 @@
         <connector>
             <targetReference>Renewal_Created</targetReference>
         </connector>
-        <faultConnector>
-            <targetReference>Handle_Fault</targetReference>
-        </faultConnector>
         <flowName>quotingAI__createRenewalQuote</flowName>
         <inputAssignments>
             <name>assetIds</name>
