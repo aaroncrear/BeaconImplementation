@@ -142,8 +142,10 @@ re-run the automation, and it carries on where it stopped (see Post Deployment I
 ### Create Asset Order Event - Mark Order Assets Created (new flow)
 
 `Create_Asset_Order_Event_Mark_Order_Assets_Created` is a platform-event-triggered flow on the
-native **Create Asset Order Event** (`CreateAssetOrderEvent`). It only runs on the final event
-for an Order (`IsLastEvent` = true), and only when Run Flows is checked. It checks **Assets
+native **Create Asset Order Event** (`CreateAssetOrderEvent`). Its first decision only lets
+through the final event for an Order (`IsLastEvent` = true), and only when Run Flows is checked.
+This check is a decision because platform event-triggered flows can't filter in the Start
+element. It then checks **Assets
 Created** on the Order named in the event (`OrderIdentifier`) if it isn't already checked.
 Nothing else happens here. The flow only listens to the event, so Revenue Cloud and any other
 subscribers still receive it as normal.

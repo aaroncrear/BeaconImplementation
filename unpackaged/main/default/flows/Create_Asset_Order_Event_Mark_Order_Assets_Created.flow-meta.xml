@@ -3,14 +3,14 @@
     <apiVersion>68.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
-        <description>Continues only when Run Flows is checked on the On/Off Switch custom setting.</description>
+        <description>Continues only when Run Flows is checked on the On/Off Switch custom setting and this is the final event for the Order (Final Event). Platform event-triggered flows can&apos;t filter in the Start element, so the check is here.</description>
         <name>Run_Flows</name>
-        <label>Run Flows?</label>
+        <label>Run Flows and Final Event?</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnectorLabel>Flows Off</defaultConnectorLabel>
+        <defaultConnectorLabel>Skip</defaultConnectorLabel>
         <rules>
-            <name>Flows_On</name>
+            <name>Flows_On_And_Final_Event</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
                 <leftValueReference>$Setup.On_Off_Switch__c.Run_Flows__c</leftValueReference>
@@ -19,10 +19,17 @@
                     <booleanValue>true</booleanValue>
                 </rightValue>
             </conditions>
+            <conditions>
+                <leftValueReference>$Record.IsLastEvent</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
             <connector>
                 <targetReference>Mark_Order_Assets_Created</targetReference>
             </connector>
-            <label>Flows On</label>
+            <label>Flows On and Final Event</label>
         </rules>
     </decisions>
     <description>Runs when Revenue Cloud publishes the final Create Asset Order Event for an Order, meaning its Assets have been created after Order activation. Checks Assets Created on the Order, which starts Order - Assets Created - Create Renewal. The renewal work isn&apos;t done here because platform event-triggered flows can&apos;t call subflows or flow actions. Only listens to the event; it doesn&apos;t change it, so other subscribers still receive it. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
@@ -83,14 +90,6 @@
         <connector>
             <targetReference>Run_Flows</targetReference>
         </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>IsLastEvent</field>
-            <operator>EqualTo</operator>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </filters>
         <object>CreateAssetOrderEvent</object>
         <triggerType>PlatformEvent</triggerType>
     </start>
