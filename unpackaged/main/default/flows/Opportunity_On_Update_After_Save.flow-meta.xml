@@ -82,6 +82,36 @@
         </connector>
     </assignments>
     <decisions>
+        <description>Async path: continues only when the Opportunity was moved to Closed Won and the Closed Won automation hasn&apos;t already completed for it.</description>
+        <name>Closed_Won_Automation_Needed</name>
+        <label>Closed Won Automation Needed?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Not Needed</defaultConnectorLabel>
+        <rules>
+            <name>Run_Closed_Won_Automation</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Closed Won</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Closed_Won_Automation_Complete__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Closed_Won_Revenue_Automation</targetReference>
+            </connector>
+            <label>Run Closed Won Automation</label>
+        </rules>
+    </decisions>
+    <decisions>
         <description>Checks that the Opportunity has a Primary Module and the Campaign Parent Campaign record type was found before looking up the Parent Campaign. Without both, the lookup could match the wrong Campaign, so the Case is created without setting the Owner.</description>
         <name>Can_Look_Up_Parent_Campaign</name>
         <label>Can Look Up Parent Campaign?</label>
@@ -212,7 +242,7 @@
             <label>Record Type Found</label>
         </rules>
     </decisions>
-    <description>When a Subscription New Opportunity&apos;s Stage is changed to Contract, creates a Contract Cleanup ResOps Request Case linked to the Opportunity, its Account and the Contact on its primary Contact Role. The Case is owned by the ResOps Primary on the Parent Campaign whose Primary Module matches the Opportunity&apos;s Primary Module. If no such Campaign is found, the Case is owned by the user who updated the Opportunity. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>Runs when a Subscription New Opportunity&apos;s Stage is changed. Contract (run immediately): creates a Contract Cleanup ResOps Request Case linked to the Opportunity, its Account and the Contact on its primary Contact Role. The Case is owned by the ResOps Primary on the Parent Campaign whose Primary Module matches the Opportunity&apos;s Primary Module. If no such Campaign is found, the Case is owned by the user who updated the Opportunity. Closed Won (run asynchronously): when Closed Won Automation Complete is unchecked, calls the Closed Won Revenue Automation subflow, which creates and activates the Contract and Order from the Accepted Quote. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Opportunity - On Update - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Opportunity - On Update - After Save</label>
@@ -394,13 +424,39 @@
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
     {!$Record.RecordType.DeveloperName} = &quot;Subscription_New&quot;,
     ISCHANGED({!$Record.StageName}),
-    ISPICKVAL({!$Record.StageName}, &quot;Contract&quot;)
+    OR(
+        ISPICKVAL({!$Record.StageName}, &quot;Contract&quot;),
+        AND(
+            ISPICKVAL({!$Record.StageName}, &quot;Closed Won&quot;),
+            NOT({!$Record.Closed_Won_Automation_Complete__c})
+        )
+    )
 )</filterFormula>
         <object>Opportunity</object>
         <recordTriggerType>Update</recordTriggerType>
+        <scheduledPaths>
+            <connector>
+                <targetReference>Closed_Won_Automation_Needed</targetReference>
+            </connector>
+            <pathType>AsyncAfterCommit</pathType>
+        </scheduledPaths>
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>
+    <subflows>
+        <description>Creates and activates the Contract and the Order from the Opportunity&apos;s Accepted Quote. Handles its own errors (writes them to Closed Won Automation Error and sends the fault email).</description>
+        <name>Closed_Won_Revenue_Automation</name>
+        <label>Closed Won Revenue Automation</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>Closed_Won_Revenue_Automation</flowName>
+        <inputAssignments>
+            <name>opportunityId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
     <subflows>
         <description>Used to send email notification</description>
         <name>Fault_Path_Subflow</name>

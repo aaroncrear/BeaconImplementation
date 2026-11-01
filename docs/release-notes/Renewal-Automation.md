@@ -31,7 +31,7 @@ renewal or amendment, and running the automation for Subscription Renewal Opport
 
 ```
 Quote Accepted → Opportunity Stage = Contract → Opportunity Stage = Closed Won
-  └─ Opportunity - Closed Won - After Save (async path)
+  └─ Opportunity - On Update - After Save (Run Asynchronously path)
        └─ Closed Won Revenue Automation (subflow)
             ├─ Create Contract (native createContract) → Activate Contract
             ├─ Create Order (native createOrdersFromQuote) → Activate Order
@@ -62,27 +62,36 @@ Aaron):
    **or update** when Current Quantity is set or changes.
 3. **Quote status is "Accepted".** The approved status on Quote in HTCDEV is `Accepted`.
    `Approved` isn't a value.
-4. **Separate Closed Won trigger flow.** The existing `Opportunity - On Update - After Save`
-   (ResOps Contract Cleanup Case) is being finished on the `ResOps-automation` branch. The
-   Closed Won trigger is its own flow so the two branches don't overwrite each other. They can
-   be merged into one flow later if preferred.
+4. **Closed Won trigger lives in the existing Opportunity update flow.** It was first built as a
+   separate flow (`Opportunity - Closed Won - After Save`) while `Opportunity - On Update - After
+   Save` was being finished on the `ResOps-automation` branch. Once Aaron pushed the finished
+   flow here, the Closed Won trigger was folded into it as a Run Asynchronously path, and the
+   separate flow was removed. It was never deployed to an org. This keeps one after-save update
+   flow per object, in line with the rest of the org.
 
-### Opportunity - Closed Won - After Save (new flow)
+### Opportunity - On Update - After Save (updated flow)
 
-`Opportunity_Closed_Won_After_Save` is a thin record-triggered flow on Opportunity update. It
-runs when all of these are true:
+`Opportunity_On_Update_After_Save` already created the Contract Cleanup ResOps Request Case
+when a Subscription New Opportunity moved to Contract. That part is unchanged. The changes are:
 
-- Run Flows is checked on the On/Off Switch
-- the record type is **Subscription New**
-- the Stage has just changed to **Closed Won**
-- Closed Won Automation Complete is unchecked
+- **Entry criteria** (formula) widened. It still requires Run Flows on the On/Off Switch, record
+  type **Subscription New** and a Stage change. The Stage must now be **Contract**, *or*
+  **Closed Won** with Closed Won Automation Complete unchecked.
+- **Run immediately path:** unchanged. The `Opportunity Stage` decision sends Contract to the
+  ResOps Case steps. Closed Won falls through to "Other Stage" and does nothing here.
+- **New Run Asynchronously path:** the `Closed Won Automation Needed?` decision checks Stage =
+  Closed Won and Closed Won Automation Complete unchecked. It then calls the **Closed Won
+  Revenue Automation** subflow with the Opportunity Id. Running it asynchronously means the
+  Stage change saves straight away for the user, and the Revenue Cloud actions run in their own
+  transaction afterwards.
 
-It calls the subflow on the **Run Asynchronously** path. The Stage change saves straight away for
-the user, and the Revenue Cloud actions run in their own transaction afterwards.
+The same file is on the `ResOps-automation` branch. This branch's copy already includes the
+finished ResOps version, so whichever branch merges second must keep the Closed Won path (see
+Post Deployment Items).
 
 ### Closed Won Revenue Automation (new subflow)
 
-`Closed_Won_Revenue_Automation` is an autolaunched subflow.
+`Closed_Won_Revenue_Automation` is an autolaunched subflow, called from `Opportunity - On Update - After Save`.
 
 - **Input:** `opportunityId`.
 - **Outputs:** `contractId`, `orderId`, `isSuccess`, `errorMessage`.
@@ -268,22 +277,26 @@ existing Assets.
 
 1. **Deploy order:** deploy the four Opportunity fields and permission sets first, then the
    flows. The flows reference the new fields. `Closed_Won_Revenue_Automation` must be deployed
-   before (or with) `Opportunity_Closed_Won_After_Save`.
-2. **Page layouts:** add Closed Won Automation Complete, Closed Won Automation Error, Renewal
+   before (or with) `Opportunity_On_Update_After_Save`.
+2. **Merging with `ResOps-automation`:** both branches change
+   `Opportunity_On_Update_After_Save`. If `ResOps-automation` merges first, this branch's copy
+   (ResOps steps + Closed Won path) is the one to keep. If this branch merges first, don't let
+   the ResOps branch overwrite the Closed Won path.
+3. **Page layouts:** add Closed Won Automation Complete, Closed Won Automation Error, Renewal
    Opportunity and Previous Opportunity to the Opportunity layouts or the Beacon Opportunity
    Record Page. Add the **Renewal Opportunities** related list too.
-3. **Gearset comparison:** when deploying the permission sets, include the Opportunity object
+4. **Gearset comparison:** when deploying the permission sets, include the Opportunity object
    (at least the four new fields) in the comparison. Otherwise Gearset strips the new field
    permissions.
-4. **Create Contract override:** `Beacon - Create Contract From Quote` overrides the managed
+5. **Create Contract override:** `Beacon - Create Contract From Quote` overrides the managed
    Create Contract From Quote flow. Confirm this is wanted before deploying it to UAT and Prod.
-5. **Re-running a failed deal:** fix the cause shown in Closed Won Automation Error. Make sure
+6. **Re-running a failed deal:** fix the cause shown in Closed Won Automation Error. Make sure
    Closed Won Automation Complete is unchecked, then move the Opportunity off Closed Won and
    back. If the renewal step failed (the Contract and Order are done), raise it with the admin
    team: it needs Renewal Opportunity blank and a new Create Asset Order Event, or a manual
    Renew from the Assets.
-6. **Review `Order - Create Assets`:** see the note above about its Test element.
-7. **Existing deals:** Assets and Opportunities from before this build don't get subscriptions or
+7. **Review `Order - Create Assets`:** see the note above about its Test element.
+8. **Existing deals:** Assets and Opportunities from before this build don't get subscriptions or
    renewals automatically. Data load subscriptions where needed, and renew existing Assets
    manually.
 
@@ -293,7 +306,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Renewal-A
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Flow | Opportunity | Opportunity_Closed_Won_After_Save | Opportunity - Closed Won - After Save | Created | Record-triggered (update) flow. When a Subscription New Opportunity moves to Closed Won and the automation hasn't completed, calls Closed Won Revenue Automation on the async path. |
+| 1 | Flow | Opportunity | Opportunity_On_Update_After_Save | Opportunity - On Update - After Save | Updated | Entry criteria widened to Contract or Closed Won (automation not complete). Added a Run Asynchronously path that calls Closed Won Revenue Automation for Closed Won. ResOps Contract Cleanup Case path unchanged. |
 | 2 | Flow | Opportunity | Closed_Won_Revenue_Automation | Closed Won Revenue Automation | Created | Autolaunched subflow. Creates (or reuses) and activates the Contract (native createContract, net unit prices) and Order (native createOrdersFromQuote) from the Accepted Quote, then marks the Opportunity complete. Errors go to the Opportunity and the fault email. |
 | 3 | Flow | CreateAssetOrderEvent | Order_Assets_Created_Create_Renewal | Order - Assets Created - Create Renewal | Created | Platform-event flow. After an Order's Assets are created, calls native Create Renewal Quote with the Order's Assets, sets up the renewal Opportunity and links it to the original. |
 | 4 | Flow | Asset | Asset_On_Create_Or_Update_After_Save | Asset - On Create or Update - After Save | Created | Record-triggered flow. Creates one Beacon Subscription per missing seat (Current Quantity minus existing) with Asset, Account, Start and End Date. Excludes Platform Bundle Assets. |
