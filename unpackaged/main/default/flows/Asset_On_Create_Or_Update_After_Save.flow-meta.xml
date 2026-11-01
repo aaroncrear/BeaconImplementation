@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Counts the Beacon Subscriptions already linked to this Asset, so only the missing seats are created and the flow never creates duplicates if it runs again.</description>
+        <name>Count_Existing_Subscriptions</name>
+        <label>Count Existing Subscriptions</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varExistingSubscriptionCount</assignToReference>
+            <operator>AssignCount</operator>
+            <value>
+                <elementReference>Get_Existing_Subscriptions</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Seats_To_Create</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Builds one Beacon Subscription for the next seat (Asset, Account, Start Date and End Date), adds it to the collection to be created, and adds one to the seat counter. Contact is left blank and filled in later. Active and Status are formulas and are not set.</description>
+        <name>Add_Subscription_To_Collection</name>
+        <label>Add Subscription to Collection</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varSubscription.Asset__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSubscription.Account__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSubscription.Start_Date__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formStartDate</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSubscription.End_Date__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formEndDate</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSubscriptionsToCreate</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>varSubscription</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSeatCounter</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <numberValue>1.0</numberValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>More_Seats_To_Add</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>Checks whether the Asset has more seats (Current Quantity, rounded down) than it has Beacon Subscriptions. If not, there is nothing to create.</description>
+        <name>Seats_To_Create</name>
+        <label>Seats to Create?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>None</defaultConnectorLabel>
+        <rules>
+            <name>Has_Seats_To_Create</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formSeatsToCreate</leftValueReference>
+                <operator>GreaterThan</operator>
+                <rightValue>
+                    <numberValue>0.0</numberValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Add_Subscription_To_Collection</targetReference>
+            </connector>
+            <label>Has Seats to Create</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Loops back to add another Beacon Subscription until one has been added for every missing seat, then creates them all in one step.</description>
+        <name>More_Seats_To_Add</name>
+        <label>More Seats to Add?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>All Seats Added</defaultConnectorLabel>
+        <defaultConnector>
+            <targetReference>Create_Beacon_Subscriptions</targetReference>
+        </defaultConnector>
+        <rules>
+            <name>More_Seats</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varSeatCounter</leftValueReference>
+                <operator>LessThan</operator>
+                <rightValue>
+                    <elementReference>formSeatsToCreate</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <isGoTo>true</isGoTo>
+                <targetReference>Add_Subscription_To_Collection</targetReference>
+            </connector>
+            <label>More Seats</label>
+        </rules>
+    </decisions>
+    <description>Creates one Beacon Subscription per seat when an Asset is created by Order activation (Revenue Cloud assetization). Runs when the Asset&apos;s Current Quantity is set or changes to 1 or more, the Asset has an Account and a Product, and it is not the Platform Bundle parent. Revenue Cloud leaves Asset Quantity blank and sets Current Quantity from the Asset State Period just after the Asset is created, so Current Quantity is used as the seat count. Creates only the seats that don&apos;t already have a Beacon Subscription (Current Quantity, rounded down, minus existing subscriptions), so it never creates duplicates. Start Date and End Date come from the Asset&apos;s Lifecycle Start Date and Current Lifecycle End Date (falling back to Lifecycle End Date). Contact is left blank. Does not remove subscriptions when the quantity goes down. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>The number of Beacon Subscriptions still to create: Current Quantity rounded down, minus the subscriptions the Asset already has.</description>
+        <name>formSeatsToCreate</name>
+        <dataType>Number</dataType>
+        <expression>FLOOR( BLANKVALUE( {!$Record.CurrentQuantity}, 0 ) ) - {!varExistingSubscriptionCount}</expression>
+        <scale>0</scale>
+    </formulas>
+    <formulas>
+        <description>Subscription Start Date: the date part of the Asset&apos;s Lifecycle Start Date.</description>
+        <name>formStartDate</name>
+        <dataType>Date</dataType>
+        <expression>DATEVALUE( {!$Record.LifecycleStartDate} )</expression>
+    </formulas>
+    <formulas>
+        <description>Subscription End Date: the date part of the Asset&apos;s Current Lifecycle End Date (the end of the current term). Falls back to Lifecycle End Date when Current Lifecycle End Date is blank.</description>
+        <name>formEndDate</name>
+        <dataType>Date</dataType>
+        <expression>DATEVALUE( BLANKVALUE( {!$Record.CurrentLifecycleEndDate}, {!$Record.LifecycleEndDate} ) )</expression>
+    </formulas>
+    <interviewLabel>Asset - On Create or Update - After Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Asset - On Create or Update - After Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <description>Creates all of the new Beacon Subscriptions for this Asset in one step.</description>
+        <name>Create_Beacon_Subscriptions</name>
+        <label>Create Beacon Subscriptions</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <inputReference>varSubscriptionsToCreate</inputReference>
+    </recordCreates>
+    <recordLookups>
+        <description>Gets the Beacon Subscriptions already linked to this Asset.</description>
+        <name>Get_Existing_Subscriptions</name>
+        <label>Get Existing Subscriptions</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Count_Existing_Subscriptions</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Asset__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>Beacon_Subscription__c</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Existing_Subscriptions</targetReference>
+        </connector>
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    NOT( ISBLANK( {!$Record.AccountId} ) ),
+    NOT( ISBLANK( {!$Record.Product2Id} ) ),
+    NOT( ISPICKVAL( {!$Record.ProductFamily}, &quot;Platform Bundle&quot; ) ),
+    {!$Record.CurrentQuantity} &gt;= 1,
+    OR(
+        ISNEW(),
+        ISCHANGED( {!$Record.CurrentQuantity} )
+    )
+)</filterFormula>
+        <object>Asset</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <subflows>
+        <description>Used to send email notification</description>
+        <name>Fault_Path_Subflow</name>
+        <label>Fault Path Subflow</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>Fault_Path_Subflow</flowName>
+        <inputAssignments>
+            <name>varFaultMessage</name>
+            <value>
+                <elementReference>$Flow.FaultMessage</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <variables>
+        <description>Number of Beacon Subscriptions already linked to the Asset.</description>
+        <name>varExistingSubscriptionCount</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+        <value>
+            <numberValue>0.0</numberValue>
+        </value>
+    </variables>
+    <variables>
+        <description>Counts how many Beacon Subscriptions have been added to the collection so far.</description>
+        <name>varSeatCounter</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+        <value>
+            <numberValue>0.0</numberValue>
+        </value>
+    </variables>
+    <variables>
+        <description>Holds one Beacon Subscription while it is built, before it is added to the collection.</description>
+        <name>varSubscription</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Beacon_Subscription__c</objectType>
+    </variables>
+    <variables>
+        <description>The Beacon Subscriptions to create, one per missing seat.</description>
+        <name>varSubscriptionsToCreate</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Beacon_Subscription__c</objectType>
+    </variables>
+</Flow>
