@@ -424,7 +424,6 @@
         <filterFormula>AND(
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
     {!$Record.RecordType.DeveloperName} = &quot;Subscription_New&quot;,
-    ISCHANGED({!$Record.StageName}),
     OR(
         ISPICKVAL({!$Record.StageName}, &quot;Contract&quot;),
         AND(

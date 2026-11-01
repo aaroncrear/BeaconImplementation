@@ -1,5 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Calls the native Revenue Cloud Create Renewal Quote flow (quotingAI__createRenewalQuote) as a flow action, because platform event-triggered flows can&apos;t contain Subflow elements. Creates the renewal Opportunity and renewal Quote for the Assets. Renewal dates are left to the flow&apos;s defaults (the term after the Assets&apos; current term).</description>
+        <name>Create_Renewal_Quote</name>
+        <label>Create Renewal Quote</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>quotingAI__createRenewalQuote</actionName>
+        <actionType>flow</actionType>
+        <connector>
+            <targetReference>Renewal_Created</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Handle_Fault</targetReference>
+        </faultConnector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>assetIds</name>
+            <value>
+                <elementReference>varAssetIds</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>revenueRecommendation</name>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </inputParameters>
+        <nameSegment>quotingAI__createRenewalQuote</nameSegment>
+        <offset>0</offset>
+        <outputParameters>
+            <assignToReference>varErrorMessage</assignToReference>
+            <name>errorMessage</name>
+        </outputParameters>
+        <outputParameters>
+            <assignToReference>varRenewalSuccess</assignToReference>
+            <name>isSuccess</name>
+        </outputParameters>
+        <outputParameters>
+            <assignToReference>varRenewalQuoteId</assignToReference>
+            <name>renewalQuoteId</name>
+        </outputParameters>
+    </actionCalls>
     <apiVersion>68.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
@@ -189,7 +231,7 @@
             <label>Flows On</label>
         </rules>
     </decisions>
-    <description>Runs when Revenue Cloud publishes the final Create Asset Order Event for an Order, meaning its Assets have been created after Order activation. If the Order came from a Subscription New Opportunity that the Closed Won Revenue Automation completed, and that Opportunity has no Renewal Opportunity yet, the flow finds the Assets created from the Order&apos;s products (Order Product &gt; Asset Action Source &gt; Asset Action &gt; Asset). It then calls the native Create Renewal Quote flow once with all of them, which creates the renewal Opportunity and renewal Quote. The new Opportunity is set to the Subscription Renewal record type, renamed &quot;&lt;original name&gt; - Renewal&quot;, given Type Existing Business, the original Owner and the Contract, and linked both ways (Previous Opportunity on the renewal, Renewal Opportunity on the original). Errors are written to Closed Won Automation Error on the original Opportunity and sent through the Fault Path Subflow. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>Runs when Revenue Cloud publishes the final Create Asset Order Event for an Order, meaning its Assets have been created after Order activation. If the Order came from a Subscription New Opportunity that the Closed Won Revenue Automation completed, and that Opportunity has no Renewal Opportunity yet, the flow finds the Assets created from the Order&apos;s products (Order Product &gt; Asset Action Source &gt; Asset Action &gt; Asset). It then calls the native Create Renewal Quote flow (as a flow action) once with all of them, which creates the renewal Opportunity and renewal Quote. The new Opportunity is set to the Subscription Renewal record type, renamed &quot;&lt;original name&gt; - Renewal&quot;, given Type Existing Business, the original Owner and the Contract, and linked both ways (Previous Opportunity on the renewal, Renewal Opportunity on the original). Errors are written to Closed Won Automation Error on the original Opportunity and sent through the Fault Path Subflow. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <formulas>
         <description>The renewal Opportunity name: the original Opportunity name followed by &quot; - Renewal&quot;, cut to the 120-character limit.</description>
@@ -675,41 +717,6 @@
         <triggerType>PlatformEvent</triggerType>
     </start>
     <status>Active</status>
-    <subflows>
-        <description>Native Revenue Cloud Create Renewal Quote flow. Creates the renewal Opportunity and renewal Quote for the Assets. Renewal dates are left to the action&apos;s defaults (the term after the Assets&apos; current term). Subflow elements can&apos;t have a fault path; Create Renewal Quote catches its own errors and returns them in isSuccess / errorMessage, which Renewal Created? checks.</description>
-        <name>Create_Renewal_Quote</name>
-        <label>Create Renewal Quote</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <connector>
-            <targetReference>Renewal_Created</targetReference>
-        </connector>
-        <flowName>quotingAI__createRenewalQuote</flowName>
-        <inputAssignments>
-            <name>assetIds</name>
-            <value>
-                <elementReference>varAssetIds</elementReference>
-            </value>
-        </inputAssignments>
-        <inputAssignments>
-            <name>revenueRecommendation</name>
-            <value>
-                <booleanValue>false</booleanValue>
-            </value>
-        </inputAssignments>
-        <outputAssignments>
-            <assignToReference>varErrorMessage</assignToReference>
-            <name>errorMessage</name>
-        </outputAssignments>
-        <outputAssignments>
-            <assignToReference>varRenewalSuccess</assignToReference>
-            <name>isSuccess</name>
-        </outputAssignments>
-        <outputAssignments>
-            <assignToReference>varRenewalQuoteId</assignToReference>
-            <name>renewalQuoteId</name>
-        </outputAssignments>
-    </subflows>
     <subflows>
         <description>Used to send email notification</description>
         <name>Fault_Path_Subflow</name>
