@@ -364,10 +364,13 @@ be renewed.
    Subscription** entries were created in HTCDEV. There's one for every product that had an
    active entry with no selling model in each price book (Standard: the 5 bundles; <50 Heads,
    51-200 Heads, Contract Orgs (>200 Heads) and PE-VC: all 22 products; >200 Heads: the 17
-   modules). Each copies the price of the existing entry. The old entries with no selling model
-   were **left active**: deactivate them once you've confirmed the tiered pricing doesn't depend
-   on them, so reps can't pick a term-less entry. Repeat this in **UAT and Prod** before testing
-   there (or re-run the pricing sync with Annual Subscription entries).
+   modules). Each copies the price of the existing entry. The 110 matching entries with no
+   selling model were then **deactivated** (not deleted, so existing quote lines keep their
+   link), so reps can't pick a term-less entry. The 17 Standard Price Book module entries with no
+   selling model are still active, because they already had Annual Subscription twins and
+   weren't part of this change. After the change, **re-run the pricing sync** so Revenue Cloud
+   prices from the Annual Subscription entries, and use a new quote: existing quote lines stay on
+   the old entries. Repeat all of this in **UAT and Prod** before testing there.
 
 ## Component Manifest
 
