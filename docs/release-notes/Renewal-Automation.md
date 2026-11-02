@@ -77,8 +77,9 @@ Aaron):
    "Contract *or* Closed Won" condition, moving from Contract to Closed Won doesn't count as
    newly meeting the criteria, so the automation never ran (seen on the "Hat-Trick Consulting-
    Test" Opportunity, 2 Nov 2026). The trigger is back in its own flow with a Closed Won-only
-   condition, and `Opportunity - On Update - After Save` is not part of this branch. It stays
-   on the `ResOps-automation` branch, unchanged by this build.
+   condition. `Opportunity - On Update - After Save` is on this branch only as the unchanged
+   `ResOps-automation` version (Contract Cleanup Case only, no Closed Won path), so it isn't
+   listed in the Component Manifest.
 
 ### Opportunity - Closed Won - After Save (new flow)
 
