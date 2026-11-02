@@ -31,7 +31,7 @@ renewal or amendment, and running the automation for Subscription Renewal Opport
 
 ```
 Quote Accepted → Opportunity Stage = Contract → Opportunity Stage = Closed Won
-  └─ Opportunity - On Update - After Save (Run Asynchronously path)
+  └─ Opportunity - Closed Won - After Save (Run Asynchronously path)
        └─ Closed Won Revenue Automation (subflow)
             ├─ Create Contract (native createContract) → Activate Contract
             ├─ Create Order (native createOrdersFromQuote) → Activate Order
@@ -70,43 +70,39 @@ Aaron):
    **or update** when Current Quantity is set or changes.
 3. **Quote status is "Accepted".** The approved status on Quote in HTCDEV is `Accepted`.
    `Approved` isn't a value.
-4. **Closed Won trigger lives in the existing Opportunity update flow.** It was first built as a
-   separate flow (`Opportunity - Closed Won - After Save`) while `Opportunity - On Update - After
-   Save` was being finished on the `ResOps-automation` branch. Once Aaron pushed the finished
-   flow here, the Closed Won trigger was folded into it as a Run Asynchronously path, and the
-   separate flow was removed. It was never deployed to an org. This keeps one after-save update
-   flow per object, in line with the rest of the org.
+4. **The Closed Won trigger is its own flow.** It was briefly folded into `Opportunity - On
+   Update - After Save` (the ResOps Contract Cleanup Case flow) as a Run Asynchronously path.
+   That broke it in HTCDEV. An asynchronous path requires "only when a record is updated to
+   meet the condition requirements", which can't be combined with `ISCHANGED`. With a combined
+   "Contract *or* Closed Won" condition, moving from Contract to Closed Won doesn't count as
+   newly meeting the criteria, so the automation never ran (seen on the "Hat-Trick Consulting-
+   Test" Opportunity, 2 Nov 2026). The trigger is back in its own flow with a Closed Won-only
+   condition, and `Opportunity - On Update - After Save` is not part of this branch. It stays
+   on the `ResOps-automation` branch, unchanged by this build.
 
-### Opportunity - On Update - After Save (updated flow)
+### Opportunity - Closed Won - After Save (new flow)
 
-`Opportunity_On_Update_After_Save` already created the Contract Cleanup ResOps Request Case
-when a Subscription New Opportunity moved to Contract. That part is unchanged. The changes are:
+`Opportunity_Closed_Won_After_Save` is a thin record-triggered flow on Opportunity update. Its
+entry formula is all of:
 
-- **Entry criteria** (formula) widened. It still requires Run Flows on the On/Off Switch and
-  record type **Subscription New**. The Stage must now be **Contract**, *or* **Closed Won** with
-  Closed Won Automation Complete unchecked.
-- **"Only when a record is updated to meet the condition requirements"** is now on. Salesforce
-  requires it for a flow with a Run Asynchronously path, and it can't be combined with
-  `ISCHANGED`, so `ISCHANGED(StageName)` was removed from the formula. The flow still only
-  runs when the record *moves into* the criteria, for example the Stage changing to Contract or
-  Closed Won. Editing other fields on an Opportunity that's already at Contract or Closed Won
-  doesn't re-trigger it. One new behaviour: **unchecking Closed Won Automation Complete on a
-  Closed Won Opportunity re-runs the automation**.
-- **Run immediately path:** unchanged. The `Opportunity Stage` decision sends Contract to the
-  ResOps Case steps. Closed Won falls through to "Other Stage" and does nothing here.
-- **New Run Asynchronously path:** the `Closed Won Automation Needed?` decision checks Stage =
-  Closed Won and Closed Won Automation Complete unchecked. It then calls the **Closed Won
-  Revenue Automation** subflow with the Opportunity Id. Running it asynchronously means the
-  Stage change saves straight away for the user, and the Revenue Cloud actions run in their own
-  transaction afterwards.
+- Run Flows is checked on the On/Off Switch
+- the record type is **Subscription New**
+- the Stage is **Closed Won**
+- Closed Won Automation Complete is unchecked
 
-The same file is on the `ResOps-automation` branch. This branch's copy already includes the
-finished ResOps version, so whichever branch merges second must keep the Closed Won path (see
-Post Deployment Items).
+**"Only when a record is updated to meet the condition requirements"** is on. Salesforce
+requires it for a flow with a Run Asynchronously path. So the flow runs when an Opportunity
+*moves into* that state, for example its Stage changing to Closed Won from any other Stage.
+Editing other fields on a Closed Won Opportunity doesn't re-run it. Unchecking Closed Won
+Automation Complete on a Closed Won Opportunity *does* re-run it (a deliberate admin re-run).
+
+It calls the **Closed Won Revenue Automation** subflow with the Opportunity Id on the **Run
+Asynchronously** path. The Stage change saves straight away for the user, and the Revenue Cloud
+actions run in their own transaction afterwards.
 
 ### Closed Won Revenue Automation (new subflow)
 
-`Closed_Won_Revenue_Automation` is an autolaunched subflow, called from `Opportunity - On Update - After Save`.
+`Closed_Won_Revenue_Automation` is an autolaunched subflow, called from `Opportunity - Closed Won - After Save`.
 
 - **Input:** `opportunityId`.
 - **Outputs:** `contractId`, `orderId`, `isSuccess`, `errorMessage`.
@@ -314,12 +310,14 @@ existing Assets.
 ## Post Deployment Items
 
 1. **Deploy order:** deploy the four Opportunity fields, the Order **Assets Created** field and
-   the permission sets first, then the flows. The flows reference the new fields. `Closed_Won_Revenue_Automation` must be deployed
-   before (or with) `Opportunity_On_Update_After_Save`.
-2. **Merging with `ResOps-automation`:** both branches change
-   `Opportunity_On_Update_After_Save`. If `ResOps-automation` merges first, this branch's copy
-   (ResOps steps + Closed Won path) is the one to keep. If this branch merges first, don't let
-   the ResOps branch overwrite the Closed Won path.
+   the permission sets first, then the flows. The flows reference the new fields.
+   `Closed_Won_Revenue_Automation` must be deployed before (or with)
+   `Opportunity_Closed_Won_After_Save`.
+2. **HTCDEV clean-up:** an earlier version of this branch deployed `Opportunity - On Update -
+   After Save` to HTCDEV with a Closed Won path. Redeploy that flow from the `ResOps-automation`
+   branch, or remove the Closed Won path in Flow Builder. Otherwise Closed Won Opportunities
+   could call the automation twice. The subflow's checks stop duplicate records, but it's
+   wasted work.
 3. **Page layouts:** add Closed Won Automation Complete, Closed Won Automation Error, Renewal
    Opportunity and Previous Opportunity to the Opportunity layouts or the Beacon Opportunity
    Record Page. Add the **Renewal Opportunities** related list too.
@@ -345,7 +343,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Renewal-A
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Flow | Opportunity | Opportunity_On_Update_After_Save | Opportunity - On Update - After Save | Updated | Entry criteria widened to Contract or Closed Won (automation not complete). Added a Run Asynchronously path that calls Closed Won Revenue Automation for Closed Won. ResOps Contract Cleanup Case path unchanged. |
+| 1 | Flow | Opportunity | Opportunity_Closed_Won_After_Save | Opportunity - Closed Won - After Save | Created | Record-triggered (update) flow. When a Subscription New Opportunity moves to Closed Won with Closed Won Automation Complete unchecked, calls Closed Won Revenue Automation on the Run Asynchronously path. |
 | 2 | Flow | Opportunity | Closed_Won_Revenue_Automation | Closed Won Revenue Automation | Created | Autolaunched subflow. Creates (or reuses) and activates the Contract (native createContract, net unit prices) and Order (native createOrdersFromQuote) from the Accepted Quote, then marks the Opportunity complete. Errors go to the Opportunity and the fault email. |
 | 3 | Flow | CreateAssetOrderEvent | Create_Asset_Order_Event_Mark_Order_Assets_Created | Create Asset Order Event - Mark Order Assets Created | Created | Platform-event flow. On the final Create Asset Order Event for an Order, checks Assets Created on the Order. |
 | 4 | Flow | Order | Order_Assets_Created_Create_Renewal | Order - Assets Created - Create Renewal | Created | Record-triggered flow (async path). When Assets Created becomes checked, calls native Create Renewal Quote with the Order's Assets, sets up the renewal Opportunity and links it to the original. |

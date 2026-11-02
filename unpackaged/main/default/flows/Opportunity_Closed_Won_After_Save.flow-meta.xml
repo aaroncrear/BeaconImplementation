@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>When a Subscription New Opportunity is moved to Closed Won and Closed Won Automation Complete is unchecked, calls the Closed Won Revenue Automation subflow on the asynchronous path (after the Stage change has been saved). The subflow creates and activates the Contract and the Order from the Opportunity&apos;s Accepted Quote. Runs only when the record is updated to meet the entry criteria (required for an asynchronous path), so editing other fields on a Closed Won Opportunity doesn&apos;t re-run it, but unchecking Closed Won Automation Complete on a Closed Won Opportunity does. Kept separate from Opportunity - On Update - After Save: that flow&apos;s Contract criteria would otherwise mean a Contract to Closed Won move never counts as &quot;updated to meet the criteria&quot;. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <environments>Default</environments>
+    <interviewLabel>Opportunity - Closed Won - After Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity - Closed Won - After Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    {!$Record.RecordType.DeveloperName} = &quot;Subscription_New&quot;,
+    ISPICKVAL({!$Record.StageName}, &quot;Closed Won&quot;),
+    NOT({!$Record.Closed_Won_Automation_Complete__c})
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <scheduledPaths>
+            <connector>
+                <targetReference>Closed_Won_Revenue_Automation</targetReference>
+            </connector>
+            <pathType>AsyncAfterCommit</pathType>
+        </scheduledPaths>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <subflows>
+        <description>Creates and activates the Contract and the Order from the Opportunity&apos;s Accepted Quote. Handles its own errors (writes them to the Opportunity and sends the fault email).</description>
+        <name>Closed_Won_Revenue_Automation</name>
+        <label>Closed Won Revenue Automation</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>Closed_Won_Revenue_Automation</flowName>
+        <inputAssignments>
+            <name>opportunityId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+</Flow>
