@@ -135,6 +135,151 @@
         <default>false</default>
         <label>Intelligence Referral</label>
     </customValue>
+    <customValue>
+        <fullName>Account Upgrade</fullName>
+        <default>false</default>
+        <label>Account Upgrade</label>
+    </customValue>
+    <customValue>
+        <fullName>Active enquiry</fullName>
+        <default>false</default>
+        <label>Active enquiry</label>
+    </customValue>
+    <customValue>
+        <fullName>Allocated List</fullName>
+        <default>false</default>
+        <label>Allocated List</label>
+    </customValue>
+    <customValue>
+        <fullName>Click through</fullName>
+        <default>false</default>
+        <label>Click through</label>
+    </customValue>
+    <customValue>
+        <fullName>Customer Success Referral</fullName>
+        <default>false</default>
+        <label>Customer Success Referral</label>
+    </customValue>
+    <customValue>
+        <fullName>Delegate referral</fullName>
+        <default>false</default>
+        <label>Delegate referral</label>
+    </customValue>
+    <customValue>
+        <fullName>Email Open</fullName>
+        <default>false</default>
+        <label>Email Open</label>
+    </customValue>
+    <customValue>
+        <fullName>External referral</fullName>
+        <default>false</default>
+        <label>External referral</label>
+    </customValue>
+    <customValue>
+        <fullName>Infographic Download</fullName>
+        <default>false</default>
+        <label>Infographic Download</label>
+    </customValue>
+    <customValue>
+        <fullName>LinkedIn Lead Gen</fullName>
+        <default>false</default>
+        <label>LinkedIn Lead Gen</label>
+    </customValue>
+    <customValue>
+        <fullName>Mail Merge</fullName>
+        <default>false</default>
+        <label>Mail Merge</label>
+    </customValue>
+    <customValue>
+        <fullName>Onsite Demo</fullName>
+        <default>false</default>
+        <label>Onsite Demo</label>
+    </customValue>
+    <customValue>
+        <fullName>Production referral</fullName>
+        <default>false</default>
+        <label>Production referral</label>
+    </customValue>
+    <customValue>
+        <fullName>Renewal</fullName>
+        <default>false</default>
+        <label>Renewal</label>
+    </customValue>
+    <customValue>
+        <fullName>Sales Navigator</fullName>
+        <default>false</default>
+        <label>Sales Navigator</label>
+    </customValue>
+    <customValue>
+        <fullName>Sales research</fullName>
+        <default>false</default>
+        <label>Sales research</label>
+    </customValue>
+    <customValue>
+        <fullName>Social network contact</fullName>
+        <default>false</default>
+        <label>Social network contact</label>
+    </customValue>
+    <customValue>
+        <fullName>Spex referral</fullName>
+        <default>false</default>
+        <label>Spex referral</label>
+    </customValue>
+    <customValue>
+        <fullName>Top 100</fullName>
+        <default>false</default>
+        <label>Top 100</label>
+    </customValue>
+    <customValue>
+        <fullName>Webinar</fullName>
+        <default>false</default>
+        <label>Webinar</label>
+    </customValue>
+    <customValue>
+        <fullName>On-Site Rebook</fullName>
+        <default>false</default>
+        <label>On-Site Rebook</label>
+    </customValue>
+    <customValue>
+        <fullName>Analyst Referral</fullName>
+        <default>false</default>
+        <label>Analyst Referral</label>
+    </customValue>
+    <customValue>
+        <fullName>Digital Event</fullName>
+        <default>false</default>
+        <label>Digital Event</label>
+    </customValue>
+    <customValue>
+        <fullName>HW Delegate</fullName>
+        <default>false</default>
+        <label>HW Delegate</label>
+    </customValue>
+    <customValue>
+        <fullName>Sales Trip</fullName>
+        <default>false</default>
+        <label>Sales Trip</label>
+    </customValue>
+    <customValue>
+        <fullName>SCP</fullName>
+        <default>false</default>
+        <label>SCP</label>
+    </customValue>
+    <customValue>
+        <fullName>Target Sales research</fullName>
+        <default>false</default>
+        <label>Target Sales research</label>
+    </customValue>
+    <customValue>
+        <fullName>Targeted Sales Outreach</fullName>
+        <default>false</default>
+        <label>Targeted Sales Outreach</label>
+    </customValue>
+    <customValue>
+        <fullName>Webinar Recording Download</fullName>
+        <default>false</default>
+        <label>Webinar Recording Download</label>
+    </customValue>
     <description>Used to give more granular reporting than Lead Source</description>
     <masterLabel>Lead Type</masterLabel>
     <sorted>false</sorted>
