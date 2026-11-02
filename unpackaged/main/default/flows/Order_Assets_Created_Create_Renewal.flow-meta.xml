@@ -555,7 +555,7 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordUpdates>
-        <description>Sets the Renewal Opportunity lookup on the original Opportunity.</description>
+        <description>Sets the Renewal Opportunity lookup on the original Opportunity and clears Closed Won Automation Error (left over from any earlier failed renewal attempt).</description>
         <name>Update_Source_Opportunity</name>
         <label>Update Source Opportunity</label>
         <locationX>0</locationX>
@@ -571,6 +571,12 @@
                 <elementReference>Get_Source_Opportunity.Id</elementReference>
             </value>
         </filters>
+        <inputAssignments>
+            <field>Closed_Won_Automation_Error__c</field>
+            <value>
+                <elementReference>varBlank</elementReference>
+            </value>
+        </inputAssignments>
         <inputAssignments>
             <field>Renewal_Opportunity__c</field>
             <value>
@@ -747,6 +753,14 @@
         <name>varAssetIds</name>
         <dataType>String</dataType>
         <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Always blank. Used to clear Closed Won Automation Error after a successful renewal.</description>
+        <name>varBlank</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
         <isInput>false</isInput>
         <isOutput>false</isOutput>
     </variables>

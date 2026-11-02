@@ -186,7 +186,8 @@ It then:
    | Contract | The Contract on the Order |
    | Previous Opportunity | The original Opportunity |
 
-6. Sets **Renewal Opportunity** on the original Opportunity.
+6. Sets **Renewal Opportunity** on the original Opportunity and clears Closed Won Automation
+   Error (left over from any earlier failed renewal attempt).
 
 If Create Renewal Quote reports a failure (`isSuccess` false), or any other step faults, the error
 is written to Closed Won Automation Error on the original Opportunity and sent through the Fault
