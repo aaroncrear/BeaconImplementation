@@ -2,6 +2,6 @@
 <PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
     <description>Holds the integration permission sets that ResOps persona users need. Integration permission sets are added to this group in Production only. Assigned and removed by the Beacon Persona - ResOps user access policy.</description>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>Beacon ResOps Integrations</label>
+    <label>Beacon - ResOps Integrations</label>
     <status>Updated</status>
 </PermissionSetGroup>

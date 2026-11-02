@@ -3,7 +3,7 @@
 ## Requirements
 
 - Each Beacon persona, except Integration, needs its own permission set group named
-  **Beacon {Persona} Integrations**. The group holds the permission sets for every integration
+  **Beacon - {Persona} Integrations**. The group holds the permission sets for every integration
   that persona's users need.
 - The integrations are connected only in Production, so the integration permission sets are
   added to these groups in Production. The groups are deployed empty.
@@ -16,16 +16,16 @@
 
 | Persona | API Name | Label |
 |---|---|---|
-| Consulting | `Beacon_Consulting_Integrations` | Beacon Consulting Integrations |
-| Customer Success | `Beacon_Customer_Success_Integrations` | Beacon Customer Success Integrations |
-| Executive | `Beacon_Executive_Integrations` | Beacon Executive Integrations |
-| Finance | `Beacon_Finance_Integrations` | Beacon Finance Integrations |
-| Marketing | `Beacon_Marketing_Integrations` | Beacon Marketing Integrations |
-| Product | `Beacon_Product_Integrations` | Beacon Product Integrations |
-| ResOps | `Beacon_ResOps_Integrations` | Beacon ResOps Integrations |
-| Sales | `Beacon_Sales_Integrations` | Beacon Sales Integrations |
-| Salesforce Admin | `Beacon_Salesforce_Admin_Integrations` | Beacon Salesforce Admin Integrations |
-| Tech | `Beacon_Tech_Integrations` | Beacon Tech Integrations |
+| Consulting | `Beacon_Consulting_Integrations` | Beacon - Consulting Integrations |
+| Customer Success | `Beacon_Customer_Success_Integrations` | Beacon - Customer Success Integrations |
+| Executive | `Beacon_Executive_Integrations` | Beacon - Executive Integrations |
+| Finance | `Beacon_Finance_Integrations` | Beacon - Finance Integrations |
+| Marketing | `Beacon_Marketing_Integrations` | Beacon - Marketing Integrations |
+| Product | `Beacon_Product_Integrations` | Beacon - Product Integrations |
+| ResOps | `Beacon_ResOps_Integrations` | Beacon - ResOps Integrations |
+| Sales | `Beacon_Sales_Integrations` | Beacon - Sales Integrations |
+| Salesforce Admin | `Beacon_Salesforce_Admin_Integrations` | Beacon - Salesforce Admin Integrations |
+| Tech | `Beacon_Tech_Integrations` | Beacon - Tech Integrations |
 
 Each group is deployed with no permission sets, so it grants nothing until integration
 permission sets are added to it in Production. `hasActivationRequired` is false, the same as
@@ -49,7 +49,7 @@ changes.
 
 **Why removal uses Revoke actions:** a User Access Policy never undoes its own grants when a
 user stops matching. Each policy revokes every other persona's Integrations group, so changing
-a user from Marketing to Sales grants Beacon Sales Integrations and removes Beacon Marketing
+a user from Marketing to Sales grants Beacon - Sales Integrations and removes Beacon Marketing
 Integrations.
 
 **Why the groups are deployed empty:** the integration packages and their permission sets exist
@@ -68,19 +68,19 @@ Policies still in Design need the activation steps in the User-Access-Policies r
 
 1. **Groups exist.** Go to Setup → Permission Set Groups. Confirm all ten "Beacon {Persona}
    Integrations" groups are listed with the API names in the table above.
-2. **Groups are empty outside Production.** Open **Beacon Sales Integrations** in a sandbox.
+2. **Groups are empty outside Production.** Open **Beacon - Sales Integrations** in a sandbox.
    Confirm it has no permission sets and its status is Updated.
 3. **Policy definition.** Go to Setup → User Access Policies and open **Beacon Persona - Sales**.
    Confirm:
    - It still grants Beacon - Baseline and Beacon Sales - Object, Tab, FLS.
-   - It also grants **Beacon Sales Integrations**.
+   - It also grants **Beacon - Sales Integrations**.
    - It still revokes the other nine persona Object, Tab, FLS permission sets.
-   - It also revokes the other nine Beacon {Persona} Integrations groups.
+   - It also revokes the other nine Beacon - {Persona} Integrations groups.
 4. **New user grant.** Create an internal user with Persona = **Marketing**. On Permission Set
-   Group Assignments, confirm **Beacon - Baseline** and **Beacon Marketing Integrations** are
+   Group Assignments, confirm **Beacon - Baseline** and **Beacon - Marketing Integrations** are
    assigned, and no other Integrations group is assigned.
 5. **Persona change swaps the group.** Change the same user's Persona to **Sales** and save.
-   Confirm **Beacon Sales Integrations** is assigned, **Beacon Marketing Integrations** has been
+   Confirm **Beacon - Sales Integrations** is assigned, **Beacon - Marketing Integrations** has been
    removed, and Beacon - Baseline and Beacon Sales - Object, Tab, FLS are assigned.
 6. **Every persona.** Repeat step 5 for Consulting, Customer Success, Executive, Finance,
    Product, ResOps, Salesforce Admin and Tech. Each time, confirm exactly one Integrations group
@@ -94,7 +94,7 @@ Policies still in Design need the activation steps in the User-Access-Policies r
 ## Post Deployment Items
 
 - **Production: add integration permission sets.** In Setup → Permission Set Groups, open each
-  Beacon {Persona} Integrations group and add the integration permission sets that persona
+  Beacon - {Persona} Integrations group and add the integration permission sets that persona
   needs. Wait for each group's status to return to Updated.
 - **Do not retrieve the Production groups into this branch** once their permission sets are
   added. Those permission sets don't exist in Beacon HTC Dev or Beacon UAT, so a later deploy
@@ -115,16 +115,16 @@ Github Branch: [Persona-Permission-Set-Groups](https://github.com/aaroncrear/Bea
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Permission Set Group | N/A | `Beacon_Consulting_Integrations` | Beacon Consulting Integrations | Created | Empty group for the integration permission sets Consulting users need. Integration permission sets are added in Production only. |
-| 2 | Permission Set Group | N/A | `Beacon_Customer_Success_Integrations` | Beacon Customer Success Integrations | Created | Empty group for the integration permission sets Customer Success users need. Integration permission sets are added in Production only. |
-| 3 | Permission Set Group | N/A | `Beacon_Executive_Integrations` | Beacon Executive Integrations | Created | Empty group for the integration permission sets Executive users need. Integration permission sets are added in Production only. |
-| 4 | Permission Set Group | N/A | `Beacon_Finance_Integrations` | Beacon Finance Integrations | Created | Empty group for the integration permission sets Finance users need. Integration permission sets are added in Production only. |
-| 5 | Permission Set Group | N/A | `Beacon_Marketing_Integrations` | Beacon Marketing Integrations | Created | Empty group for the integration permission sets Marketing users need. Integration permission sets are added in Production only. |
-| 6 | Permission Set Group | N/A | `Beacon_Product_Integrations` | Beacon Product Integrations | Created | Empty group for the integration permission sets Product users need. Integration permission sets are added in Production only. |
-| 7 | Permission Set Group | N/A | `Beacon_ResOps_Integrations` | Beacon ResOps Integrations | Created | Empty group for the integration permission sets ResOps users need. Integration permission sets are added in Production only. |
-| 8 | Permission Set Group | N/A | `Beacon_Sales_Integrations` | Beacon Sales Integrations | Created | Empty group for the integration permission sets Sales users need. Integration permission sets are added in Production only. |
-| 9 | Permission Set Group | N/A | `Beacon_Salesforce_Admin_Integrations` | Beacon Salesforce Admin Integrations | Created | Empty group for the integration permission sets Salesforce Admin users need. Integration permission sets are added in Production only. |
-| 10 | Permission Set Group | N/A | `Beacon_Tech_Integrations` | Beacon Tech Integrations | Created | Empty group for the integration permission sets Tech users need. Integration permission sets are added in Production only. |
+| 1 | Permission Set Group | N/A | `Beacon_Consulting_Integrations` | Beacon - Consulting Integrations | Created | Empty group for the integration permission sets Consulting users need. Integration permission sets are added in Production only. |
+| 2 | Permission Set Group | N/A | `Beacon_Customer_Success_Integrations` | Beacon - Customer Success Integrations | Created | Empty group for the integration permission sets Customer Success users need. Integration permission sets are added in Production only. |
+| 3 | Permission Set Group | N/A | `Beacon_Executive_Integrations` | Beacon - Executive Integrations | Created | Empty group for the integration permission sets Executive users need. Integration permission sets are added in Production only. |
+| 4 | Permission Set Group | N/A | `Beacon_Finance_Integrations` | Beacon - Finance Integrations | Created | Empty group for the integration permission sets Finance users need. Integration permission sets are added in Production only. |
+| 5 | Permission Set Group | N/A | `Beacon_Marketing_Integrations` | Beacon - Marketing Integrations | Created | Empty group for the integration permission sets Marketing users need. Integration permission sets are added in Production only. |
+| 6 | Permission Set Group | N/A | `Beacon_Product_Integrations` | Beacon - Product Integrations | Created | Empty group for the integration permission sets Product users need. Integration permission sets are added in Production only. |
+| 7 | Permission Set Group | N/A | `Beacon_ResOps_Integrations` | Beacon - ResOps Integrations | Created | Empty group for the integration permission sets ResOps users need. Integration permission sets are added in Production only. |
+| 8 | Permission Set Group | N/A | `Beacon_Sales_Integrations` | Beacon - Sales Integrations | Created | Empty group for the integration permission sets Sales users need. Integration permission sets are added in Production only. |
+| 9 | Permission Set Group | N/A | `Beacon_Salesforce_Admin_Integrations` | Beacon - Salesforce Admin Integrations | Created | Empty group for the integration permission sets Salesforce Admin users need. Integration permission sets are added in Production only. |
+| 10 | Permission Set Group | N/A | `Beacon_Tech_Integrations` | Beacon - Tech Integrations | Created | Empty group for the integration permission sets Tech users need. Integration permission sets are added in Production only. |
 | 11 | User Access Policy | User | `Beacon_Persona_Consulting` | Beacon Persona - Consulting | Updated | Added a Grant for `Beacon_Consulting_Integrations` and Revokes for the other nine Integrations groups. Description updated. Existing actions unchanged. |
 | 12 | User Access Policy | User | `Beacon_Persona_Customer_Success` | Beacon Persona - Customer Success | Updated | Added a Grant for `Beacon_Customer_Success_Integrations` and Revokes for the other nine Integrations groups. Description updated. Existing actions unchanged. |
 | 13 | User Access Policy | User | `Beacon_Persona_Executive` | Beacon Persona - Executive | Updated | Added a Grant for `Beacon_Executive_Integrations` and Revokes for the other nine Integrations groups. Description updated. Existing actions unchanged. |

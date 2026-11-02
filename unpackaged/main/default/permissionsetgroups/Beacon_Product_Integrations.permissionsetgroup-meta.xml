@@ -2,6 +2,6 @@
 <PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
     <description>Holds the integration permission sets that Product persona users need. Integration permission sets are added to this group in Production only. Assigned and removed by the Beacon Persona - Product user access policy.</description>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>Beacon Product Integrations</label>
+    <label>Beacon - Product Integrations</label>
     <status>Updated</status>
 </PermissionSetGroup>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UserAccessPolicy xmlns="http://soap.sforce.com/2006/04/metadata">
     <booleanFilter>1</booleanFilter>
-    <description>Persona = ResOps: grants Beacon - Baseline, Beacon ResOps - Object, Tab, FLS and Beacon ResOps Integrations. Revokes the other personas' Object, Tab, FLS permission sets and Integrations groups.</description>
+    <description>Persona = ResOps: grants Beacon - Baseline, Beacon ResOps - Object, Tab, FLS and Beacon - ResOps Integrations. Revokes the other personas' Object, Tab, FLS permission sets and Integrations groups.</description>
     <masterLabel>Beacon Persona - ResOps</masterLabel>
     <order>7</order>
     <status>Design</status>
