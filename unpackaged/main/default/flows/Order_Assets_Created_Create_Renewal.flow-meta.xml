@@ -3,6 +3,23 @@
     <apiVersion>68.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
+        <description>Removes the bundle component Asset from the list of Assets to renew. Create Renewal Quote only accepts top-level Assets and renews their components with them.</description>
+        <name>Remove_Bundle_Component</name>
+        <label>Remove Bundle Component</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varAssetIds</assignToReference>
+            <operator>RemoveAll</operator>
+            <value>
+                <elementReference>Loop_Bundle_Components.RelatedAssetId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Bundle_Components</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
         <description>Adds the current Asset Action&apos;s Asset to the list of Assets to renew.</description>
         <name>Add_Asset_Id</name>
         <label>Add Asset Id</label>
@@ -166,7 +183,7 @@
             <label>Found</label>
         </rules>
     </decisions>
-    <description>Runs asynchronously when Assets Created is checked on an Order that came from a Quote (Create Asset Order Event - Mark Order Assets Created checks it once Revenue Cloud has created the Order&apos;s Assets). If the Order came from a Subscription New Opportunity that the Closed Won Revenue Automation completed, and that Opportunity has no Renewal Opportunity yet, finds the Assets created from the Order&apos;s products (Order Product &gt; Asset Action Source &gt; Asset Action &gt; Asset). It then calls the native Create Renewal Quote flow once with all of them, which creates the renewal Opportunity and renewal Quote. The new Opportunity is set to the Subscription Renewal record type, renamed &quot;&lt;original name&gt; - Renewal&quot;, given Type Existing Business, the original Owner and the Contract, and linked both ways (Previous Opportunity on the renewal, Renewal Opportunity on the original). Errors are written to Closed Won Automation Error on the original Opportunity and sent through the Fault Path Subflow. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>Runs asynchronously when Assets Created is checked on an Order that came from a Quote (Create Asset Order Event - Mark Order Assets Created checks it once Revenue Cloud has created the Order&apos;s Assets). If the Order came from a Subscription New Opportunity that the Closed Won Revenue Automation completed, and that Opportunity has no Renewal Opportunity yet, finds the Assets created from the Order&apos;s products (Order Product &gt; Asset Action Source &gt; Asset Action &gt; Asset) and drops any Asset that is a bundle component of another Asset (Asset Relationship), because Create Renewal Quote only accepts top-level Assets. It then calls the native Create Renewal Quote flow once with the top-level Assets, which creates the renewal Opportunity and renewal Quote. The new Opportunity is set to the Subscription Renewal record type, renamed &quot;&lt;original name&gt; - Renewal&quot;, given Type Existing Business, the original Owner and the Contract, and linked both ways (Previous Opportunity on the renewal, Renewal Opportunity on the original). Errors are written to Closed Won Automation Error on the original Opportunity and sent through the Fault Path Subflow. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <formulas>
         <description>The renewal Opportunity name: the original Opportunity name followed by &quot; - Renewal&quot;, cut to the 120-character limit.</description>
@@ -183,6 +200,21 @@
     <interviewLabel>Order - Assets Created - Create Renewal {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Order - Assets Created - Create Renewal</label>
     <loops>
+        <description>Goes through each bundle component Asset so it can be removed from the list.</description>
+        <name>Loop_Bundle_Components</name>
+        <label>Loop Bundle Components</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Bundle_Components</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Remove_Bundle_Component</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Assets_Found</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
         <description>Collects the Asset Id from each Asset Action.</description>
         <name>Loop_Asset_Actions</name>
         <label>Loop Asset Actions</label>
@@ -194,7 +226,7 @@
             <targetReference>Add_Asset_Id</targetReference>
         </nextValueConnector>
         <noMoreValuesConnector>
-            <targetReference>Assets_Found</targetReference>
+            <targetReference>Get_Bundle_Components</targetReference>
         </noMoreValuesConnector>
     </loops>
     <loops>
@@ -246,6 +278,33 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Gets the Asset Relationships where one of the Order&apos;s Assets is a bundle component (the Related Asset) of another Asset. Revenue Cloud stores bundle structure here; Asset.ParentId is left blank.</description>
+        <name>Get_Bundle_Components</name>
+        <label>Get Bundle Components</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Loop_Bundle_Components</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Handle_Fault</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>RelatedAssetId</field>
+            <operator>In</operator>
+            <value>
+                <elementReference>varAssetIds</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>AssetRelationship</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>RelatedAssetId</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <recordLookups>
         <description>Gets the Asset Action Sources whose source is one of the Order&apos;s products. Each one links an Order Product to the Asset Action that created or changed its Asset.</description>
         <name>Get_Asset_Action_Sources</name>

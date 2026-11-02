@@ -164,10 +164,17 @@ It then:
 2. Finds the Assets created from the Order: Order Products → Asset Action Sources
    (`ReferenceEntityItemId`) → Asset Actions → Asset Ids. Asset has no direct link to its Order,
    so this is the reliable path.
-3. Calls the native **Create Renewal Quote** flow (as a subflow) once with all of the Asset Ids.
+3. Drops any Asset that is a **bundle component** of another Asset. Revenue Cloud stores bundle
+   structure in **Asset Relationship** (the bundle Asset is `AssetId` and each component is
+   `RelatedAssetId`). It leaves `Asset.ParentId` blank. Create Renewal Quote rejects component
+   Assets ("the asset is a bundle component. Provide the top-level asset"), and it renews the
+   components together with their bundle. Found in HTCDEV on 2 Nov 2026 with a Core Bundle
+   quote.
+4. Calls the native **Create Renewal Quote** flow (as a subflow) once with the top-level Asset
+   Ids.
    Renewal dates are left to the flow's defaults (the term after the current one). This creates
    the renewal Opportunity and renewal Quote.
-4. Sets up the renewal Opportunity:
+5. Sets up the renewal Opportunity:
 
    | Field | Value |
    |---|---|
@@ -178,7 +185,7 @@ It then:
    | Contract | The Contract on the Order |
    | Previous Opportunity | The original Opportunity |
 
-5. Sets **Renewal Opportunity** on the original Opportunity.
+6. Sets **Renewal Opportunity** on the original Opportunity.
 
 If Create Renewal Quote reports a failure (`isSuccess` false), or any other step faults, the error
 is written to Closed Won Automation Error on the original Opportunity and sent through the Fault
@@ -247,10 +254,15 @@ Order 00000105 and should be reviewed.
 Test in Beacon HTCDEV with Run Flows checked on the On/Off Switch. Use a test Account with no
 existing Assets.
 
+**Quote setup matters.** Each quote line must have a term-defined Product Selling Model (e.g.
+**Annual Subscription**) with a Start Date and Subscription Term. Lines without one create
+Assets with no end date, so the Beacon Subscriptions get a blank End Date and the Assets can't
+be renewed.
+
 **Happy path**
 
 1. Create a Subscription New Opportunity and a Quote with two module products (e.g. ADC Module,
-   Autoimmune Module), quantity 1 each. Set the Quote Status to **Accepted**. Move the
+   Autoimmune Module), quantity 1 each, on Annual Subscription. Set the Quote Status to **Accepted**. Move the
    Opportunity to Contract, then to **Closed Won**.
 2. Wait a minute and refresh. On the Opportunity, confirm Closed Won Automation Complete is
    checked, Closed Won Automation Error is blank and Contract is filled in.
@@ -275,6 +287,13 @@ existing Assets.
    - it has a Renewal Quote for the next term containing both products
 8. On the original Opportunity, confirm the renewal Opportunity appears in the **Renewal
    Opportunities** related list (once it's added to the layout).
+
+**Bundles**
+
+- **Bundle quote:** repeat steps 1–7 with a Core Bundle quote (the bundle plus its modules, on
+  Annual Subscription). Confirm Beacon Subscriptions are created on the module Assets and not on
+  the Core Bundle Asset. Confirm the renewal is created without the "asset is a bundle
+  component" error, and that the Renewal Quote contains the bundle and its modules.
 
 **No duplicates**
 
