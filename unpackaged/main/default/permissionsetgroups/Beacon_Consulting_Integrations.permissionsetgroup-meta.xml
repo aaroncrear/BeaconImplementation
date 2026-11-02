@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Holds the integration permission sets that Consulting persona users need. Integration permission sets are added to this group in Production only. Assigned and removed by the Beacon Persona - Consulting user access policy.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Beacon - Consulting Integrations</label>
+    <status>Updated</status>
+</PermissionSetGroup>
