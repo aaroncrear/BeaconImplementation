@@ -357,6 +357,18 @@ be renewed.
    renewals automatically. Data load subscriptions where needed, and renew existing Assets
    manually.
 
+9. **Annual Subscription price book entries (data, per org).** Quote lines only get a term
+   (Start/End Date, Subscription Term) when they're priced from a price book entry with a
+   term-defined Product Selling Model. In HTCDEV, most entries had no selling model, so quotes
+   created Assets with no end date that couldn't be renewed. On 2 Nov 2026, 110 **Annual
+   Subscription** entries were created in HTCDEV. There's one for every product that had an
+   active entry with no selling model in each price book (Standard: the 5 bundles; <50 Heads,
+   51-200 Heads, Contract Orgs (>200 Heads) and PE-VC: all 22 products; >200 Heads: the 17
+   modules). Each copies the price of the existing entry. The old entries with no selling model
+   were **left active**: deactivate them once you've confirmed the tiered pricing doesn't depend
+   on them, so reps can't pick a term-less entry. Repeat this in **UAT and Prod** before testing
+   there (or re-run the pricing sync with Annual Subscription entries).
+
 ## Component Manifest
 
 Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Renewal-Automation
