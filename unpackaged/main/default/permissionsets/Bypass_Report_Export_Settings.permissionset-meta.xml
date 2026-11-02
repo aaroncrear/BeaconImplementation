@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Uses a custom permission to allow users to bypass report export settings</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Bypass Report Export Settings</label>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>Bypass_Report_Export_Settings</name>
+    </customPermissions>
+</PermissionSet>
