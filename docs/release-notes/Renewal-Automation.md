@@ -165,17 +165,23 @@ It then:
 2. Finds the Assets created from the Order: Order Products → Asset Action Sources
    (`ReferenceEntityItemId`) → Asset Actions → Asset Ids. Asset has no direct link to its Order,
    so this is the reliable path.
-3. Drops any Asset that is a **bundle component** of another Asset. Revenue Cloud stores bundle
+3. Sets **Renewal Term** and **Renewal Term Unit** on the Order's Assets where they're blank,
+   using the **Pricing Term** and **Pricing Term Unit** of the Order's Product Selling Model
+   (Annual Subscription = 1 / Annual). Create Renewal Quote requires both on every Asset ("All
+   assets in a request must have values for RenewalTermUnit and RenewalTerm"). Assetization
+   leaves them blank, and neither the Contract nor the Product supplies them. Values already set
+   on an Asset are kept. Found in HTCDEV on 2 Nov 2026.
+4. Drops any Asset that is a **bundle component** of another Asset. Revenue Cloud stores bundle
    structure in **Asset Relationship** (the bundle Asset is `AssetId` and each component is
    `RelatedAssetId`). It leaves `Asset.ParentId` blank. Create Renewal Quote rejects component
    Assets ("the asset is a bundle component. Provide the top-level asset"), and it renews the
    components together with their bundle. Found in HTCDEV on 2 Nov 2026 with a Core Bundle
    quote.
-4. Calls the native **Create Renewal Quote** flow (as a subflow) once with the top-level Asset
+5. Calls the native **Create Renewal Quote** flow (as a subflow) once with the top-level Asset
    Ids.
    Renewal dates are left to the flow's defaults (the term after the current one). This creates
    the renewal Opportunity and renewal Quote.
-5. Sets up the renewal Opportunity:
+6. Sets up the renewal Opportunity:
 
    | Field | Value |
    |---|---|
@@ -186,7 +192,7 @@ It then:
    | Contract | The Contract on the Order |
    | Previous Opportunity | The original Opportunity |
 
-6. Sets **Renewal Opportunity** on the original Opportunity and clears Closed Won Automation
+7. Sets **Renewal Opportunity** on the original Opportunity and clears Closed Won Automation
    Error (left over from any earlier failed renewal attempt).
 
 If Create Renewal Quote reports a failure (`isSuccess` false), or any other step faults, the error
@@ -276,7 +282,8 @@ be renewed.
    Quantity 1.
    Then open the Order and confirm **Assets Created** is checked. If it isn't, the Create Asset
    Order Event wasn't received as the final event, and no renewal will be created.
-6. On each Asset, confirm one Beacon Subscription with Account and Asset filled in, Contact blank,
+6. On each Asset, confirm Renewal Term = 1 and Renewal Term Unit = Annual (set by the renewal
+   flow), and one Beacon Subscription with Account and Asset filled in, Contact blank,
    Start Date = the Asset's Lifecycle Start Date and End Date = its Current Lifecycle End Date.
 7. Back on the original Opportunity, confirm **Renewal Opportunity** is filled in. Open it and
    confirm:

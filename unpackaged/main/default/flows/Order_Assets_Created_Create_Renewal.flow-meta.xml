@@ -54,7 +54,7 @@
         </connector>
     </assignments>
     <assignments>
-        <description>Adds the current Order Product to the list of Order Product Ids.</description>
+        <description>Adds the current Order Product to the list of Order Product Ids and remembers its Product Selling Model (keeping an earlier one if this line has none).</description>
         <name>Add_Order_Item_Id</name>
         <label>Add Order Item Id</label>
         <locationX>0</locationX>
@@ -64,6 +64,13 @@
             <operator>Add</operator>
             <value>
                 <elementReference>Loop_Order_Items.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSellingModelId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formSellingModelId</elementReference>
             </value>
         </assignmentItems>
         <connector>
@@ -183,8 +190,14 @@
             <label>Found</label>
         </rules>
     </decisions>
-    <description>Runs asynchronously when Assets Created is checked on an Order that came from a Quote (Create Asset Order Event - Mark Order Assets Created checks it once Revenue Cloud has created the Order&apos;s Assets). If the Order came from a Subscription New Opportunity that the Closed Won Revenue Automation completed, and that Opportunity has no Renewal Opportunity yet, finds the Assets created from the Order&apos;s products (Order Product &gt; Asset Action Source &gt; Asset Action &gt; Asset) and drops any Asset that is a bundle component of another Asset (Asset Relationship), because Create Renewal Quote only accepts top-level Assets. It then calls the native Create Renewal Quote flow once with the top-level Assets, which creates the renewal Opportunity and renewal Quote. The new Opportunity is set to the Subscription Renewal record type, renamed &quot;&lt;original name&gt; - Renewal&quot;, given Type Existing Business, the original Owner and the Contract, and linked both ways (Previous Opportunity on the renewal, Renewal Opportunity on the original). Errors are written to Closed Won Automation Error on the original Opportunity and sent through the Fault Path Subflow. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>Runs asynchronously when Assets Created is checked on an Order that came from a Quote (Create Asset Order Event - Mark Order Assets Created checks it once Revenue Cloud has created the Order&apos;s Assets). If the Order came from a Subscription New Opportunity that the Closed Won Revenue Automation completed, and that Opportunity has no Renewal Opportunity yet, finds the Assets created from the Order&apos;s products (Order Product &gt; Asset Action Source &gt; Asset Action &gt; Asset) sets Renewal Term and Renewal Term Unit on those Assets from the Order&apos;s Product Selling Model where they are blank (Create Renewal Quote requires them and assetization leaves them blank), and drops any Asset that is a bundle component of another Asset (Asset Relationship), because Create Renewal Quote only accepts top-level Assets. It then calls the native Create Renewal Quote flow once with the top-level Assets, which creates the renewal Opportunity and renewal Quote. The new Opportunity is set to the Subscription Renewal record type, renamed &quot;&lt;original name&gt; - Renewal&quot;, given Type Existing Business, the original Owner and the Contract, and linked both ways (Previous Opportunity on the renewal, Renewal Opportunity on the original). Errors are written to Closed Won Automation Error on the original Opportunity and sent through the Fault Path Subflow. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
+    <formulas>
+        <description>The current Order Product&apos;s Product Selling Model, or the one already found if this line has none.</description>
+        <name>formSellingModelId</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE( {!Loop_Order_Items.ProductSellingModelId}, {!varSellingModelId} )</expression>
+    </formulas>
     <formulas>
         <description>The renewal Opportunity name: the original Opportunity name followed by &quot; - Renewal&quot;, cut to the 120-character limit.</description>
         <name>formRenewalName</name>
@@ -226,7 +239,7 @@
             <targetReference>Add_Asset_Id</targetReference>
         </nextValueConnector>
         <noMoreValuesConnector>
-            <targetReference>Get_Bundle_Components</targetReference>
+            <targetReference>Get_Selling_Model</targetReference>
         </noMoreValuesConnector>
     </loops>
     <loops>
@@ -278,6 +291,34 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Gets the Order&apos;s Product Selling Model (e.g. Annual Subscription: Pricing Term 1, Unit Annual) to use as the Assets&apos; renewal term.</description>
+        <name>Get_Selling_Model</name>
+        <label>Get Selling Model</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Set_Asset_Renewal_Terms</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Handle_Fault</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>varSellingModelId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>ProductSellingModel</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>PricingTerm</queriedFields>
+        <queriedFields>PricingTermUnit</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <recordLookups>
         <description>Gets the Asset Relationships where one of the Order&apos;s Assets is a bundle component (the Related Asset) of another Asset. Revenue Cloud stores bundle structure here; Asset.ParentId is left blank.</description>
         <name>Get_Bundle_Components</name>
@@ -383,6 +424,7 @@
         <getFirstRecordOnly>false</getFirstRecordOnly>
         <object>OrderItem</object>
         <queriedFields>Id</queriedFields>
+        <queriedFields>ProductSellingModelId</queriedFields>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
@@ -554,6 +596,47 @@
         <queriedFields>Id</queriedFields>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
+    <recordUpdates>
+        <description>Create Renewal Quote requires Renewal Term and Renewal Term Unit on every Asset, but assetization leaves them blank. Sets them from the Order&apos;s Product Selling Model on any of the Order&apos;s Assets where Renewal Term Unit is blank. Values already set on an Asset are kept.</description>
+        <name>Set_Asset_Renewal_Terms</name>
+        <label>Set Asset Renewal Terms</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Bundle_Components</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Handle_Fault</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>In</operator>
+            <value>
+                <elementReference>varAssetIds</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>RenewalTermUnit</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>RenewalTerm</field>
+            <value>
+                <elementReference>Get_Selling_Model.PricingTerm</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>RenewalTermUnit</field>
+            <value>
+                <elementReference>Get_Selling_Model.PricingTermUnit</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Asset</object>
+    </recordUpdates>
     <recordUpdates>
         <description>Sets the Renewal Opportunity lookup on the original Opportunity and clears Closed Won Automation Error (left over from any earlier failed renewal attempt).</description>
         <name>Update_Source_Opportunity</name>
@@ -783,6 +866,14 @@
     <variables>
         <description>Id of the renewal Quote returned by Create Renewal Quote.</description>
         <name>varRenewalQuoteId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>The Product Selling Model of the Order&apos;s products.</description>
+        <name>varSellingModelId</name>
         <dataType>String</dataType>
         <isCollection>false</isCollection>
         <isInput>false</isInput>
