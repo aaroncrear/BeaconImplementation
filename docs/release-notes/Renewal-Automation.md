@@ -18,6 +18,7 @@ steps:
   and End Date. The subscriber Contact is left blank; Contacts will be data loaded later.
 - Automatically create the **renewal Opportunity and renewal Quote** for the next term.
 - Track the link between the original and renewal Opportunities in both directions.
+- Copy the original Opportunity's Contact Roles to the renewal Opportunity.
 - The automation must not run twice for the same Opportunity. If a step fails, the error must be
   visible on the Opportunity and the admins must be notified.
 - Build and test in Beacon HTCDEV first, then UAT, then Prod.
@@ -194,6 +195,11 @@ It then:
 
 7. Sets **Renewal Opportunity** on the original Opportunity and clears Closed Won Automation
    Error (left over from any earlier failed renewal attempt).
+8. Copies the original Opportunity's **Contact Roles** to the renewal Opportunity: same Contact,
+   Role and Primary flag, created in a single step. Create Renewal Quote doesn't create any
+   Contact Roles itself. If the original has none, nothing is created. The existing
+   `Opportunity Contact Role - On Create - Afrer Save` flow also runs for the copies, and sets each
+   Contact's Status to Active Opp.
 
 If Create Renewal Quote reports a failure (`isSuccess` false), or any other step faults, the error
 is written to Closed Won Automation Error on the original Opportunity and sent through the Fault
@@ -296,6 +302,15 @@ be renewed.
    - it has a Renewal Quote for the next term containing both products
 8. On the original Opportunity, confirm the renewal Opportunity appears in the **Renewal
    Opportunities** related list (once it's added to the layout).
+
+**Contact Roles**
+
+- **Copy to renewal:** before Closed Won, add two Contact Roles to the original Opportunity
+  (e.g. one Decision Maker marked Primary, one Evaluator). After the renewal is created, confirm
+  the renewal Opportunity has the same two Contacts with the same Roles, and that the same one
+  is Primary.
+- **No Contact Roles:** on a deal with no Contact Roles, confirm the renewal is still created
+  with no error.
 
 **Bundles**
 

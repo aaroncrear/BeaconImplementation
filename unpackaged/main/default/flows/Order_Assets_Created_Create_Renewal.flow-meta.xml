@@ -3,6 +3,51 @@
     <apiVersion>68.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
+        <description>Builds a copy of the current Contact Role for the renewal Opportunity (same Contact, Role and Primary flag) and adds it to the collection to create.</description>
+        <name>Add_Renewal_Contact_Role</name>
+        <label>Add Renewal Contact Role</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varContactRole.OpportunityId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Renewal_Quote.OpportunityId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varContactRole.ContactId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Source_Contact_Roles.ContactId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varContactRole.Role</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Source_Contact_Roles.Role</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varContactRole.IsPrimary</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Source_Contact_Roles.IsPrimary</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varContactRolesToCreate</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>varContactRole</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Source_Contact_Roles</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
         <description>Removes the bundle component Asset from the list of Assets to renew. Create Renewal Quote only accepts top-level Assets and renews their components with them.</description>
         <name>Remove_Bundle_Component</name>
         <label>Remove Bundle Component</label>
@@ -112,6 +157,29 @@
         </connector>
     </assignments>
     <decisions>
+        <description>Only creates Contact Roles when the original Opportunity had at least one.</description>
+        <name>Contact_Roles_To_Copy</name>
+        <label>Contact Roles to Copy?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>None</defaultConnectorLabel>
+        <rules>
+            <name>Has_Contact_Roles</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varContactRolesToCreate</leftValueReference>
+                <operator>IsEmpty</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Create_Renewal_Contact_Roles</targetReference>
+            </connector>
+            <label>Has Contact Roles</label>
+        </rules>
+    </decisions>
+    <decisions>
         <description>Only continues when at least one Asset was found for the Order.</description>
         <name>Assets_Found</name>
         <label>Assets Found?</label>
@@ -190,7 +258,7 @@
             <label>Found</label>
         </rules>
     </decisions>
-    <description>Runs asynchronously when Assets Created is checked on an Order that came from a Quote (Create Asset Order Event - Mark Order Assets Created checks it once Revenue Cloud has created the Order&apos;s Assets). If the Order came from a Subscription New Opportunity that the Closed Won Revenue Automation completed, and that Opportunity has no Renewal Opportunity yet, finds the Assets created from the Order&apos;s products (Order Product &gt; Asset Action Source &gt; Asset Action &gt; Asset) sets Renewal Term and Renewal Term Unit on those Assets from the Order&apos;s Product Selling Model where they are blank (Create Renewal Quote requires them and assetization leaves them blank), and drops any Asset that is a bundle component of another Asset (Asset Relationship), because Create Renewal Quote only accepts top-level Assets. It then calls the native Create Renewal Quote flow once with the top-level Assets, which creates the renewal Opportunity and renewal Quote. The new Opportunity is set to the Subscription Renewal record type, renamed &quot;&lt;original name&gt; - Renewal&quot;, given Type Existing Business, the original Owner and the Contract, and linked both ways (Previous Opportunity on the renewal, Renewal Opportunity on the original). Errors are written to Closed Won Automation Error on the original Opportunity and sent through the Fault Path Subflow. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>Runs asynchronously when Assets Created is checked on an Order that came from a Quote (Create Asset Order Event - Mark Order Assets Created checks it once Revenue Cloud has created the Order&apos;s Assets). If the Order came from a Subscription New Opportunity that the Closed Won Revenue Automation completed, and that Opportunity has no Renewal Opportunity yet, finds the Assets created from the Order&apos;s products (Order Product &gt; Asset Action Source &gt; Asset Action &gt; Asset) sets Renewal Term and Renewal Term Unit on those Assets from the Order&apos;s Product Selling Model where they are blank (Create Renewal Quote requires them and assetization leaves them blank), and drops any Asset that is a bundle component of another Asset (Asset Relationship), because Create Renewal Quote only accepts top-level Assets. It then calls the native Create Renewal Quote flow once with the top-level Assets, which creates the renewal Opportunity and renewal Quote. The new Opportunity is set to the Subscription Renewal record type, renamed &quot;&lt;original name&gt; - Renewal&quot;, given Type Existing Business, the original Owner and the Contract, and linked both ways (Previous Opportunity on the renewal, Renewal Opportunity on the original). The original Opportunity&apos;s Contact Roles (Contact, Role and Primary) are then copied to the renewal Opportunity. Errors are written to Closed Won Automation Error on the original Opportunity and sent through the Fault Path Subflow. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <formulas>
         <description>The current Order Product&apos;s Product Selling Model, or the one already found if this line has none.</description>
@@ -212,6 +280,21 @@
     </formulas>
     <interviewLabel>Order - Assets Created - Create Renewal {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Order - Assets Created - Create Renewal</label>
+    <loops>
+        <description>Goes through each Contact Role on the original Opportunity.</description>
+        <name>Loop_Source_Contact_Roles</name>
+        <label>Loop Source Contact Roles</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Source_Contact_Roles</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Add_Renewal_Contact_Role</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Contact_Roles_To_Copy</targetReference>
+        </noMoreValuesConnector>
+    </loops>
     <loops>
         <description>Goes through each bundle component Asset so it can be removed from the list.</description>
         <name>Loop_Bundle_Components</name>
@@ -291,6 +374,46 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <description>Creates the copied Contact Roles on the renewal Opportunity in one step.</description>
+        <name>Create_Renewal_Contact_Roles</name>
+        <label>Create Renewal Contact Roles</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <faultConnector>
+            <targetReference>Handle_Fault</targetReference>
+        </faultConnector>
+        <inputReference>varContactRolesToCreate</inputReference>
+    </recordCreates>
+    <recordLookups>
+        <description>Gets the Contact Roles on the original Opportunity so they can be copied to the renewal Opportunity.</description>
+        <name>Get_Source_Contact_Roles</name>
+        <label>Get Source Contact Roles</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Loop_Source_Contact_Roles</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Handle_Fault</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>OpportunityId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Source_Opportunity.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>OpportunityContactRole</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>ContactId</queriedFields>
+        <queriedFields>Role</queriedFields>
+        <queriedFields>IsPrimary</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <recordLookups>
         <description>Gets the Order&apos;s Product Selling Model (e.g. Annual Subscription: Pricing Term 1, Unit Annual) to use as the Assets&apos; renewal term.</description>
         <name>Get_Selling_Model</name>
@@ -643,6 +766,9 @@
         <label>Update Source Opportunity</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Source_Contact_Roles</targetReference>
+        </connector>
         <faultConnector>
             <targetReference>Handle_Fault</targetReference>
         </faultConnector>
@@ -870,6 +996,24 @@
         <isCollection>false</isCollection>
         <isInput>false</isInput>
         <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Holds one Contact Role for the renewal Opportunity while it is built.</description>
+        <name>varContactRole</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>OpportunityContactRole</objectType>
+    </variables>
+    <variables>
+        <description>The Contact Roles to create on the renewal Opportunity.</description>
+        <name>varContactRolesToCreate</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>OpportunityContactRole</objectType>
     </variables>
     <variables>
         <description>The Product Selling Model of the Order&apos;s products.</description>
