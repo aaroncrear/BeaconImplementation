@@ -37,7 +37,7 @@ permission sets are added to it in Production. `hasActivationRequired` is false,
 2. **Revokes** the other nine `Beacon_<Persona>_Integrations` groups.
 
 The criteria, order, trigger (`CreateAndUpdate`), status (`Design`) and existing actions are
-unchanged. The description on each policy was updated to cover the new actions. Each policy
+unchanged. The description on each policy was rewritten to cover the new actions and kept under the 255-character limit for User Access Policy descriptions. Each policy
 now has 21 actions: 3 grants and 18 revokes.
 
 **Why the groups are granted by the existing persona policies:** a user who matches more than
