@@ -28,6 +28,8 @@ steps:
   new Contract.
 - Stop users editing Closed Opportunities, except users given the Edit Closed Opportunities
   permission set, and the automation.
+- Stop users editing the primary Quote of a Closed Won Opportunity, except users given the Edit
+  Closed Won Quotes permission set.
 - Default the **Billing Address** on new Quotes, Orders and Contracts from the Account.
 - The automation must not run twice for the same Opportunity. If a step fails, the error must be
   visible on the Opportunity and the admins must be notified.
@@ -282,6 +284,27 @@ It honours the On/Off Switch (Run Validation Rules), like the other Opportunity 
 shown: "This Opportunity is closed and can't be edited. Contact a Beacon Salesforce Admin if it
 needs to be changed."
 
+### Closed_Won_Quote_Locked (new Quote validation rule)
+
+Stops users editing the **primary (synced) Quote** (`IsSyncing`) of a **Closed Won**
+Opportunity. Users with the new **Edit Closed Won Quotes** custom permission, granted through its
+own **Edit Closed Won Quotes** permission set, are exempt. It honours the On/Off Switch (Run
+Validation Rules).
+
+**When the lock starts.** The native Create Contract and Create Orders From Quote actions update
+the Accepted Quote after Closed Won: in HTCDEV the Quote was modified two seconds after Closed
+Won, when the Contract was linked to it. Which Quote fields these native actions change isn't
+visible, so locking the Quote at Closed Won could break Contract and Order creation. For
+**Subscription New** Opportunities, the lock therefore starts once **Closed Won Automation
+Complete** is checked (the Contract and Order are done). For Closed Won Opportunities of any other
+record type, which the automation doesn't process, it applies straight away.
+
+Error shown: "This is the primary Quote of a Closed Won Opportunity and can't be edited. Contact
+a Beacon Salesforce Admin if it needs to be changed."
+
+Not covered: **quote lines** (Quote Line Items) and non-primary Quotes on the same Opportunity.
+Quote lines need their own rule if they should be locked too.
+
 ### Asset - On Create or Update - After Save (new flow)
 
 `Asset_On_Create_Or_Update_After_Save` is a record-triggered after-save flow on Asset. It runs on
@@ -412,6 +435,16 @@ be renewed.
 - Uncheck Run Validation Rules on the On/Off Switch and confirm a persona user can edit. Re-check
   it afterwards.
 
+**Closed Won Quote lock**
+
+- As a persona user, open the primary Quote of a completed Closed Won Opportunity (Closed Won
+  Automation Complete checked), change a field (e.g. Description) and save. Confirm the error.
+- Assign the **Edit Closed Won Quotes** permission set and confirm the edit is allowed. Remove it
+  and confirm it's blocked again.
+- Close Won a new Subscription New deal as a persona user. Confirm the Contract and Order are
+  still created (the lock only starts once the automation is complete).
+- Confirm a non-primary Quote on the same Opportunity can still be edited.
+
 **Contact Roles**
 
 - **Copy to renewal:** before Closed Won, add two Contact Roles to the original Opportunity
@@ -462,9 +495,9 @@ be renewed.
 ## Post Deployment Items
 
 1. **Deploy order:** deploy the four Opportunity fields, the Order **Assets Created** field, the
-   **Edit Closed Opportunities** custom permission and permission set and the other permission
-   sets first, then the
-   validation rule and the flows. The flows reference the new fields.
+   **Edit Closed Opportunities** and **Edit Closed Won Quotes** custom permissions and permission
+   sets and the other permission sets first, then the
+   validation rules and the flows. The flows reference the new fields.
    `Closed_Won_Revenue_Automation` must be deployed before (or with)
    `Opportunity_Closed_Won_After_Save`.
 2. **HTCDEV clean-up:** an earlier version of this branch deployed `Opportunity - On Update -
@@ -514,7 +547,9 @@ be renewed.
 11. **Assign the Edit Closed Opportunities permission set** in each org to the users who should
     be able to edit or reopen closed deals (admins, and anyone who re-runs a failed deal). Nobody
     has it after deployment, so until it's assigned no user can edit a closed Opportunity.
-12. **Existing Contracts:** Contracts created before this build have no Contract Term or End
+12. **Assign the Edit Closed Won Quotes permission set** in each org to the users who should be
+    able to edit the primary Quote of a Closed Won deal. Nobody has it after deployment.
+13. **Existing Contracts:** Contracts created before this build have no Contract Term or End
     Date (e.g. 00000113 and 00000114 in HTCDEV). Set them by hand if needed.
 
 ## Component Manifest
@@ -551,3 +586,6 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Renewal-A
 | 26 | Validation Rule | Opportunity | Closed_Opportunity_Locked | Closed_Opportunity_Locked | Created | Blocks edits to Opportunities that were already Closed Won or Closed Lost, except for the Edit Closed Opportunities custom permission and saves that change the automation's fields. Honours the On/Off Switch. |
 | 27 | Custom Permission | N/A | Edit_Closed_Opportunities | Edit Closed Opportunities | Created | Lets the holder edit Closed Opportunities (checked by Closed_Opportunity_Locked). |
 | 28 | Permission Set | N/A | Edit_Closed_Opportunities | Edit Closed Opportunities | Created | Grants only the Edit Closed Opportunities custom permission. Assign to users who may edit or reopen closed deals. |
+| 29 | Validation Rule | Quote | Closed_Won_Quote_Locked | Closed_Won_Quote_Locked | Created | Blocks edits to the primary (synced) Quote of a Closed Won Opportunity once the Closed Won automation is complete (straight away for non-Subscription New Opportunities), unless the user has the Edit Closed Won Quotes custom permission. Honours the On/Off Switch. |
+| 30 | Custom Permission | N/A | Edit_Closed_Won_Quotes | Edit Closed Won Quotes | Created | Lets the holder edit the primary Quote of a Closed Won Opportunity (checked by Closed_Won_Quote_Locked). |
+| 31 | Permission Set | N/A | Edit_Closed_Won_Quotes | Edit Closed Won Quotes | Created | Grants only the Edit Closed Won Quotes custom permission. Assign to users who may edit closed-won Quotes. |
