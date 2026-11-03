@@ -86,16 +86,19 @@ parent.
 - `Project__c`, `Project_Team_Member__c`, and `Project_Time__c`. `Project__c` looks up to Account
   and Contact, but it isn't in this repository and has no records in Production.
 
-**License.** No license is set on the permission set, so it can be assigned to a user with any
-license (for example the Salesforce Integration license usually used for an integration user).
-It doesn't give API access. The integration user's profile must have **API Enabled** (the
+**License.** The permission set uses the **Salesforce API Integration** permission set license,
+the same one used by the existing Beacon Hubspot, Gong, Dialpad, and LinkedIn SN integration
+permission sets. It can only be assigned to a user with the **Salesforce Integration** user
+license who has also been assigned the Salesforce API Integration permission set license. It
+doesn't give API access by itself. The integration user's profile must have **API Enabled** (the
 **Minimum Access - API Only Integrations** profile already has it).
 
 ## Acceptance Criteria
 
 1. Deploy the branch to the target org.
 2. Go to **Setup → Permission Sets** and open **Beacon - Databricks Integration**. Check that
-   the API name is `Beacon_Databricks_Integration` and that no license is set.
+   the API name is `Beacon_Databricks_Integration` and that the license is
+   **Salesforce API Integration**.
 3. Under **Object Settings**, open each of the 14 objects in the Object Permissions table. Check
    that **Read**, **View All Records**, and **View All Fields** are checked, and that **Create**,
    **Edit**, **Delete**, and **Modify All Records** are unchecked.
@@ -104,8 +107,9 @@ It doesn't give API access. The integration user's profile must have **API Enabl
    **Edit Access** unchecked.
 5. Under **System Permissions**, check that **Access Activities** and **View All Activities**
    are checked, and that no other system permissions are on.
-6. Assign the permission set to the Databricks integration user (or a test user whose profile
-   has API Enabled and no other object access).
+6. Assign the permission set to the Databricks integration user (a Salesforce Integration user
+   with the Salesforce API Integration permission set license, whose profile has API Enabled
+   and no other object access).
 7. As that user, run these SOQL queries (for example from Workbench or the Databricks
    connector). Check that each one returns every record in the org, including records the user
    doesn't own, and that all fields come back:
@@ -123,9 +127,11 @@ It doesn't give API access. The integration user's profile must have **API Enabl
 
 ## Post Deployment Items
 
-- Assign **Beacon - Databricks Integration** to the Databricks integration user.
-- Make sure the integration user's profile has **API Enabled** (for example, use the
-  **Minimum Access - API Only Integrations** profile).
+- Create the Databricks integration user with the **Salesforce Integration** user license and
+  the **Minimum Access - API Only Integrations** profile (which has **API Enabled**).
+- Assign the **Salesforce API Integration** permission set license to that user. Production has
+  5 of these licenses and 4 are in use, so this uses the last one.
+- Assign **Beacon - Databricks Integration** to the user.
 - When new custom fields are added to the child objects in the second table (for example a new
   field on Opportunity Product or Task), add Read access for them to this permission set. Fields
   on the 14 main objects are covered automatically by View All Fields.
@@ -136,4 +142,4 @@ Github Branch: [Beacon-Databricks-Integration](https://github.com/aaroncrear/Bea
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Permission Set | N/A | Beacon_Databricks_Integration | Beacon - Databricks Integration | Created | Read, View All Records, and View All Fields on Account, Asset, Beacon Feedback, Beacon Subscription, Campaign, Case, Contact, Contract, Lead, Opportunity, Order, Price Book, Product, and Quote. Access Activities and View All Activities for Tasks and Events. Read only field access on 178 fields across Account Team Member, Account Contact Relationship, Asset Relationship, Campaign Member, Opportunity Product, Opportunity Contact Role, Quote Line Item, Order Product, Task, and Event. |
+| 1 | Permission Set | N/A | Beacon_Databricks_Integration | Beacon - Databricks Integration | Created | Salesforce API Integration license. Read, View All Records, and View All Fields on Account, Asset, Beacon Feedback, Beacon Subscription, Campaign, Case, Contact, Contract, Lead, Opportunity, Order, Price Book, Product, and Quote. Access Activities and View All Activities for Tasks and Events. Read only field access on 178 fields across Account Team Member, Account Contact Relationship, Asset Relationship, Campaign Member, Opportunity Product, Opportunity Contact Role, Quote Line Item, Order Product, Task, and Event. |
