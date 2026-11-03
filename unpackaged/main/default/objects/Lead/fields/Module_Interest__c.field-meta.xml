@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Module_Interest__c</fullName>
+    <description>Receives module interest from HubSpot; used for white-space mapping. Uses the Primary Module global value set. Custom field created specifically for the HubSpot integration, outside of the HubSpot managed package.</description>
+    <externalId>false</externalId>
+    <label>Module Interest</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>Primary_Module</valueSetName>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

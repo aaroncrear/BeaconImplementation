@@ -92,6 +92,19 @@ parent.
 - `Project__c`, `Project_Team_Member__c`, and `Project_Time__c`. `Project__c` looks up to Account
   and Contact, but it isn't in this repository and has no records in Production.
 
+**Fields pulled from Production.** Deploying the permission set failed because
+`AccountTeamMember.HW_Record_ID__c` wasn't in the target org. The repo was compared with
+Production for every object in the permission set, and 18 unmanaged custom fields existed in
+Production but not in the repo. They were added so they deploy with the permission set:
+
+- 14 HubSpot integration fields (on Account, Contact, and Lead) were copied from the
+  `Hubspot-Integration` branch, which is the source that was deployed to Production. Their labels,
+  types, and descriptions were checked against Production, and the Account Tier values (1 to 5)
+  match.
+- 4 fields weren't in any branch, so they were rebuilt from their Production definitions (label,
+  type, length, External ID, and description): `HW_Record_ID__c` on Account Team Member, Campaign
+  Member, and Opportunity Contact Role, and `LinkedIn_Profile__c` on Lead.
+
 **License.** The permission set uses the **Salesforce API Integration** permission set license
 (set in the metadata by its developer name, `SalesforceAPIIntegrationPsl`, because the Metadata
 API doesn't accept the label). This is the same license used by the existing Beacon Hubspot, Gong, Dialpad, and LinkedIn SN integration
@@ -157,3 +170,21 @@ Github Branch: [Beacon-Databricks-Integration](https://github.com/aaroncrear/Bea
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
 | 1 | Permission Set | N/A | Beacon_Databricks_Integration | Beacon - Databricks Integration | Created | Salesforce API Integration license. Read, View All Records, and View All Fields on Account, Asset, Beacon Feedback, Beacon Subscription, Campaign, Case, Contact, Contract, Lead, Opportunity, Order, Price Book, Product, and Quote. Access Activities for Tasks and Events. Read only field access on 178 fields across Account Team Member, Account Contact Relationship, Asset Relationship, Campaign Member, Opportunity Product, Opportunity Contact Role, Quote Line Item, Order Product, Task, and Event. |
+| 2 | Custom Field | Account | ABM_Flag__c | ABM Flag | Created | Checkbox for ABM accounts, used by the HubSpot integration. Pulled from Production. |
+| 3 | Custom Field | Account | Active_Drug_Count__c | Active Drug Count | Created | Number of active drugs, used by the HubSpot integration and Data Universe Tier. Pulled from Production. |
+| 4 | Custom Field | Account | Funding__c | Funding | Created | Funding amount from data providers, used by the HubSpot integration. Pulled from Production. |
+| 5 | Custom Field | Account | Tier__c | Tier | Created | Sales prioritisation picklist (1 to 5), used by the HubSpot integration. Pulled from Production. |
+| 6 | Custom Field | Account Team Member | HW_Record_ID__c | HW Record ID | Created | External ID holding the record ID from the Hanson Wade org. Pulled from Production. |
+| 7 | Custom Field | Campaign Member | HW_Record_ID__c | HW Record ID | Created | External ID holding the record ID from the Hanson Wade org. Pulled from Production. |
+| 8 | Custom Field | Contact | Data_Universe_Tier__c | Data Universe Tier | Created | Formula for the Beacon Data Universe Tier (1 to 4). Pulled from Production. |
+| 9 | Custom Field | Contact | HubSpot_Lead_Score__c | HubSpot Lead Score | Created | Lead score received from HubSpot. Pulled from Production. |
+| 10 | Custom Field | Contact | Key_Job_Title__c | Key Job Title | Created | Formula checkbox, checked when the Title contains a key job title keyword. Pulled from Production. |
+| 11 | Custom Field | Contact | Module_Interest__c | Module Interest | Created | Multi-select picklist using the Primary Module global value set, received from HubSpot. Pulled from Production. |
+| 12 | Custom Field | Contact | User_Persona__c | User Persona | Created | Formula assigning a Beacon user persona from the Title. Pulled from Production. |
+| 13 | Custom Field | Lead | Data_Universe_Tier__c | Data Universe Tier | Created | Formula for the Beacon Data Universe Tier (1 to 4). Pulled from Production. |
+| 14 | Custom Field | Lead | HubSpot_Lead_Score__c | HubSpot Lead Score | Created | Lead score received from HubSpot. Pulled from Production. |
+| 15 | Custom Field | Lead | Key_Job_Title__c | Key Job Title | Created | Formula checkbox, checked when the Title contains a key job title keyword. Pulled from Production. |
+| 16 | Custom Field | Lead | LinkedIn_Profile__c | LinkedIn Profile | Created | LinkedIn profile URL for the Lead. Pulled from Production. |
+| 17 | Custom Field | Lead | Module_Interest__c | Module Interest | Created | Multi-select picklist using the Primary Module global value set, received from HubSpot. Pulled from Production. |
+| 18 | Custom Field | Lead | User_Persona__c | User Persona | Created | Formula assigning a Beacon user persona from the Title. Pulled from Production. |
+| 19 | Custom Field | Opportunity Contact Role | HW_Record_ID__c | HW Record ID | Created | Holds the record ID from the Hanson Wade org. Pulled from Production. |

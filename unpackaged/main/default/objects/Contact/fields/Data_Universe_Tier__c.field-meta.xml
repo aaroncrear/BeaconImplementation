@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Data_Universe_Tier__c</fullName>
+    <description>Beacon Data Universe Tier (1-4) from Key Job Title and the related Account. 1: key job title and Account Active Drug Count 4+. 2: key job title and Segment Top 200, Emerging, Mid Market or Other Pharma. 3: key job title and Segment Contract Org. 4: key job title and Segment Other. Blank when no tier criteria are met (including no key job title or no Account). Tier 5 (campaign activity) not yet implemented. Custom field created specifically for the HubSpot integration, outside of the HubSpot managed package.</description>
+    <externalId>false</externalId>
+    <formula>IF( NOT( Key_Job_Title__c ), NULL,
+IF( BLANKVALUE( Account.Active_Drug_Count__c, 0 ) &gt;= 4, 1,
+CASE( Account.Segment__c,
+"Top 200 Pharma", 2,
+"Emerging Pharma", 2,
+"Mid Market Pharma", 2,
+"Other Pharma", 2,
+"Contract Org", 3,
+"Other", 4,
+NULL )))</formula>
+    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+    <label>Data Universe Tier</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>
