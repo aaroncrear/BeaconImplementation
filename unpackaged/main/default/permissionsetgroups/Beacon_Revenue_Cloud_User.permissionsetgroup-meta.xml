@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Contains the Revenue Cloud permission sets users need to browse the catalog, configure and price quotes, create orders and contracts, and amend, renew or cancel assets.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Beacon - Revenue Cloud User</label>
+    <permissionSets>BRERuntime</permissionSets>
+    <permissionSets>CorePricingRunTimeUser</permissionSets>
+    <permissionSets>DROOrderSubmitInitiateUser</permissionSets>
+    <permissionSets>DecimalQuantityRuntime</permissionSets>
+    <permissionSets>DocGenUser</permissionSets>
+    <permissionSets>IndustriesConfiguratorPlatformApi</permissionSets>
+    <permissionSets>OmniStudioExecution</permissionSets>
+    <permissionSets>ProductCatalogManagementViewer</permissionSets>
+    <permissionSets>ProductDiscoveryUser</permissionSets>
+    <permissionSets>RevLifecycleManagementCoreCPQAssetization</permissionSets>
+    <permissionSets>RevLifecycleManagementCreateContractApi</permissionSets>
+    <permissionSets>RevLifecycleManagementCreateOrderFromQuote</permissionSets>
+    <permissionSets>RevLifecycleManagementInitiateAmendmentApi</permissionSets>
+    <permissionSets>RevLifecycleManagementInitiateCancellationApi</permissionSets>
+    <permissionSets>RevLifecycleManagementInitiateRenewalApi</permissionSets>
+    <permissionSets>RevLifecycleManagementQuotePricesTaxes</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>
