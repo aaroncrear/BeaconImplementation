@@ -3,21 +3,21 @@
     <description>Contains the Revenue Cloud permission sets users need to browse the catalog, configure and price quotes, create orders and contracts, and amend, renew or cancel assets.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Beacon - Revenue Cloud User</label>
-    <permissionSets>BRERuntime</permissionSets>
-    <permissionSets>CorePricingRunTimeUser</permissionSets>
-    <permissionSets>DROOrderSubmitInitiateUser</permissionSets>
-    <permissionSets>DecimalQuantityRuntime</permissionSets>
-    <permissionSets>DocGenUser</permissionSets>
-    <permissionSets>IndustriesConfiguratorPlatformApi</permissionSets>
-    <permissionSets>OmniStudioExecution</permissionSets>
-    <permissionSets>ProductCatalogManagementViewer</permissionSets>
-    <permissionSets>ProductDiscoveryUser</permissionSets>
-    <permissionSets>RevLifecycleManagementCoreCPQAssetization</permissionSets>
-    <permissionSets>RevLifecycleManagementCreateContractApi</permissionSets>
-    <permissionSets>RevLifecycleManagementCreateOrderFromQuote</permissionSets>
-    <permissionSets>RevLifecycleManagementInitiateAmendmentApi</permissionSets>
-    <permissionSets>RevLifecycleManagementInitiateCancellationApi</permissionSets>
-    <permissionSets>RevLifecycleManagementInitiateRenewalApi</permissionSets>
-    <permissionSets>RevLifecycleManagementQuotePricesTaxes</permissionSets>
+    <permissionSets>force__BRERuntime</permissionSets>
+    <permissionSets>force__CorePricingRunTimeUser</permissionSets>
+    <permissionSets>force__DROOrderSubmitInitiateUser</permissionSets>
+    <permissionSets>force__DecimalQuantityRuntime</permissionSets>
+    <permissionSets>force__DocGenUser</permissionSets>
+    <permissionSets>force__IndustriesConfiguratorPlatformApi</permissionSets>
+    <permissionSets>force__OmniStudioExecution</permissionSets>
+    <permissionSets>force__ProductCatalogManagementViewer</permissionSets>
+    <permissionSets>force__ProductDiscoveryUser</permissionSets>
+    <permissionSets>force__RevLifecycleManagementCoreCPQAssetization</permissionSets>
+    <permissionSets>force__RevLifecycleManagementCreateContractApi</permissionSets>
+    <permissionSets>force__RevLifecycleManagementCreateOrderFromQuote</permissionSets>
+    <permissionSets>force__RevLifecycleManagementInitiateAmendmentApi</permissionSets>
+    <permissionSets>force__RevLifecycleManagementInitiateCancellationApi</permissionSets>
+    <permissionSets>force__RevLifecycleManagementInitiateRenewalApi</permissionSets>
+    <permissionSets>force__RevLifecycleManagementQuotePricesTaxes</permissionSets>
     <status>Updated</status>
 </PermissionSetGroup>

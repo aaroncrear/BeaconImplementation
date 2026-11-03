@@ -15,24 +15,29 @@ for users who sell, not for admins who set up the catalog or pricing.
 
 | # | Permission Set API Name | Label | Permission Set License | Why it's included |
 |---|---|---|---|---|
-| 1 | `ProductCatalogManagementViewer` | Product Catalog Management Viewer | Product Catalog Management Viewer | View products, catalogs, categories and attributes. |
-| 2 | `ProductDiscoveryUser` | Product Discovery User | Product Discovery User | Browse and search the catalog to add products to quotes. |
-| 3 | `CorePricingRunTimeUser` | Salesforce Pricing Run Time User | Salesforce Pricing Run Time | Run price calculations with price books and pricing procedures. |
-| 4 | `IndustriesConfiguratorPlatformApi` | Product Configurator | Product Configuration User | Configure bundles and attributes on quote lines. |
-| 5 | `BRERuntime` | Rule Engine Runtime | Business Rules Engine Runtime | Run the decision tables and expression sets that pricing and configuration rules use. |
-| 6 | `DecimalQuantityRuntime` | DecimalQuantityRuntime | Decimal Quantity Runtime User | Enter decimal quantities on quote and order lines. |
-| 7 | `RevLifecycleManagementQuotePricesTaxes` | Price and Tax Calculation for Quoting | Revenue Cloud User | Calculate prices and taxes on quotes. |
-| 8 | `RevLifecycleManagementCreateOrderFromQuote` | Create Orders from Quotes | Revenue Cloud User | Create orders from accepted quotes. |
-| 9 | `RevLifecycleManagementCreateContractApi` | CreateContract API | Revenue Cloud User | Create contracts from quotes and orders. |
-| 10 | `RevLifecycleManagementCoreCPQAssetization` | Assetize Order | Revenue Cloud User | Turn activated orders into assets. |
-| 11 | `RevLifecycleManagementInitiateAmendmentApi` | InitiateAmendment API | Revenue Cloud User | Start amendments on assets. |
-| 12 | `RevLifecycleManagementInitiateRenewalApi` | InitiateRenewal API | Revenue Cloud User | Start renewals on assets. |
-| 13 | `RevLifecycleManagementInitiateCancellationApi` | InitiateCancellation API | Revenue Cloud User | Start cancellations on assets. |
-| 14 | `DROOrderSubmitInitiateUser` | Submit Transactions User | Fulfillment User PSL | Submit orders to Dynamic Revenue Orchestrator for fulfillment. |
-| 15 | `DocGenUser` | DocGen User | DocGen Designer | Generate quote and contract documents. |
-| 16 | `OmniStudioExecution` | Omnistudio User | OmniStudio | Run the OmniStudio components that Document Generation and guided flows use. |
+| 1 | `force__ProductCatalogManagementViewer` | Product Catalog Management Viewer | Product Catalog Management Viewer | View products, catalogs, categories and attributes. |
+| 2 | `force__ProductDiscoveryUser` | Product Discovery User | Product Discovery User | Browse and search the catalog to add products to quotes. |
+| 3 | `force__CorePricingRunTimeUser` | Salesforce Pricing Run Time User | Salesforce Pricing Run Time | Run price calculations with price books and pricing procedures. |
+| 4 | `force__IndustriesConfiguratorPlatformApi` | Product Configurator | Product Configuration User | Configure bundles and attributes on quote lines. |
+| 5 | `force__BRERuntime` | Rule Engine Runtime | Business Rules Engine Runtime | Run the decision tables and expression sets that pricing and configuration rules use. |
+| 6 | `force__DecimalQuantityRuntime` | DecimalQuantityRuntime | Decimal Quantity Runtime User | Enter decimal quantities on quote and order lines. |
+| 7 | `force__RevLifecycleManagementQuotePricesTaxes` | Price and Tax Calculation for Quoting | Revenue Cloud User | Calculate prices and taxes on quotes. |
+| 8 | `force__RevLifecycleManagementCreateOrderFromQuote` | Create Orders from Quotes | Revenue Cloud User | Create orders from accepted quotes. |
+| 9 | `force__RevLifecycleManagementCreateContractApi` | CreateContract API | Revenue Cloud User | Create contracts from quotes and orders. |
+| 10 | `force__RevLifecycleManagementCoreCPQAssetization` | Assetize Order | Revenue Cloud User | Turn activated orders into assets. |
+| 11 | `force__RevLifecycleManagementInitiateAmendmentApi` | InitiateAmendment API | Revenue Cloud User | Start amendments on assets. |
+| 12 | `force__RevLifecycleManagementInitiateRenewalApi` | InitiateRenewal API | Revenue Cloud User | Start renewals on assets. |
+| 13 | `force__RevLifecycleManagementInitiateCancellationApi` | InitiateCancellation API | Revenue Cloud User | Start cancellations on assets. |
+| 14 | `force__DROOrderSubmitInitiateUser` | Submit Transactions User | Fulfillment User PSL | Submit orders to Dynamic Revenue Orchestrator for fulfillment. |
+| 15 | `force__DocGenUser` | DocGen User | DocGen Designer | Generate quote and contract documents. |
+| 16 | `force__OmniStudioExecution` | Omnistudio User | OmniStudio | Run the OmniStudio components that Document Generation and guided flows use. |
 
 `hasActivationRequired` is false and the status is `Updated`, the same as `Beacon_Baseline`.
+
+**Why the names start with `force__`:** these are Salesforce-provided permission sets in the
+`force` namespace. Permission set group metadata must name them as `force__<Name>`, or the deploy
+fails with "permission set names are invalid". This matches the existing `force__SalesCloudSeller`
+group. In Setup and SOQL they appear without the prefix.
 
 **Why these permission sets:** the list was taken from the Revenue Cloud permission sets in Beacon
 HTC Dev and Beacon Prod, and covers each step a user takes: find a product, configure it, price
