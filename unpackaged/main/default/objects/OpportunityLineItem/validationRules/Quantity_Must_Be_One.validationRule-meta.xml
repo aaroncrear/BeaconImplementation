@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Quantity_Must_Be_One</fullName>
+    <active>true</active>
+    <description>Every module is sold at quantity 1. Users are captured in Number of Users, not Quantity.</description>
+    <errorConditionFormula>Quantity &lt;&gt; 1</errorConditionFormula>
+    <errorDisplayField>Quantity</errorDisplayField>
+    <errorMessage>Quantity must be 1. Enter the number of users in Number of Users.</errorMessage>
+</ValidationRule>

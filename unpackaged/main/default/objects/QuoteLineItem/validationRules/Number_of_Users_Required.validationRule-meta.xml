@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Number_of_Users_Required</fullName>
+    <active>true</active>
+    <description>Every quote line needs at least 1 user, because users drive the price tier.</description>
+    <errorConditionFormula>OR(ISBLANK(Number_of_Users__c), Number_of_Users__c &lt; 1)</errorConditionFormula>
+    <errorDisplayField>Number_of_Users__c</errorDisplayField>
+    <errorMessage>Enter 1 or more in Number of Users.</errorMessage>
+</ValidationRule>

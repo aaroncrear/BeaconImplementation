@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Number_of_Users__c</fullName>
+    <description>Number of users for this module. On Per Module price books it sets this line's user tier. On Module Count price books the highest value on any line sets the band for the whole quote.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>How many users this module is for.</inlineHelpText>
+    <label>Number of Users</label>
+    <precision>6</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

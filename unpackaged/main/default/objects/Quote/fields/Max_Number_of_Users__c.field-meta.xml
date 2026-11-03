@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Max_Number_of_Users__c</fullName>
+    <description>Highest Number of Users on any quote line. On Module Count price books this sets the user band for every module on the quote.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Highest Number of Users on any module on this quote.</inlineHelpText>
+    <label>Max Number of Users</label>
+    <summarizedField>QuoteLineItem.Number_of_Users__c</summarizedField>
+    <summaryForeignKey>QuoteLineItem.QuoteId</summaryForeignKey>
+    <summaryOperation>max</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <type>Summary</type>
+</CustomField>

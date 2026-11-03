@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Pricing_Users__c</fullName>
+    <description>Number of users the pricing procedure uses for this line. On Per Module price books it is this line's Number of Users. On Module Count price books it is the quote's Max Number of Users (the highest on any line), so every line is priced at the same band.</description>
+    <externalId>false</externalId>
+    <formula>IF(
+    ISPICKVAL(Quote.Pricebook2.Pricing_Method__c, "Module Count"),
+    Quote.Max_Number_of_Users__c,
+    Number_of_Users__c
+)</formula>
+    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+    <inlineHelpText>Users that set this line's price. Module Count price books use the highest users on the quote.</inlineHelpText>
+    <label>Pricing Users</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Number_of_Users__c</fullName>
+    <description>Number of users for this module. Copied from the matching line on the Opportunity's synced Quote by the Opportunity Product and Quote Line Item flows.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>How many users this module is for. Copied from the synced quote.</inlineHelpText>
+    <label>Number of Users</label>
+    <precision>6</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

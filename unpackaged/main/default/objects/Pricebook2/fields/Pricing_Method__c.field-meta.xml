@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Pricing_Method__c</fullName>
+    <description>How the Revenue Cloud pricing procedure prices quotes on this price book. Per Module: each quote line is priced at the tier for its own Number of Users, with the multi-module discount. Module Count: the highest Number of Users on any line sets one band for the whole quote, and the number of modules sets the quote total.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Per Module: each module is priced from its own users. Module Count: the highest users on any module and the number of modules set the quote total.</inlineHelpText>
+    <label>Pricing Method</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Per Module</fullName>
+                <default>false</default>
+                <label>Per Module</label>
+            </value>
+            <value>
+                <fullName>Module Count</fullName>
+                <default>false</default>
+                <label>Module Count</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
