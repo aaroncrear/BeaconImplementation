@@ -86,8 +86,9 @@ parent.
 - `Project__c`, `Project_Team_Member__c`, and `Project_Time__c`. `Project__c` looks up to Account
   and Contact, but it isn't in this repository and has no records in Production.
 
-**License.** The permission set uses the **Salesforce API Integration** permission set license,
-the same one used by the existing Beacon Hubspot, Gong, Dialpad, and LinkedIn SN integration
+**License.** The permission set uses the **Salesforce API Integration** permission set license
+(set in the metadata by its developer name, `SalesforceAPIIntegrationPsl`, because the Metadata
+API doesn't accept the label). This is the same license used by the existing Beacon Hubspot, Gong, Dialpad, and LinkedIn SN integration
 permission sets. It can only be assigned to a user with the **Salesforce Integration** user
 license who has also been assigned the Salesforce API Integration permission set license. It
 doesn't give API access by itself. The integration user's profile must have **API Enabled** (the

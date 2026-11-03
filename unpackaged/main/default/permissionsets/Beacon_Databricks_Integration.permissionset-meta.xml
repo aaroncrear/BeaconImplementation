@@ -3,7 +3,7 @@
     <description>Read only, View All Records and View All Fields access to the Beacon CRM objects (and their child objects) for the Databricks integration user.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Beacon - Databricks Integration</label>
-    <license>Salesforce API Integration</license>
+    <license>SalesforceAPIIntegrationPsl</license>
     <fieldPermissions>
         <editable>false</editable>
         <field>AccountContactRelation.EndDate</field>
