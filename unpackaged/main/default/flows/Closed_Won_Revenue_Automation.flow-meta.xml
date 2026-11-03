@@ -73,7 +73,7 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Activate_Contract</targetReference>
+            <targetReference>Get_Contract</targetReference>
         </connector>
     </assignments>
     <assignments>
@@ -90,7 +90,7 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Activate_Contract</targetReference>
+            <targetReference>Get_Contract</targetReference>
         </connector>
     </assignments>
     <assignments>
@@ -148,6 +148,46 @@
             </value>
         </assignmentItems>
     </assignments>
+    <decisions>
+        <description>Only sets the Contract Term when the Contract doesn&apos;t have one and the quote lines have an End Date. Create Contract sets the Start Date but no term, so without this the Contract (and the Opportunity&apos;s License End Date) would have no end date.</description>
+        <name>Set_Contract_Term</name>
+        <label>Set Contract Term?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Activate_Contract</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Term_Needed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Contract.ContractTerm</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Contract.StartDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Latest_Quote_Line.EndDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Contract_Term</targetReference>
+            </connector>
+            <label>Term Needed</label>
+        </rules>
+    </decisions>
     <decisions>
         <description>Checks whether the Accepted Quote already has a Contract. If it does, that Contract is reused.</description>
         <name>Contract_Exists</name>
@@ -256,8 +296,15 @@
             <label>Run</label>
         </rules>
     </decisions>
-    <description>Called by Opportunity - Closed Won - After Save with the Opportunity Id. Finds the Opportunity&apos;s Accepted Quote and stops if there isn&apos;t one. Creates the Contract with the native Create Contract action (net unit prices saved as contract prices) and activates it. Creates the Order with the native Create Orders From Quote action and activates it, which fires Order - Create Assets. Then checks Closed Won Automation Complete, clears Closed Won Automation Error and links the Contract to the Opportunity. Re-uses a Contract or Order that already exists for the Quote, and does nothing if the automation has already completed, so re-running it doesn&apos;t create duplicates. Any error is written to Closed Won Automation Error and sent through the Fault Path Subflow. The renewal Opportunity and Quote are created later by Order - Assets Created - Create Renewal, once the Assets exist.</description>
+    <description>Called by Opportunity - Closed Won - After Save with the Opportunity Id. Finds the Opportunity&apos;s Accepted Quote and stops if there isn&apos;t one. Creates the Contract with the native Create Contract action (net unit prices saved as contract prices), sets its Contract Term from the quote lines if blank (Create Contract leaves it blank, so the Contract would have no End Date) and activates it. Creates the Order with the native Create Orders From Quote action and activates it, which fires Order - Create Assets. Then checks Closed Won Automation Complete, clears Closed Won Automation Error, links the Contract to the Opportunity and copies the Contract&apos;s Start Date and End Date to License Start Date and License End Date. Re-uses a Contract or Order that already exists for the Quote, and does nothing if the automation has already completed, so re-running it doesn&apos;t create duplicates. Any error is written to Closed Won Automation Error and sent through the Fault Path Subflow. The renewal Opportunity and Quote are created later by Order - Assets Created - Create Renewal, once the Assets exist.</description>
     <environments>Default</environments>
+    <formulas>
+        <description>Contract Term in months, from the Contract Start Date to the day after the latest quote line End Date (e.g. 2 Nov 2026 to 1 Nov 2027 = 12).</description>
+        <name>formContractTerm</name>
+        <dataType>Number</dataType>
+        <expression>( YEAR( {!Get_Latest_Quote_Line.EndDate} + 1 ) - YEAR( {!Get_Contract.StartDate} ) ) * 12 + MONTH( {!Get_Latest_Quote_Line.EndDate} + 1 ) - MONTH( {!Get_Contract.StartDate} )</expression>
+        <scale>0</scale>
+    </formulas>
     <interviewLabel>Closed Won Revenue Automation {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Closed Won Revenue Automation</label>
     <processMetadataValues>
@@ -279,6 +326,98 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Gets the Contract&apos;s Start Date and Contract Term, used to work out the term.</description>
+        <name>Get_Contract</name>
+        <label>Get Contract</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Latest_Quote_Line</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Handle_Fault</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>contractId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Contract</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>StartDate</queriedFields>
+        <queriedFields>ContractTerm</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the activated Contract&apos;s Start Date and End Date (End Date is calculated from the Contract Term) for the Opportunity&apos;s License dates.</description>
+        <name>Get_Contract_Dates</name>
+        <label>Get Contract Dates</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Mark_Opportunity_Complete</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Handle_Fault</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>contractId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Contract</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>StartDate</queriedFields>
+        <queriedFields>EndDate</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Accepted Quote&apos;s line with the latest End Date, which marks the end of the subscription term.</description>
+        <name>Get_Latest_Quote_Line</name>
+        <label>Get Latest Quote Line</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Set_Contract_Term</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Handle_Fault</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>QuoteId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Accepted_Quote.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>EndDate</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>QuoteLineItem</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>EndDate</queriedFields>
+        <sortField>EndDate</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <recordLookups>
         <description>Gets the most recently modified Accepted Quote on the Opportunity.</description>
         <name>Get_Accepted_Quote</name>
@@ -376,7 +515,7 @@
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Mark_Opportunity_Complete</targetReference>
+            <targetReference>Get_Contract_Dates</targetReference>
         </connector>
         <faultConnector>
             <targetReference>Handle_Fault</targetReference>
@@ -396,6 +535,34 @@
         <sortOrder>Asc</sortOrder>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
+    <recordUpdates>
+        <description>Sets the Contract Term (months) from the quote lines, before the Contract is activated, so the Contract gets an End Date.</description>
+        <name>Update_Contract_Term</name>
+        <label>Update Contract Term</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Activate_Contract</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Handle_Fault</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>contractId</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>ContractTerm</field>
+            <value>
+                <elementReference>formContractTerm</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Contract</object>
+    </recordUpdates>
     <recordUpdates>
         <description>Activates the Contract (Status = Activated) unless it is already active.</description>
         <name>Activate_Contract</name>
@@ -467,7 +634,7 @@
         <object>Order</object>
     </recordUpdates>
     <recordUpdates>
-        <description>Checks Closed Won Automation Complete, clears Closed Won Automation Error and links the Contract to the Opportunity.</description>
+        <description>Checks Closed Won Automation Complete, clears Closed Won Automation Error, links the Contract to the Opportunity and sets License Start Date and License End Date from the Contract&apos;s Start Date and End Date.</description>
         <name>Mark_Opportunity_Complete</name>
         <label>Mark Opportunity Complete</label>
         <locationX>0</locationX>
@@ -496,6 +663,18 @@
             <field>Closed_Won_Automation_Error__c</field>
             <value>
                 <elementReference>varBlank</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>License_End_Date__c</field>
+            <value>
+                <elementReference>Get_Contract_Dates.EndDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>License_Start_Date__c</field>
+            <value>
+                <elementReference>Get_Contract_Dates.StartDate</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>

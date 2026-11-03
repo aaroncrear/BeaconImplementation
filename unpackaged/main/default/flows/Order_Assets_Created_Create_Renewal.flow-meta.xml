@@ -258,7 +258,7 @@
             <label>Found</label>
         </rules>
     </decisions>
-    <description>Runs asynchronously when Assets Created is checked on an Order that came from a Quote (Create Asset Order Event - Mark Order Assets Created checks it once Revenue Cloud has created the Order&apos;s Assets). If the Order came from a Subscription New Opportunity that the Closed Won Revenue Automation completed, and that Opportunity has no Renewal Opportunity yet, finds the Assets created from the Order&apos;s products (Order Product &gt; Asset Action Source &gt; Asset Action &gt; Asset) sets Renewal Term and Renewal Term Unit on those Assets from the Order&apos;s Product Selling Model where they are blank (Create Renewal Quote requires them and assetization leaves them blank), and drops any Asset that is a bundle component of another Asset (Asset Relationship), because Create Renewal Quote only accepts top-level Assets. It then calls the native Create Renewal Quote flow once with the top-level Assets, which creates the renewal Opportunity and renewal Quote. The new Opportunity is set to the Subscription Renewal record type, renamed &quot;&lt;original name&gt; - Renewal&quot;, given Type Existing Business, the original Owner and the Contract, and linked both ways (Previous Opportunity on the renewal, Renewal Opportunity on the original). The original Opportunity&apos;s Contact Roles (Contact, Role and Primary) are then copied to the renewal Opportunity. Errors are written to Closed Won Automation Error on the original Opportunity and sent through the Fault Path Subflow. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>Runs asynchronously when Assets Created is checked on an Order that came from a Quote (Create Asset Order Event - Mark Order Assets Created checks it once Revenue Cloud has created the Order&apos;s Assets). If the Order came from a Subscription New Opportunity that the Closed Won Revenue Automation completed, and that Opportunity has no Renewal Opportunity yet, finds the Assets created from the Order&apos;s products (Order Product &gt; Asset Action Source &gt; Asset Action &gt; Asset) sets Renewal Term and Renewal Term Unit on those Assets from the Order&apos;s Product Selling Model where they are blank (Create Renewal Quote requires them and assetization leaves them blank), and drops any Asset that is a bundle component of another Asset (Asset Relationship), because Create Renewal Quote only accepts top-level Assets. It then calls the native Create Renewal Quote flow once with the top-level Assets, which creates the renewal Opportunity and renewal Quote. The new Opportunity is set to the Subscription Renewal record type and Stage Onboarding, renamed &quot;&lt;original name&gt; - Renewal&quot;, given Type Existing Business, the original Owner and the Contract, and linked both ways (Previous Opportunity on the renewal, Renewal Opportunity on the original). The original Opportunity&apos;s Contact Roles (Contact, Role and Primary) are then copied to the renewal Opportunity. Errors are written to Closed Won Automation Error on the original Opportunity and sent through the Fault Path Subflow. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <formulas>
         <description>The current Order Product&apos;s Product Selling Model, or the one already found if this line has none.</description>
@@ -823,7 +823,7 @@
         <object>Opportunity</object>
     </recordUpdates>
     <recordUpdates>
-        <description>Sets up the renewal Opportunity created by Create Renewal Quote: Subscription Renewal record type, name, Type Existing Business, the original Owner, the Contract and Previous Opportunity.</description>
+        <description>Sets up the renewal Opportunity created by Create Renewal Quote: Subscription Renewal record type, Stage Onboarding, name, Type Existing Business, the original Owner, the Contract and Previous Opportunity.</description>
         <name>Update_Renewal_Opportunity</name>
         <label>Update Renewal Opportunity</label>
         <locationX>0</locationX>
@@ -870,6 +870,12 @@
             <field>RecordTypeId</field>
             <value>
                 <elementReference>Get_Subscription_Renewal_Record_Type.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>StageName</field>
+            <value>
+                <stringValue>Onboarding</stringValue>
             </value>
         </inputAssignments>
         <inputAssignments>

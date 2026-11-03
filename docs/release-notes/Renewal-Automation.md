@@ -19,6 +19,15 @@ steps:
 - Automatically create the **renewal Opportunity and renewal Quote** for the next term.
 - Track the link between the original and renewal Opportunities in both directions.
 - Copy the original Opportunity's Contact Roles to the renewal Opportunity.
+- Set the renewal Opportunity's Stage to **Onboarding**.
+- Give the renewal Opportunity the renewal Beacon Feedback surveys (Onboarding Call 1 - Kick Off
+  and Customer Call), not the new-business ones (Sales Demo and Sales Prospecting).
+- When an Opportunity is Closed Won, set its Account's **Type** to **Customer** if it isn't
+  already.
+- At Closed Won, set the Opportunity's **License Start Date** and **License End Date** from the
+  new Contract.
+- Stop users editing Closed Opportunities (Beacon Salesforce Admins and the automation excepted).
+- Default the **Billing Address** on new Quotes, Orders and Contracts from the Account.
 - The automation must not run twice for the same Opportunity. If a step fails, the error must be
   visible on the Opportunity and the admins must be notified.
 - Build and test in Beacon HTCDEV first, then UAT, then Prod.
@@ -32,11 +41,12 @@ renewal or amendment, and running the automation for Subscription Renewal Opport
 
 ```
 Quote Accepted → Opportunity Stage = Contract → Opportunity Stage = Closed Won
-  └─ Opportunity - Closed Won - After Save (Run Asynchronously path)
+  ├─ Opportunity - Closed Won - After Save (Run Immediately) → Account Type = Customer
+  └─ Opportunity - Closed Won - After Save (Run Asynchronously, Subscription New only)
        └─ Closed Won Revenue Automation (subflow)
-            ├─ Create Contract (native createContract) → Activate Contract
+            ├─ Create Contract (native createContract) → set Contract Term → Activate Contract
             ├─ Create Order (native createOrdersFromQuote) → Activate Order
-            └─ Mark Opportunity complete, link Contract
+            └─ Mark Opportunity complete, link Contract, set License Start/End Date
                  └─ Order - Create Assets (existing, async) → Assets created
                       ├─ Asset - On Create or Update - After Save → Beacon Subscriptions
                       └─ Create Asset Order Event (native platform event)
@@ -44,7 +54,12 @@ Quote Accepted → Opportunity Stage = Contract → Opportunity Stage = Closed W
                                 └─ Order.Assets_Created__c = true
                                      └─ Order - Assets Created - Create Renewal (async path)
                                           └─ Create Renewal Quote (native) → renewal Opp + Quote
-                                               → set up renewal Opp, link both Opportunities
+                                               → set up renewal Opp (Stage Onboarding), link both
+                                                 Opportunities, copy Contact Roles
+                                                    └─ Opportunity - On Create or Record Type
+                                                       Change - After Save → swap surveys
+
+New Quote / Order / Contract → <Object> - On Create - Before Save → Billing Address from Account
 ```
 
 ### What changed from the original design
@@ -84,11 +99,10 @@ Aaron):
 
 ### Opportunity - Closed Won - After Save (new flow)
 
-`Opportunity_Closed_Won_After_Save` is a thin record-triggered flow on Opportunity update. Its
-entry formula is all of:
+`Opportunity_Closed_Won_After_Save` is a record-triggered flow on Opportunity update. Its entry
+formula is all of:
 
 - Run Flows is checked on the On/Off Switch
-- the record type is **Subscription New**
 - the Stage is **Closed Won**
 - Closed Won Automation Complete is unchecked
 
@@ -98,9 +112,12 @@ requires it for a flow with a Run Asynchronously path. So the flow runs when an 
 Editing other fields on a Closed Won Opportunity doesn't re-run it. Unchecking Closed Won
 Automation Complete on a Closed Won Opportunity *does* re-run it (a deliberate admin re-run).
 
-It calls the **Closed Won Revenue Automation** subflow with the Opportunity Id on the **Run
-Asynchronously** path. The Stage change saves straight away for the user, and the Revenue Cloud
-actions run in their own transaction afterwards.
+- **Run Immediately (any record type):** sets the Opportunity's **Account Type** to
+  **Customer** if it isn't already. The Account is only updated when its Type is something else
+  (Prospect, Former Customer, blank, and so on).
+- **Run Asynchronously (Subscription New only):** calls the **Closed Won Revenue Automation**
+  subflow with the Opportunity Id. The Stage change saves straight away for the user, and the
+  Revenue Cloud actions run in their own transaction afterwards.
 
 ### Closed Won Revenue Automation (new subflow)
 
@@ -121,16 +138,20 @@ The steps are:
    with `sourceId` = the Quote and `contractPriceOption` = `NET_UNIT_PRICE_ONLY`. This is the
    same action and option as the "Net Unit Price" choice on the Create Contract From Quote screen,
    and it saves the quote's net unit prices as Contract Item Prices. The existing HTCDEV contracts
-   had prices saved this way. The Contract is then **activated** (Status = Activated) if it
-   isn't already.
+   had prices saved this way. Create Contract sets the Contract's Start Date but leaves **Contract
+   Term** blank, so the Contract has no End Date. If the term is blank, the subflow sets it in
+   months, from the Contract Start Date to the day after the latest quote line End Date (e.g. 2
+   Nov 2026 to 1 Nov 2027 = 12), and Salesforce then calculates the End Date. The Contract is
+   then **activated** (Status = Activated) if it isn't already.
 4. **Order:** if an Order already exists for the Quote, it's reused. Otherwise the native
    **Create Orders From Quote** action (`createOrdersFromQuote`) creates it with just the Quote
    Id. This creates a single Order from all of the quote lines. It's the same action used by
    `Quote - Create Order - Screen Flow`, and the Order picks up the Contract from the Quote.
    Every Order for the Quote that isn't active is then **activated**. Activation fires the
    existing `Order - Create Assets` flow, which creates the Assets asynchronously.
-5. Checks **Closed Won Automation Complete**, clears **Closed Won Automation Error** and sets the
-   Opportunity's **Contract** lookup.
+5. Checks **Closed Won Automation Complete**, clears **Closed Won Automation Error**, sets the
+   Opportunity's **Contract** lookup, and copies the Contract's Start Date and End Date to the
+   Opportunity's **License Start Date** and **License End Date**.
 
 Every step has a fault path. The error is written to Closed Won Automation Error and sent through
 the standard `Fault Path Subflow` email. Steps that already succeeded are not rolled back.
@@ -187,6 +208,7 @@ It then:
    | Field | Value |
    |---|---|
    | Record Type | Subscription Renewal |
+   | Stage | Onboarding (in the Subscription Renewal sales process; Create Renewal Quote leaves it on Request for Information, which isn't) |
    | Name | `<original Opportunity name> - Renewal` |
    | Type | Existing Business |
    | Owner | Owner of the original Opportunity |
@@ -206,6 +228,57 @@ is written to Closed Won Automation Error on the original Opportunity and sent t
 Path Subflow. Salesforce doesn't allow a fault path on a Subflow element. If Create Renewal Quote
 throws an unhandled error instead of returning `isSuccess` false, the interview fails with the
 standard flow error email.
+
+### Opportunity - On Create or Record Type Change - After Save (updated flow)
+
+`Opportunity_On_Create_After_Save` creates the Beacon Feedback surveys for new Opportunities
+(Beacon-Feedback build). Create Renewal Quote creates the renewal Opportunity with the running
+user's default record type, **Subscription New**. This flow then gave it the new-business surveys
+(Sales Demo and Sales Prospecting), and the renewal flow switched its record type to
+Subscription Renewal straight afterwards. The renewal surveys were never created. Seen on
+006S900000Ul2YLIAZ ("Renewal Automation 3 - Renewal"), BFB-0012 and BFB-0013.
+
+The flow now also runs on **update** when an existing Opportunity's record type changes to
+**Subscription Renewal**. It then:
+
+1. Deletes that Opportunity's **Sales Demo** and **Sales Prospecting** surveys, unless they've
+   been completed (Survey Completed = Yes). A filled-in survey is never removed.
+2. Creates the **Onboarding Call 1 - Kick Off** and **Customer Call** surveys, using the same
+   steps as for a new Subscription Renewal Opportunity (due 15 and 45 days after the Close Date,
+   owned by the Opportunity Owner).
+
+The survey rules stay in one flow, and this also covers a user changing an Opportunity's record
+type by hand. The entry formula keeps new Opportunities exactly as before (`ISNEW()` with
+Subscription New or Subscription Renewal), and only adds the record type change case. The label
+is now "Opportunity - On Create or Record Type Change - After Save". The API name is unchanged.
+
+### Quote / Order / Contract - On Create - Before Save (new flows)
+
+`Quote_On_Create_Before_Save`, `Order_On_Create_Before_Save` and `Contract_On_Create_Before_Save`
+run when a record is created with a **blank Billing Address** (Street, City, State, Postal Code
+and Country all empty), and Run Flows is checked. They copy those five fields from the Account.
+A Quote's Account isn't set until after it is saved, so the Quote flow reads the address
+through the Quote's Opportunity's Account. An address entered on the record is kept, and later
+changes to the Account's address don't change existing Quotes, Orders or Contracts. These also
+cover the Orders and Contracts created by the automation.
+
+### Closed_Opportunity_Locked (new validation rule)
+
+Stops users editing an Opportunity that was **already Closed Won or Closed Lost** before the
+edit (`PRIORVALUE(StageName)`), including changing its Stage to reopen it. Moving an open
+Opportunity to Closed is still allowed. Exceptions:
+
+- Users with the new **Edit Closed Opportunities** custom permission, granted through
+  **Beacon Salesforce Admin - Object, Tab, FLS** (the admin permission set assigned in HTCDEV).
+- Saves that change one of the fields the Closed Won automation maintains after Closed Won:
+  Closed Won Automation Complete, Closed Won Automation Error, Renewal Opportunity, Contract,
+  License Start Date or License End Date. Without this, the automation's own updates would fail.
+  The trade-off is that a save which changes one of those fields isn't blocked. Personas can
+  only read the custom fields, so in practice only the automation and admins change them.
+
+It honours the On/Off Switch (Run Validation Rules), like the other Opportunity rules. Error
+shown: "This Opportunity is closed and can't be edited. Contact a Beacon Salesforce Admin if it
+needs to be changed."
 
 ### Asset - On Create or Update - After Save (new flow)
 
@@ -293,7 +366,7 @@ be renewed.
    Start Date = the Asset's Lifecycle Start Date and End Date = its Current Lifecycle End Date.
 7. Back on the original Opportunity, confirm **Renewal Opportunity** is filled in. Open it and
    confirm:
-   - Record Type = Subscription Renewal
+   - Record Type = Subscription Renewal and Stage = **Onboarding**
    - Name = `<original name> - Renewal`
    - Type = Existing Business
    - Owner = the original Owner
@@ -302,6 +375,38 @@ be renewed.
    - it has a Renewal Quote for the next term containing both products
 8. On the original Opportunity, confirm the renewal Opportunity appears in the **Renewal
    Opportunities** related list (once it's added to the layout).
+
+**Closed Won extras**
+
+- **Account Type:** use an Account whose Type is Prospect. After Closed Won, confirm the Account
+  Type is **Customer**. Close Won a second deal on a Customer Account and confirm nothing changes.
+- **License dates:** confirm the Contract has a Contract Term (12 for Annual Subscription) and an
+  End Date, and that the Opportunity's License Start Date and License End Date match the
+  Contract's Start Date and End Date.
+- **Renewal surveys:** on the renewal Opportunity, confirm it has **Onboarding Call 1 - Kick Off**
+  and **Customer Call** surveys (due Close Date + 15 and + 45 days), and no Sales Demo or Sales
+  Prospecting surveys.
+- **Record type change by hand:** on a test Subscription New Opportunity with its two Sales
+  surveys, mark one Survey Completed = Yes. Change the record type to Subscription Renewal.
+  Confirm the incomplete Sales survey is deleted, the completed one is kept, and the two renewal
+  surveys are created.
+
+**Billing Address**
+
+- On an Account with a Billing Address, create a Quote with no Billing Address. Confirm it
+  copies the Account's. Create a second Quote and type in a different address: confirm it's kept.
+- After Closed Won, confirm the Order and Contract created by the automation have the Account's
+  Billing Address.
+
+**Closed Opportunity lock**
+
+- As a persona user (e.g. Beacon Sales), open a Closed Won Opportunity, change Next Step and
+  save. Confirm the error. Try changing the Stage back to Contract and confirm the same error.
+- As a Beacon Salesforce Admin, confirm both edits are allowed.
+- Confirm the Closed Won automation still completes (Complete flag, Contract, License dates and
+  Renewal Opportunity all set) on a deal Closed Won by a persona user.
+- Uncheck Run Validation Rules on the On/Off Switch and confirm a persona user can edit. Re-check
+  it afterwards.
 
 **Contact Roles**
 
@@ -331,8 +436,8 @@ be renewed.
 11. Create another Subscription New Opportunity with a Quote left in **Draft** and move it to
     Closed Won. Confirm Closed Won Automation Error says no Accepted Quote was found, Closed Won
     Automation Complete is unchecked, and the fault email arrives.
-12. **Re-run:** on that Opportunity, set the Quote to Accepted. Move the Opportunity off Closed
-    Won and back. Confirm the automation completes and the error is cleared.
+12. **Re-run (as an admin):** on that Opportunity, set the Quote to Accepted. Move the
+    Opportunity off Closed Won and back. Closed Opportunities are locked for other users. Confirm the automation completes and the error is cleared.
 13. **No re-trigger on other edits:** on a completed Closed Won Opportunity, edit another field
     (e.g. Next Step). Confirm nothing new is created.
 
@@ -352,8 +457,9 @@ be renewed.
 
 ## Post Deployment Items
 
-1. **Deploy order:** deploy the four Opportunity fields, the Order **Assets Created** field and
-   the permission sets first, then the flows. The flows reference the new fields.
+1. **Deploy order:** deploy the four Opportunity fields, the Order **Assets Created** field, the
+   **Edit Closed Opportunities** custom permission and the permission sets first, then the
+   validation rule and the flows. The flows reference the new fields.
    `Closed_Won_Revenue_Automation` must be deployed before (or with)
    `Opportunity_Closed_Won_After_Save`.
 2. **HTCDEV clean-up:** an earlier version of this branch deployed `Opportunity - On Update -
@@ -369,8 +475,9 @@ be renewed.
    permissions.
 5. **Create Contract override:** `Beacon - Create Contract From Quote` overrides the managed
    Create Contract From Quote flow. Confirm this is wanted before deploying it to UAT and Prod.
-6. **Re-running a failed deal:** fix the cause shown in Closed Won Automation Error, then move
-   the Opportunity off Closed Won and back. Alternatively, an admin can check and then uncheck
+6. **Re-running a failed deal (admins):** fix the cause shown in Closed Won Automation Error,
+   then move the Opportunity off Closed Won and back. Only admins can do this, because Closed
+   Opportunities are locked for other users. Alternatively, an admin can check and then uncheck
    Closed Won Automation Complete; unchecking it on a Closed Won Opportunity re-runs the
    automation. Existing Contracts and Orders are reused, so nothing is duplicated. If the renewal step failed (the Contract and Order are done), raise it with the admin
    team: with Renewal Opportunity blank, uncheck and re-check **Assets Created** on the Order, or do a manual
@@ -395,16 +502,26 @@ be renewed.
    prices from the Annual Subscription entries, and use a new quote: existing quote lines stay on
    the old entries. Repeat all of this in **UAT and Prod** before testing there.
 
+10. **Wrong surveys on the HTCDEV test renewal:** on 006S900000Ul2YLIAZ, delete BFB-0012 (Sales
+    Demo) and BFB-0013 (Sales Prospecting), and create its Onboarding Call 1 - Kick Off and
+    Customer Call surveys. This happened before the survey flow fix; renewals created afterwards
+    are correct.
+11. **Assign the custom permission elsewhere if needed:** Edit Closed Opportunities is only in
+    Beacon Salesforce Admin - Object, Tab, FLS. Add it to any other admin permission set used in
+    UAT or Prod.
+12. **Existing Contracts:** Contracts created before this build have no Contract Term or End
+    Date (e.g. 00000113 and 00000114 in HTCDEV). Set them by hand if needed.
+
 ## Component Manifest
 
 Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Renewal-Automation
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Flow | Opportunity | Opportunity_Closed_Won_After_Save | Opportunity - Closed Won - After Save | Created | Record-triggered (update) flow. When a Subscription New Opportunity moves to Closed Won with Closed Won Automation Complete unchecked, calls Closed Won Revenue Automation on the Run Asynchronously path. |
-| 2 | Flow | Opportunity | Closed_Won_Revenue_Automation | Closed Won Revenue Automation | Created | Autolaunched subflow. Creates (or reuses) and activates the Contract (native createContract, net unit prices) and Order (native createOrdersFromQuote) from the Accepted Quote, then marks the Opportunity complete. Errors go to the Opportunity and the fault email. |
+| 1 | Flow | Opportunity | Opportunity_Closed_Won_After_Save | Opportunity - Closed Won - After Save | Created | Record-triggered (update) flow on Closed Won with Closed Won Automation Complete unchecked. Run Immediately: Account Type = Customer. Run Asynchronously (Subscription New only): calls Closed Won Revenue Automation. |
+| 2 | Flow | Opportunity | Closed_Won_Revenue_Automation | Closed Won Revenue Automation | Created | Autolaunched subflow. Creates (or reuses) the Contract (native createContract, net unit prices), sets its Contract Term from the quote lines and activates it; creates (or reuses) and activates the Order (native createOrdersFromQuote); marks the Opportunity complete and sets License Start/End Date from the Contract. Errors go to the Opportunity and the fault email. |
 | 3 | Flow | CreateAssetOrderEvent | Create_Asset_Order_Event_Mark_Order_Assets_Created | Create Asset Order Event - Mark Order Assets Created | Created | Platform-event flow. On the final Create Asset Order Event for an Order, checks Assets Created on the Order. |
-| 4 | Flow | Order | Order_Assets_Created_Create_Renewal | Order - Assets Created - Create Renewal | Created | Record-triggered flow (async path). When Assets Created becomes checked, calls native Create Renewal Quote with the Order's Assets, sets up the renewal Opportunity and links it to the original. |
+| 4 | Flow | Order | Order_Assets_Created_Create_Renewal | Order - Assets Created - Create Renewal | Created | Record-triggered flow (async path). When Assets Created becomes checked: sets Asset renewal terms, calls native Create Renewal Quote with the Order's top-level Assets, sets up the renewal Opportunity (Subscription Renewal, Stage Onboarding), links both Opportunities and copies Contact Roles. |
 | 5 | Field | Order | Assets_Created__c | Assets Created | Created | Checkbox. Checked when Revenue Cloud has created the Order's Assets. Hands off from the platform event flow to the renewal flow. |
 | 6 | Flow | Asset | Asset_On_Create_Or_Update_After_Save | Asset - On Create or Update - After Save | Created | Record-triggered flow. Creates one Beacon Subscription per missing seat (Current Quantity minus existing) with Asset, Account, Start and End Date. Excludes Platform Bundle Assets. |
 | 7 | Flow | Quote | Beacon_Create_Contract_From_Quote | Beacon - Create Contract From Quote | Created | Unmanaged clone of rev_contracts__CreateCntrFromQuote (screen flow, overrides it). Added by Aaron so the createContract action could be read. Not called by the automation. |
@@ -420,5 +537,11 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Renewal-A
 | 17 | Permission Set | Opportunity | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
 | 18 | Permission Set | Opportunity | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
 | 19 | Permission Set | Opportunity | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
-| 20 | Permission Set | Opportunity | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Read + Edit FLS on the four new Opportunity fields. |
+| 20 | Permission Set | Opportunity | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Read + Edit FLS on the four new Opportunity fields. Also grants the Edit Closed Opportunities custom permission. |
 | 21 | Permission Set | Opportunity | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
+| 22 | Flow | Opportunity | Opportunity_On_Create_After_Save | Opportunity - On Create or Record Type Change - After Save | Updated | Now also runs when an Opportunity's record type changes to Subscription Renewal: deletes incomplete Sales Demo and Sales Prospecting surveys and creates the Onboarding Call 1 - Kick Off and Customer Call surveys. Relabelled. |
+| 23 | Flow | Quote | Quote_On_Create_Before_Save | Quote - On Create - Before Save | Created | Copies the Account's Billing Address (via the Opportunity) to a new Quote when its Billing Address is blank. |
+| 24 | Flow | Order | Order_On_Create_Before_Save | Order - On Create - Before Save | Created | Copies the Account's Billing Address to a new Order when its Billing Address is blank. |
+| 25 | Flow | Contract | Contract_On_Create_Before_Save | Contract - On Create - Before Save | Created | Copies the Account's Billing Address to a new Contract when its Billing Address is blank. |
+| 26 | Validation Rule | Opportunity | Closed_Opportunity_Locked | Closed_Opportunity_Locked | Created | Blocks edits to Opportunities that were already Closed Won or Closed Lost, except for the Edit Closed Opportunities custom permission and saves that change the automation's fields. Honours the On/Off Switch. |
+| 27 | Custom Permission | N/A | Edit_Closed_Opportunities | Edit Closed Opportunities | Created | Lets the holder edit Closed Opportunities (checked by Closed_Opportunity_Locked). |

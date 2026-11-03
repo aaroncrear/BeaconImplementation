@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Copies the Account&apos;s Billing Street, City, State, Postal Code and Country onto the new Contract.</description>
+        <name>Copy_Account_Billing_Address</name>
+        <label>Copy Account Billing Address</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.BillingStreet</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Account.BillingStreet</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.BillingCity</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Account.BillingCity</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.BillingState</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Account.BillingState</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.BillingPostalCode</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Account.BillingPostalCode</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.BillingCountry</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Account.BillingCountry</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>When a Contract is created with no Billing Address, copies the Billing Address (Street, City, State, Postal Code, Country) from its Account. A Billing Address entered on the Contract is kept. Later changes to the Account&apos;s address don&apos;t change existing records. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <environments>Default</environments>
+    <interviewLabel>Contract - On Create - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Contract - On Create - Before Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Copy_Account_Billing_Address</targetReference>
+        </connector>
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    ISBLANK({!$Record.BillingStreet}),
+    ISBLANK({!$Record.BillingCity}),
+    ISBLANK({!$Record.BillingState}),
+    ISBLANK({!$Record.BillingPostalCode}),
+    ISBLANK({!$Record.BillingCountry})
+)</filterFormula>
+        <object>Contract</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
