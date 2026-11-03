@@ -26,7 +26,8 @@ steps:
   already.
 - At Closed Won, set the Opportunity's **License Start Date** and **License End Date** from the
   new Contract.
-- Stop users editing Closed Opportunities (Beacon Salesforce Admins and the automation excepted).
+- Stop users editing Closed Opportunities, except users given the Edit Closed Opportunities
+  permission set, and the automation.
 - Default the **Billing Address** on new Quotes, Orders and Contracts from the Account.
 - The automation must not run twice for the same Opportunity. If a step fails, the error must be
   visible on the Opportunity and the admins must be notified.
