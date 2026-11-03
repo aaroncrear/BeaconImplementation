@@ -4,10 +4,6 @@
     <hasActivationRequired>false</hasActivationRequired>
     <label>Beacon Salesforce Admin - Object, Tab, FLS</label>
     <license>Salesforce</license>
-    <customPermissions>
-        <enabled>true</enabled>
-        <name>Edit_Closed_Opportunities</name>
-    </customPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.AccountNumber</field>

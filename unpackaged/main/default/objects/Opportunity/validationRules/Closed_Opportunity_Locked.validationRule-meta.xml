@@ -2,7 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Closed_Opportunity_Locked</fullName>
     <active>true</active>
-    <description>Stops users editing an Opportunity that was already Closed Won or Closed Lost before the edit, including changing its Stage to reopen it. Moving an open Opportunity to Closed is still allowed. Exceptions: users with the Edit Closed Opportunities custom permission (Beacon Salesforce Admin - Object, Tab, FLS), and saves that change one of the fields the Closed Won automation maintains (Closed Won Automation Complete, Closed Won Automation Error, Renewal Opportunity, Contract, License Start Date, License End Date), so the automation can finish after Closed Won. Honors the On/Off Switch (Run Validation Rules).</description>
+    <description>Stops users editing an Opportunity that was already Closed Won or Closed Lost before the edit, including changing its Stage to reopen it. Moving an open Opportunity to Closed is still allowed. Exceptions: users with the Edit Closed Opportunities custom permission (Edit Closed Opportunities permission set), and saves that change one of the fields the Closed Won automation maintains (Closed Won Automation Complete, Closed Won Automation Error, Renewal Opportunity, Contract, License Start Date, License End Date), so the automation can finish after Closed Won. Honors the On/Off Switch (Run Validation Rules).</description>
     <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp;
 (
     TEXT(PRIORVALUE(StageName)) = &quot;Closed Won&quot; ||

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>Edit_Closed_Opportunities</name>
+    </customPermissions>
+    <description>Grants the Edit Closed Opportunities custom permission, which lets the user edit Opportunities that are already Closed Won or Closed Lost (bypasses the Closed_Opportunity_Locked validation rule). Assign only to users who need to correct or reopen closed deals.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Edit Closed Opportunities</label>
+</PermissionSet>

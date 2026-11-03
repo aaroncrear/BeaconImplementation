@@ -268,8 +268,9 @@ Stops users editing an Opportunity that was **already Closed Won or Closed Lost*
 edit (`PRIORVALUE(StageName)`), including changing its Stage to reopen it. Moving an open
 Opportunity to Closed is still allowed. Exceptions:
 
-- Users with the new **Edit Closed Opportunities** custom permission, granted through
-  **Beacon Salesforce Admin - Object, Tab, FLS** (the admin permission set assigned in HTCDEV).
+- Users with the new **Edit Closed Opportunities** custom permission, granted through its own
+  **Edit Closed Opportunities** permission set. Keeping it separate from the admin permission sets
+  means the ability to edit closed deals can be given to exactly the people who need it.
 - Saves that change one of the fields the Closed Won automation maintains after Closed Won:
   Closed Won Automation Complete, Closed Won Automation Error, Renewal Opportunity, Contract,
   License Start Date or License End Date. Without this, the automation's own updates would fail.
@@ -402,7 +403,9 @@ be renewed.
 
 - As a persona user (e.g. Beacon Sales), open a Closed Won Opportunity, change Next Step and
   save. Confirm the error. Try changing the Stage back to Contract and confirm the same error.
-- As a Beacon Salesforce Admin, confirm both edits are allowed.
+- Assign the **Edit Closed Opportunities** permission set to a test user and confirm both edits
+  are allowed. Remove it and confirm they're blocked again, including for a Beacon Salesforce
+  Admin who doesn't have it.
 - Confirm the Closed Won automation still completes (Complete flag, Contract, License dates and
   Renewal Opportunity all set) on a deal Closed Won by a persona user.
 - Uncheck Run Validation Rules on the On/Off Switch and confirm a persona user can edit. Re-check
@@ -436,7 +439,7 @@ be renewed.
 11. Create another Subscription New Opportunity with a Quote left in **Draft** and move it to
     Closed Won. Confirm Closed Won Automation Error says no Accepted Quote was found, Closed Won
     Automation Complete is unchecked, and the fault email arrives.
-12. **Re-run (as an admin):** on that Opportunity, set the Quote to Accepted. Move the
+12. **Re-run (with the Edit Closed Opportunities permission set):** on that Opportunity, set the Quote to Accepted. Move the
     Opportunity off Closed Won and back. Closed Opportunities are locked for other users. Confirm the automation completes and the error is cleared.
 13. **No re-trigger on other edits:** on a completed Closed Won Opportunity, edit another field
     (e.g. Next Step). Confirm nothing new is created.
@@ -458,7 +461,8 @@ be renewed.
 ## Post Deployment Items
 
 1. **Deploy order:** deploy the four Opportunity fields, the Order **Assets Created** field, the
-   **Edit Closed Opportunities** custom permission and the permission sets first, then the
+   **Edit Closed Opportunities** custom permission and permission set and the other permission
+   sets first, then the
    validation rule and the flows. The flows reference the new fields.
    `Closed_Won_Revenue_Automation` must be deployed before (or with)
    `Opportunity_Closed_Won_After_Save`.
@@ -475,9 +479,9 @@ be renewed.
    permissions.
 5. **Create Contract override:** `Beacon - Create Contract From Quote` overrides the managed
    Create Contract From Quote flow. Confirm this is wanted before deploying it to UAT and Prod.
-6. **Re-running a failed deal (admins):** fix the cause shown in Closed Won Automation Error,
-   then move the Opportunity off Closed Won and back. Only admins can do this, because Closed
-   Opportunities are locked for other users. Alternatively, an admin can check and then uncheck
+6. **Re-running a failed deal:** fix the cause shown in Closed Won Automation Error, then move
+   the Opportunity off Closed Won and back. This needs the **Edit Closed Opportunities**
+   permission set, because Closed Opportunities are locked for everyone else. Alternatively, an admin can check and then uncheck
    Closed Won Automation Complete; unchecking it on a Closed Won Opportunity re-runs the
    automation. Existing Contracts and Orders are reused, so nothing is duplicated. If the renewal step failed (the Contract and Order are done), raise it with the admin
    team: with Renewal Opportunity blank, uncheck and re-check **Assets Created** on the Order, or do a manual
@@ -506,9 +510,9 @@ be renewed.
     Demo) and BFB-0013 (Sales Prospecting), and create its Onboarding Call 1 - Kick Off and
     Customer Call surveys. This happened before the survey flow fix; renewals created afterwards
     are correct.
-11. **Assign the custom permission elsewhere if needed:** Edit Closed Opportunities is only in
-    Beacon Salesforce Admin - Object, Tab, FLS. Add it to any other admin permission set used in
-    UAT or Prod.
+11. **Assign the Edit Closed Opportunities permission set** in each org to the users who should
+    be able to edit or reopen closed deals (admins, and anyone who re-runs a failed deal). Nobody
+    has it after deployment, so until it's assigned no user can edit a closed Opportunity.
 12. **Existing Contracts:** Contracts created before this build have no Contract Term or End
     Date (e.g. 00000113 and 00000114 in HTCDEV). Set them by hand if needed.
 
@@ -537,7 +541,7 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Renewal-A
 | 17 | Permission Set | Opportunity | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
 | 18 | Permission Set | Opportunity | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
 | 19 | Permission Set | Opportunity | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
-| 20 | Permission Set | Opportunity | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Read + Edit FLS on the four new Opportunity fields. Also grants the Edit Closed Opportunities custom permission. |
+| 20 | Permission Set | Opportunity | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Read + Edit FLS on the four new Opportunity fields. |
 | 21 | Permission Set | Opportunity | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Read FLS on the four new Opportunity fields. |
 | 22 | Flow | Opportunity | Opportunity_On_Create_After_Save | Opportunity - On Create or Record Type Change - After Save | Updated | Now also runs when an Opportunity's record type changes to Subscription Renewal: deletes incomplete Sales Demo and Sales Prospecting surveys and creates the Onboarding Call 1 - Kick Off and Customer Call surveys. Relabelled. |
 | 23 | Flow | Quote | Quote_On_Create_Before_Save | Quote - On Create - Before Save | Created | Copies the Account's Billing Address (via the Opportunity) to a new Quote when its Billing Address is blank. |
@@ -545,3 +549,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/Renewal-A
 | 25 | Flow | Contract | Contract_On_Create_Before_Save | Contract - On Create - Before Save | Created | Copies the Account's Billing Address to a new Contract when its Billing Address is blank. |
 | 26 | Validation Rule | Opportunity | Closed_Opportunity_Locked | Closed_Opportunity_Locked | Created | Blocks edits to Opportunities that were already Closed Won or Closed Lost, except for the Edit Closed Opportunities custom permission and saves that change the automation's fields. Honours the On/Off Switch. |
 | 27 | Custom Permission | N/A | Edit_Closed_Opportunities | Edit Closed Opportunities | Created | Lets the holder edit Closed Opportunities (checked by Closed_Opportunity_Locked). |
+| 28 | Permission Set | N/A | Edit_Closed_Opportunities | Edit Closed Opportunities | Created | Grants only the Edit Closed Opportunities custom permission. Assign to users who may edit or reopen closed deals. |
