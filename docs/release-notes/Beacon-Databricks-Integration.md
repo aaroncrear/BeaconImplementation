@@ -162,6 +162,17 @@ doesn't give API access by itself. The integration user's profile must have **AP
 - When new custom fields are added to the child objects in the second table (for example a new
   field on Opportunity Product or Task), add Read access for them to this permission set. Fields
   on the 14 main objects are covered automatically by View All Fields.
+- **Sandbox deploys.** The permission set is built for Production. UAT and HTCDEV (checked on
+  2026-11-03) don't have 47 of the fields it grants access to, so deploying it there fails. These
+  fields can't be added from the repo:
+  - 42 Gong (`Gong__`) and Dialpad (`Dialpad__`) managed package fields on Task and Event (21 on
+    each). The Gong and Dialpad packages aren't installed in either sandbox.
+  - 4 standard Opportunity Product fields: `Discount`, `Subtotal`, `NetUnitPrice`, and `AssetId`.
+    They depend on org features that the sandboxes don't have turned on.
+  - `Task.Type`, in HTCDEV only.
+
+  To deploy to a sandbox, install the Gong and Dialpad packages there first, or leave these
+  field permissions out of the sandbox deployment. Deploy the full version to Production.
 
 ## Component Manifest
 
