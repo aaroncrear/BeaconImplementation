@@ -16,6 +16,13 @@
    - **Type** = Contract Cleanup
    - **Owner** = the **ResOps Primary** of the Campaign whose **Primary Module** matches the triggering Opportunity's Primary Module. Only Campaigns on the **Parent Campaign** record type are considered.
    - **Contact** = the Contact on the Opportunity's **primary Contact Role**.
+8. Create a **Case - On Create - After Save** Flow that runs when a **ResOps Request** Case is created and **Run Flows** is checked on the On/Off Switch.
+9. The Flow calls the **Email Subflow** in a step named **ResOps Case Created Notification**, passing `varObject` = Case, `varRecordID` = the triggering Case's Id, and `varTrigger` = ResOps Case Created.
+10. In the Email Subflow's **ResOps Case Created** path, add a Send Email action:
+    - **Subject** = ResOps Case {Case Number} - {Case Type}
+    - **Body** = ResOps Case {Case Number} has been created. Please review. "Case {Case Number}" links to the Case, using the `formRecordLink` formula.
+    - **Sender** = the **Beacon Salesforce Automations** org-wide email address.
+    - **Recipients** = the **ResOps Manager**, **ResOps Primary** and **ResOps Secondary** of the Campaign (Parent Campaign record type) whose **Primary Module** matches the Primary Module of the Case's Opportunity.
 
 ## Release Notes
 
@@ -69,6 +76,38 @@ AND(
 
 **Works with Quote - On Update - After Save.** When a synced Quote is Accepted, that Flow moves the Opportunity to Contract. That update also triggers this Flow, so a Subscription New Opportunity moved to Contract by an accepted Quote also gets a Contract Cleanup Case.
 
+### Case - On Create - After Save Flow
+
+A new record-triggered Flow, **Case - On Create - After Save** (`Case_On_Create_After_Save`), emails the ResOps team when a ResOps Request Case is created.
+
+**Entry conditions** (Formula Evaluates to True):
+
+```
+AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    {!$Record.RecordType.DeveloperName} = "ResOps_Request"
+)
+```
+
+It has a single step, **ResOps Case Created Notification**, which calls the **Email Subflow** with `varObject` = `Case`, `varRecordID` = the Case Id and `varTrigger` = `ResOps Case Created`. The Flow runs for every new ResOps Request Case, whether it's created from the **ResOps Request** action on an Opportunity or by **Opportunity - On Update - After Save**.
+
+### Email Subflow – ResOps Case Created path
+
+The **Case Placeholder** outcome on the **Which Case Trigger?** decision was replaced by a **ResOps Case Created** outcome (`varTrigger` = `ResOps Case Created`). The path:
+
+1. **Get ResOps Case** (Get Records). Gets the Case's Case Number, Type and **Primary Module** (`Opportunity_Primary_Module__c`), a formula that shows the Primary Module of the Case's Opportunity. Using the formula saves a separate Opportunity lookup.
+2. **Get Parent Campaign Record Type** (Get Records). Finds the Campaign record type with developer name `Parent_Campaign`.
+3. **Can Look Up ResOps Case Campaign?** (Decision). Continues only if the Case was found, its Opportunity has a Primary Module, and the Parent Campaign record type was found. Otherwise no email is sent.
+4. **Get ResOps Case Campaign** (Get Records). Finds the Campaign on the Parent Campaign record type with the same Primary Module and a ResOps Primary. If more than one matches, the oldest one is used. This uses the same rules as Opportunity - On Update - After Save, so the email goes to the team that owns the Case.
+5. **ResOps Case Campaign Found?** (Decision). If no Campaign is found, no email is sent.
+6. **Assign ResOps Recipient User Ids** (Assignment), **Get ResOps Recipient Users** (Get Records), **Loop ResOps Recipient Users** and **Add ResOps Recipient Email** (Assignment). These collect the email addresses of the Campaign's ResOps Manager, ResOps Primary and ResOps Secondary. The Send Email action takes a list of email addresses, not user Ids, so the users are looked up first. Blank fields and inactive users are skipped.
+7. **ResOps Recipients Found?** (Decision). Sends the email only if at least one address was found.
+8. **Send ResOps Case Created Email** (Send Email action). Subject: `ResOps Case {Case Number} - {Type}`. Body (rich text): `ResOps Case {Case Number} has been created. Please review.`, where **Case {Case Number}** links to the Case through `formRecordLink`. It's sent from the **Beacon Salesforce Automations** org-wide email address (`digital.salesforce@beaconintel.com`). The address is the same in HTCDEV and UAT.
+
+**Errors.** If any step on the path fails, the Email Subflow calls the **Fault Path Subflow**. A failed email sends the error notification instead of rolling back the new Case.
+
+**Email Subflow is now Active.** It was deployed as a Draft framework in the Email-Subflow branch. Its release notes said to activate it in the first branch that adds a real email path, and this is that branch. The other Objects' Placeholder outcomes are unchanged and send nothing.
+
 ## Acceptance Criteria
 
 **Setup data:** make sure the test Opportunity has a **primary Contact Role**. Make sure an active **Parent Campaign** has a **Primary Module** (e.g. *Module A*) and a **ResOps Primary** user. Pick a ResOps Primary user who isn't you, so you can see the Owner was set.
@@ -93,11 +132,24 @@ AND(
     1. Add a **User** level On/Off Switch record for your user with **Run Flows** unchecked.
     2. Move a Subscription New Opportunity to Contract. Confirm no Case is created.
     3. Delete the User level record afterwards.
+14. **Flows are active.** In Setup → Flows, confirm **Case - On Create - After Save** and **Email Subflow** are **Active**.
+15. **Email on a new ResOps Case:**
+    1. On the Parent Campaign for *Module A*, fill in **ResOps Manager**, **ResOps Primary** and **ResOps Secondary** with three active users whose inboxes you can check.
+    2. On an Opportunity with Primary Module *Module A*, click **ResOps Request** and create a Case.
+    3. Confirm all three users receive an email from **Beacon Salesforce Automations** with the subject **ResOps Case {Case Number} - {Type}** and the body **ResOps Case {Case Number} has been created. Please review.**
+    4. Click **Case {Case Number}** in the email and confirm it opens the new Case.
+16. **Email from the Contract automation.** Move a Subscription New Opportunity with Primary Module *Module A* to Contract. Confirm the same three users get the email for the new Contract Cleanup Case.
+17. **Blank or inactive recipients.** Clear **ResOps Secondary** on the Campaign and create another ResOps Request Case. Confirm the ResOps Manager and ResOps Primary still get the email.
+18. **No matching Campaign.** Create a ResOps Request Case from an Opportunity whose Primary Module isn't on any Parent Campaign with a ResOps Primary, or that has no Primary Module. Confirm the Case saves and no email is sent.
+19. **Sub Campaigns are ignored.** Using the *Module B* Sub Campaign from step 8, create a ResOps Request Case on a *Module B* Opportunity. Confirm the Sub Campaign's users get no email.
+20. **On/Off Switch.** With a **User** level On/Off Switch record for your user with **Run Flows** unchecked, create a ResOps Request Case. Confirm no email is sent. Delete the record afterwards.
 
 ## Post Deployment Items
 
 1. Fill in **ResOps Primary** (and **ResOps Manager**, if needed) on each active Parent Campaign so Contract Cleanup Cases get the right Owner.
-2. Make sure each Primary Module is on only one active Parent Campaign that has a ResOps Primary. If more than one matches, the Flow uses the oldest Campaign.
+2. Make sure each Primary Module is on only one active Parent Campaign that has a ResOps Primary. If more than one matches, the Flows use the oldest Campaign.
+3. Confirm the **Beacon Salesforce Automations** org-wide email address (`digital.salesforce@beaconintel.com`) exists and is verified in each target org. The email can't be sent from it otherwise. It's already set up in HTCDEV and UAT.
+4. Confirm **Deliverability** (Setup → Deliverability) is set to **All email** in the org you're testing in. Sandboxes default to System email only, which blocks these emails.
 
 ## Component Manifest
 
@@ -118,3 +170,5 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/ResOps-au
 | 11 | Permission Set | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Read/Edit on Campaign.ResOps_Manager__c, matching ResOps Primary. |
 | 12 | Permission Set | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Read on Campaign.ResOps_Manager__c, matching ResOps Primary. |
 | 13 | Flow | Opportunity | Opportunity_On_Update_After_Save | Opportunity - On Update - After Save | Created | Record-triggered After Save Flow. When a Subscription New Opportunity's Stage changes to Contract, creates a Contract Cleanup ResOps Request Case linked to the Opportunity's primary Contact Role Contact and owned by the ResOps Primary of the Parent Campaign (Parent Campaign record type only) with the matching Primary Module. Honors the On/Off Switch. |
+| 14 | Flow | Case | Case_On_Create_After_Save | Case - On Create - After Save | Created | Record-triggered After Save Flow. When a ResOps Request Case is created, calls the Email Subflow (ResOps Case Created Notification) with varObject = Case, varRecordID = the Case Id and varTrigger = ResOps Case Created. Honors the On/Off Switch. |
+| 15 | Flow | N/A | Email_Subflow | Email Subflow | Updated | Replaced the Case Placeholder outcome with a ResOps Case Created path. It finds the Parent Campaign matching the Case's Opportunity Primary Module and emails its ResOps Manager, ResOps Primary and ResOps Secondary from the Beacon Salesforce Automations org-wide address, with a link to the Case. Added fault handling and activated the Flow. |
