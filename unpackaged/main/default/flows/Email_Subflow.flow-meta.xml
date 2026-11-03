@@ -13,7 +13,7 @@
         </faultConnector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
-            <name>recipientAddresses</name>
+            <name>emailAddressesArray</name>
             <value>
                 <elementReference>collResOpsCaseRecipients</elementReference>
             </value>
@@ -28,12 +28,6 @@
             <name>senderAddress</name>
             <value>
                 <stringValue>digital.salesforce@beaconintel.com</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>composeEmailContent</name>
-            <value>
-                <stringValue>True</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -55,8 +49,6 @@
             </value>
         </inputParameters>
         <nameSegment>emailSimple</nameSegment>
-        <offset>0</offset>
-        <versionString>3.0.1</versionString>
     </actionCalls>
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
