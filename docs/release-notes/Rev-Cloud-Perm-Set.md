@@ -94,13 +94,12 @@ fails.
 
 ## Post Deployment Items
 
-- **Beacon UAT does not have all of these permission sets yet.** UAT is missing the Revenue Cloud
-  User license permission sets (`RevLifecycleManagement*`) and `IndustriesConfiguratorPlatformApi`.
-  A deploy to UAT will fail until Revenue Cloud is provisioned there. Either provision Revenue
-  Cloud in UAT first, or deploy to Beacon HTC Dev and Production only. All 16 permission sets
-  exist in Beacon HTC Dev and Beacon Prod.
-- **Check license counts.** Beacon HTC Dev has 5 seats for most of the licenses above. Before
-  assigning the group, confirm each org has enough seats for the users who need it.
+- **Deployment readiness.** All 16 permission sets exist in Beacon HTC Dev, Beacon UAT and Beacon
+  Prod, and every required permission set license is Active in each org. No group named
+  `Beacon_Revenue_Cloud_User` exists yet in any of them, so the deploy creates it.
+- **Check license counts.** Beacon HTC Dev and Beacon UAT have 5 seats for each license except
+  DocGen Designer. Beacon Prod has 27 seats for each one, with at most 1 in use. Before assigning
+  the group, confirm each org has enough seats for the users who need it.
 - **Assign licenses and the group** to every Revenue Cloud user (steps 3 and 4 above).
 - **Remove direct assignments.** If any of these permission sets were assigned to users directly,
   remove them once the user has the group.
