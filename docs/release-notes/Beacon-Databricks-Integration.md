@@ -45,11 +45,17 @@ so no field permissions are needed for them.
 still need their own object permission, so it has its own entry above.
 
 **Tasks and Events.** Salesforce doesn't allow object permissions on Task and Event. Access is
-given with two user permissions instead:
+given with the **Access Activities** (`ActivitiesAccess`) user permission. The user can then see
+every Task and Event linked (through Related To or Name) to a record they can read. With View All
+Records on Account, Contact, Lead, Opportunity, and the other objects above, that covers every
+linked activity.
 
-- **Access Activities** (`ActivitiesAccess`)
-- **View All Activities** (`ViewAllActivities`). This is the activity version of View All
-  Records.
+**View All Activities** (`ViewAllActivities`) isn't included because the Salesforce API
+Integration permission set license doesn't allow it. Without it, the user can't see Tasks and
+Events that aren't linked to any record (no Related To and no Name), because those are only
+visible to their owner and users above the owner in the role hierarchy. In Production on
+2026-11-03, that was 1,999 of 173,036 Tasks. Every other Task was linked to an Account or an
+Opportunity. Production had no Events.
 
 **Child objects without their own object permissions.** These objects get their record access
 from the parent (Read on the parent, plus View All Records on the parent, gives access to all of
@@ -106,8 +112,8 @@ doesn't give API access by itself. The integration user's profile must have **AP
 4. Open **Object Settings → Opportunity Products**, **Quote Line Items**, **Order Products**,
    **Tasks**, and **Events**. Check that every field listed has **Read Access** checked and
    **Edit Access** unchecked.
-5. Under **System Permissions**, check that **Access Activities** and **View All Activities**
-   are checked, and that no other system permissions are on.
+5. Under **System Permissions**, check that **Access Activities** is checked and that no other
+   system permissions are on.
 6. Assign the permission set to the Databricks integration user (a Salesforce Integration user
    with the Salesforce API Integration permission set license, whose profile has API Enabled
    and no other object access).
@@ -117,7 +123,10 @@ doesn't give API access by itself. The integration user's profile must have **AP
    - `SELECT FIELDS(ALL) FROM Account LIMIT 200`, and the same for Contact, Lead, Opportunity,
      Campaign, Product2, Pricebook2, Quote, Contract, Order, Asset, Beacon_Subscription__c,
      Beacon_Feedback__c, and Case.
-   - `SELECT FIELDS(ALL) FROM Task LIMIT 200` and `SELECT FIELDS(ALL) FROM Event LIMIT 200`
+   - `SELECT COUNT() FROM Task WHERE WhatId != null OR WhoId != null`: as an admin, run the same
+     query and check that both counts match. Repeat for Event.
+   - `SELECT FIELDS(ALL) FROM Task LIMIT 200` and `SELECT FIELDS(ALL) FROM Event LIMIT 200`:
+     check that all fields come back.
    - `SELECT Id, AccountId, UserId, TeamMemberRole FROM AccountTeamMember`
    - `SELECT Id, OpportunityId, UserId, TeamMemberRole FROM OpportunityTeamMember`
    - `SELECT FIELDS(ALL) FROM OpportunityLineItem LIMIT 200`, and the same for QuoteLineItem,
@@ -133,6 +142,10 @@ doesn't give API access by itself. The integration user's profile must have **AP
 - Assign the **Salesforce API Integration** permission set license to that user. Production has
   5 of these licenses and 4 are in use, so this uses the last one.
 - Assign **Beacon - Databricks Integration** to the user.
+- Tell the Databricks team that Tasks and Events with no Related To and no Name won't be
+  extracted (1,999 Tasks in Production on 2026-11-03), because the license doesn't allow View All
+  Activities. If they need these, someone has to link them to a record, or the integration
+  needs a different user license.
 - When new custom fields are added to the child objects in the second table (for example a new
   field on Opportunity Product or Task), add Read access for them to this permission set. Fields
   on the 14 main objects are covered automatically by View All Fields.
@@ -143,4 +156,4 @@ Github Branch: [Beacon-Databricks-Integration](https://github.com/aaroncrear/Bea
 
 | # | Component Type | Object | API Name | Label | Created/Updated/Deleted | Description |
 |---|----------------|--------|----------|-------|-------------------------|--------------|
-| 1 | Permission Set | N/A | Beacon_Databricks_Integration | Beacon - Databricks Integration | Created | Salesforce API Integration license. Read, View All Records, and View All Fields on Account, Asset, Beacon Feedback, Beacon Subscription, Campaign, Case, Contact, Contract, Lead, Opportunity, Order, Price Book, Product, and Quote. Access Activities and View All Activities for Tasks and Events. Read only field access on 178 fields across Account Team Member, Account Contact Relationship, Asset Relationship, Campaign Member, Opportunity Product, Opportunity Contact Role, Quote Line Item, Order Product, Task, and Event. |
+| 1 | Permission Set | N/A | Beacon_Databricks_Integration | Beacon - Databricks Integration | Created | Salesforce API Integration license. Read, View All Records, and View All Fields on Account, Asset, Beacon Feedback, Beacon Subscription, Campaign, Case, Contact, Contract, Lead, Opportunity, Order, Price Book, Product, and Quote. Access Activities for Tasks and Events. Read only field access on 178 fields across Account Team Member, Account Contact Relationship, Asset Relationship, Campaign Member, Opportunity Product, Opportunity Contact Role, Quote Line Item, Order Product, Task, and Event. |
