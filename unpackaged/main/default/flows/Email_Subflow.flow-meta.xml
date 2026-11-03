@@ -53,51 +53,34 @@
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
-        <description>Adds the current recipient&apos;s email address to the list of ResOps Case notification recipients.</description>
-        <name>Add_ResOps_Recipient_Email</name>
-        <label>Add ResOps Recipient Email</label>
+        <description>Adds the email addresses of the Campaign&apos;s ResOps Manager, ResOps Primary and ResOps Secondary to the list of ResOps Case notification recipients.</description>
+        <name>Add_ResOps_Recipient_Emails</name>
+        <label>Add ResOps Recipient Emails</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignmentItems>
             <assignToReference>collResOpsCaseRecipients</assignToReference>
             <operator>Add</operator>
             <value>
-                <elementReference>Loop_ResOps_Recipient_Users.Email</elementReference>
+                <elementReference>Get_Campaign.ResOps_Manager__r.Email</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>collResOpsCaseRecipients</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Get_Campaign.ResOps_Primary__r.Email</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>collResOpsCaseRecipients</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Get_Campaign.ResOps_Secondary__r.Email</elementReference>
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Loop_ResOps_Recipient_Users</targetReference>
-        </connector>
-    </assignments>
-    <assignments>
-        <description>Collects the ResOps Manager, ResOps Primary and ResOps Secondary user Ids from the Campaign so their email addresses can be looked up.</description>
-        <name>Assign_ResOps_Recipient_User_Ids</name>
-        <label>Assign ResOps Recipient User Ids</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>collResOpsRecipientUserIds</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <elementReference>Get_Campaign.ResOps_Manager__c</elementReference>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>collResOpsRecipientUserIds</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <elementReference>Get_Campaign.ResOps_Primary__c</elementReference>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>collResOpsRecipientUserIds</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <elementReference>Get_Campaign.ResOps_Secondary__c</elementReference>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>Get_ResOps_Recipient_Users</targetReference>
+            <targetReference>Send_ResOps_Case_Created_Email</targetReference>
         </connector>
     </assignments>
     <decisions>
@@ -118,7 +101,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Assign_ResOps_Recipient_User_Ids</targetReference>
+                <targetReference>Add_ResOps_Recipient_Emails</targetReference>
             </connector>
             <label>Matching Campaign Found</label>
         </rules>
@@ -158,29 +141,6 @@
                 <targetReference>Get_Campaign</targetReference>
             </connector>
             <label>Case, Primary Module and Record Type Found</label>
-        </rules>
-    </decisions>
-    <decisions>
-        <description>Checks that at least one active recipient has an email address before sending.</description>
-        <name>ResOps_Recipients_Found</name>
-        <label>ResOps Recipients Found?</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <defaultConnectorLabel>No Recipients</defaultConnectorLabel>
-        <rules>
-            <name>Recipients_Found</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>collResOpsCaseRecipients</leftValueReference>
-                <operator>IsEmpty</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Send_ResOps_Case_Created_Email</targetReference>
-            </connector>
-            <label>Recipients Found</label>
         </rules>
     </decisions>
     <decisions>
@@ -379,21 +339,6 @@
     </formulas>
     <interviewLabel>Email Subflow {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Email Subflow</label>
-    <loops>
-        <description>Loops through the active ResOps recipients to collect their email addresses.</description>
-        <name>Loop_ResOps_Recipient_Users</name>
-        <label>Loop ResOps Recipient Users</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <collectionReference>Get_ResOps_Recipient_Users</collectionReference>
-        <iterationOrder>Asc</iterationOrder>
-        <nextValueConnector>
-            <targetReference>Add_ResOps_Recipient_Email</targetReference>
-        </nextValueConnector>
-        <noMoreValuesConnector>
-            <targetReference>ResOps_Recipients_Found</targetReference>
-        </noMoreValuesConnector>
-    </loops>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -518,40 +463,6 @@
         <queriedFields>Id</queriedFields>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
-    <recordLookups>
-        <description>Retrieves the active users among the Campaign&apos;s ResOps Manager, ResOps Primary and ResOps Secondary, with their email addresses. Blank fields and inactive users are skipped.</description>
-        <name>Get_ResOps_Recipient_Users</name>
-        <label>Get ResOps Recipient Users</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Loop_ResOps_Recipient_Users</targetReference>
-        </connector>
-        <faultConnector>
-            <targetReference>Fault_Path_Subflow</targetReference>
-        </faultConnector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>In</operator>
-            <value>
-                <elementReference>collResOpsRecipientUserIds</elementReference>
-            </value>
-        </filters>
-        <filters>
-            <field>IsActive</field>
-            <operator>EqualTo</operator>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </filters>
-        <getFirstRecordOnly>false</getFirstRecordOnly>
-        <object>User</object>
-        <queriedFields>Id</queriedFields>
-        <queriedFields>Email</queriedFields>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
     <start>
         <locationX>0</locationX>
         <locationY>0</locationY>
@@ -589,14 +500,6 @@
     <variables>
         <description>Collection of email addresses for recipients of ResOps Case notifications</description>
         <name>collResOpsCaseRecipients</name>
-        <dataType>String</dataType>
-        <isCollection>true</isCollection>
-        <isInput>false</isInput>
-        <isOutput>false</isOutput>
-    </variables>
-    <variables>
-        <description>User Ids of the ResOps Manager, ResOps Primary and ResOps Secondary on the Case&apos;s Parent Campaign.</description>
-        <name>collResOpsRecipientUserIds</name>
         <dataType>String</dataType>
         <isCollection>true</isCollection>
         <isInput>false</isInput>
