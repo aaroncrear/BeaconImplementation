@@ -278,10 +278,17 @@
                 <booleanValue>false</booleanValue>
             </value>
         </filters>
+        <filters>
+            <field>IsActive</field>
+            <operator>EqualTo</operator>
+        </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
         <object>Campaign</object>
         <queriedFields>Id</queriedFields>
         <queriedFields>ResOps_Primary__c</queriedFields>
+        <queriedFields>Primary_Module__c</queriedFields>
+        <queriedFields>IsActive</queriedFields>
+        <queriedFields>RecordTypeId</queriedFields>
         <sortField>CreatedDate</sortField>
         <sortOrder>Asc</sortOrder>
         <storeOutputAutomatically>true</storeOutputAutomatically>
