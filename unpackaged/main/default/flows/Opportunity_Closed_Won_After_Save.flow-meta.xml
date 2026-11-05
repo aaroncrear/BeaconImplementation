@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Async path: the Contract and Order automation only runs for Subscription New Opportunities.</description>
+        <name>Is_Subscription_New</name>
+        <label>Is Subscription New?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Other Record Type</defaultConnectorLabel>
+        <rules>
+            <name>Subscription_New</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RecordType.DeveloperName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Subscription_New</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Closed_Won_Revenue_Automation</targetReference>
+            </connector>
+            <label>Subscription New</label>
+        </rules>
+    </decisions>
+    <description>Runs when an Opportunity is moved to Closed Won and Closed Won Automation Complete is unchecked. Run immediately: sets the Account&apos;s Type to Customer if it isn&apos;t already (any Opportunity record type). Run asynchronously (after the Stage change has been saved), for Subscription New Opportunities only: calls the Closed Won Revenue Automation subflow, which creates and activates the Contract and the Order from the Opportunity&apos;s Accepted Quote. Runs only when the record is updated to meet the entry criteria (required for an asynchronous path), so editing other fields on a Closed Won Opportunity doesn&apos;t re-run it, but unchecking Closed Won Automation Complete on a Closed Won Opportunity does. Kept separate from Opportunity - On Update - After Save: that flow&apos;s Contract criteria would otherwise mean a Contract to Closed Won move never counts as &quot;updated to meet the criteria&quot;. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <environments>Default</environments>
+    <interviewLabel>Opportunity - Closed Won - After Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity - Closed Won - After Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Sets the Opportunity&apos;s Account Type to Customer, only if it isn&apos;t already Customer.</description>
+        <name>Update_Account_Type</name>
+        <label>Update Account Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Type</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Customer</stringValue>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Type</field>
+            <value>
+                <stringValue>Customer</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Account</object>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Update_Account_Type</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    ISPICKVAL({!$Record.StageName}, &quot;Closed Won&quot;),
+    NOT({!$Record.Closed_Won_Automation_Complete__c})
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <scheduledPaths>
+            <connector>
+                <targetReference>Is_Subscription_New</targetReference>
+            </connector>
+            <pathType>AsyncAfterCommit</pathType>
+        </scheduledPaths>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <subflows>
+        <description>Creates and activates the Contract and the Order from the Opportunity&apos;s Accepted Quote. Handles its own errors (writes them to the Opportunity and sends the fault email).</description>
+        <name>Closed_Won_Revenue_Automation</name>
+        <label>Closed Won Revenue Automation</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>Closed_Won_Revenue_Automation</flowName>
+        <inputAssignments>
+            <name>opportunityId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <subflows>
+        <description>Used to send email notification</description>
+        <name>Fault_Path_Subflow</name>
+        <label>Fault Path Subflow</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>Fault_Path_Subflow</flowName>
+        <inputAssignments>
+            <name>varFaultMessage</name>
+            <value>
+                <elementReference>$Flow.FaultMessage</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+</Flow>

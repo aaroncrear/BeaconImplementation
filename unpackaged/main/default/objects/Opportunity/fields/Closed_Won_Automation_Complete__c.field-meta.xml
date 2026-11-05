@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Closed_Won_Automation_Complete__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Set by the Closed Won Revenue Automation once the Contract and Order have been created and activated for this Opportunity. Stops the automation running twice for the same Opportunity. Uncheck only to deliberately re-run the automation.</description>
+    <inlineHelpText>Checked automatically once the Contract and Order have been created and activated from this Opportunity&apos;s quote.</inlineHelpText>
+    <label>Closed Won Automation Complete</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

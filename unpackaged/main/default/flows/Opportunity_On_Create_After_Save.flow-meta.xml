@@ -227,6 +227,32 @@
         </value>
     </constants>
     <decisions>
+        <description>Checks whether this run is an existing Opportunity whose record type was just changed to Subscription Renewal (for example the renewal Opportunity created by Create Renewal Quote, which starts as Subscription New and is then switched by Order - Assets Created - Create Renewal). If so, its Sales surveys are removed before the renewal surveys are created. New Opportunities go straight to the record type check.</description>
+        <name>Record_Type_Changed_To_Renewal</name>
+        <label>Record Type Changed to Renewal?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Opportunity_Record_Type</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>New Opportunity</defaultConnectorLabel>
+        <rules>
+            <name>Changed_To_Renewal</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formIsRecordTypeChange</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Delete_Sales_Surveys</targetReference>
+            </connector>
+            <label>Changed to Renewal</label>
+        </rules>
+    </decisions>
+    <decisions>
         <description>Checks the Opportunity&apos;s record type to decide which Beacon Feedback surveys to create: Sales Demo and Sales Prospecting for Subscription New, Onboarding Call 1 - Kick Off and Customer Call for Subscription Renewal.</description>
         <name>Opportunity_Record_Type</name>
         <label>Opportunity Record Type</label>
@@ -264,8 +290,14 @@
             <label>Subscription Renewal</label>
         </rules>
     </decisions>
-    <description>When a Subscription New or Subscription Renewal Opportunity is created, creates its Beacon Feedback survey records. Subscription New gets Sales Demo and Sales Prospecting surveys. Subscription Renewal gets Onboarding Call 1 - Kick Off and Customer Call surveys, due 15 and 45 days after the Close Date. Each survey is owned by the Opportunity Owner and linked to the Opportunity. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>When a Subscription New or Subscription Renewal Opportunity is created, creates its Beacon Feedback survey records. Subscription New gets Sales Demo and Sales Prospecting surveys. Subscription Renewal gets Onboarding Call 1 - Kick Off and Customer Call surveys, due 15 and 45 days after the Close Date. Each survey is owned by the Opportunity Owner and linked to the Opportunity. Also runs when an existing Opportunity&apos;s record type is changed to Subscription Renewal (for example the renewal Opportunity from Create Renewal Quote, which is created as Subscription New and then switched): it deletes the Sales Demo and Sales Prospecting surveys that aren&apos;t completed and creates the renewal surveys. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
+    <formulas>
+        <description>True when an existing Opportunity&apos;s record type has just changed (not a new Opportunity).</description>
+        <name>formIsRecordTypeChange</name>
+        <dataType>Boolean</dataType>
+        <expression>AND( NOT( ISNEW() ), ISCHANGED( {!$Record.RecordTypeId} ) )</expression>
+    </formulas>
     <formulas>
         <description>Due Date for the Onboarding Call 1 - Kick Off survey: the Opportunity Close Date plus 15 days.</description>
         <name>formOnboardingCall1DueDate</name>
@@ -278,8 +310,8 @@
         <dataType>Date</dataType>
         <expression>{!$Record.CloseDate} + {!conCustomerCallDueDateDays}</expression>
     </formulas>
-    <interviewLabel>Opportunity - On Create - After Save {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Opportunity - On Create - After Save</label>
+    <interviewLabel>Opportunity - On Create or Record Type Change - After Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity - On Create or Record Type Change - After Save</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -310,6 +342,49 @@
         </faultConnector>
         <inputReference>colBeaconFeedback</inputReference>
     </recordCreates>
+    <recordDeletes>
+        <description>Removes the Sales Demo and Sales Prospecting surveys created while the Opportunity was Subscription New, unless they have been completed (Survey Completed = Yes), so the renewal surveys can replace them.</description>
+        <name>Delete_Sales_Surveys</name>
+        <label>Delete Sales Surveys</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Onboarding_Call_1_Record_Type</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>1 AND 2 AND (3 OR 4)</filterLogic>
+        <filters>
+            <field>Opportunity__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Survey_Completed__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Yes</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Survey_Type__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Sales Demo</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Survey_Type__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Sales Prospecting</stringValue>
+            </value>
+        </filters>
+        <object>Beacon_Feedback__c</object>
+    </recordDeletes>
     <recordLookups>
         <description>Retrieves the Beacon Feedback Sales Demo record type by its developer name (Sales_Demo), so its Id isn&apos;t hardcoded.</description>
         <name>Get_Sales_Demo_Record_Type</name>
@@ -434,17 +509,27 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Opportunity_Record_Type</targetReference>
+            <targetReference>Record_Type_Changed_To_Renewal</targetReference>
         </connector>
         <filterFormula>AND(
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
     OR(
-        {!$Record.RecordType.DeveloperName} = &quot;Subscription_New&quot;,
-        {!$Record.RecordType.DeveloperName} = &quot;Subscription_Renewal&quot;
+        AND(
+            ISNEW(),
+            OR(
+                {!$Record.RecordType.DeveloperName} = &quot;Subscription_New&quot;,
+                {!$Record.RecordType.DeveloperName} = &quot;Subscription_Renewal&quot;
+            )
+        ),
+        AND(
+            NOT(ISNEW()),
+            ISCHANGED({!$Record.RecordTypeId}),
+            {!$Record.RecordType.DeveloperName} = &quot;Subscription_Renewal&quot;
+        )
     )
 )</filterFormula>
         <object>Opportunity</object>
-        <recordTriggerType>Create</recordTriggerType>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>

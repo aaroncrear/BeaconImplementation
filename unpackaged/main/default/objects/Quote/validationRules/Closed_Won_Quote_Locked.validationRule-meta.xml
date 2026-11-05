@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Closed_Won_Quote_Locked</fullName>
+    <active>true</active>
+    <description>Blocks edits to the primary (synced) Quote of a Closed Won Opp once the Closed Won automation is complete (or at once for non-Subscription New Opps). Allowed with the Edit Closed Won Quotes custom permission. Honors On/Off Switch.</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp;
+IsSyncing &amp;&amp;
+Opportunity.IsWon &amp;&amp;
+(
+    Opportunity.Closed_Won_Automation_Complete__c ||
+    Opportunity.RecordType.DeveloperName &lt;&gt; &quot;Subscription_New&quot;
+) &amp;&amp;
+NOT($Permission.Edit_Closed_Won_Quotes)</errorConditionFormula>
+    <errorMessage>This is the primary Quote of a Closed Won Opportunity and can&apos;t be edited. Contact a Beacon Salesforce Admin if it needs to be changed.</errorMessage>
+</ValidationRule>

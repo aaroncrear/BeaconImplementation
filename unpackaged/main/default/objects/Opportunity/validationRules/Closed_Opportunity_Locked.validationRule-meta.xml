@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Closed_Opportunity_Locked</fullName>
+    <active>true</active>
+    <description>Blocks edits to Opportunities already Closed Won/Lost, incl. reopening. Allowed: Edit Closed Opportunities custom permission, or saves changing Closed Won automation fields (so it can finish). Honors On/Off Switch.</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp;
+(
+    TEXT(PRIORVALUE(StageName)) = &quot;Closed Won&quot; ||
+    TEXT(PRIORVALUE(StageName)) = &quot;Closed Lost&quot;
+) &amp;&amp;
+NOT($Permission.Edit_Closed_Opportunities) &amp;&amp;
+NOT(
+    ISCHANGED(Closed_Won_Automation_Complete__c) ||
+    ISCHANGED(Closed_Won_Automation_Error__c) ||
+    ISCHANGED(Renewal_Opportunity__c) ||
+    ISCHANGED(ContractId) ||
+    ISCHANGED(License_Start_Date__c) ||
+    ISCHANGED(License_End_Date__c)
+)</errorConditionFormula>
+    <errorMessage>This Opportunity is closed and can&apos;t be edited. Contact a Beacon Salesforce Admin if it needs to be changed.</errorMessage>
+</ValidationRule>

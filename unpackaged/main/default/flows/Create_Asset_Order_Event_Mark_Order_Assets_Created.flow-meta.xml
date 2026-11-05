@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Continues only when Run Flows is checked on the On/Off Switch custom setting and this is the final event for the Order (Final Event). Platform event-triggered flows can&apos;t filter in the Start element, so the check is here.</description>
+        <name>Run_Flows</name>
+        <label>Run Flows and Final Event?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Skip</defaultConnectorLabel>
+        <rules>
+            <name>Flows_On_And_Final_Event</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Setup.On_Off_Switch__c.Run_Flows__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.IsLastEvent</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Mark_Order_Assets_Created</targetReference>
+            </connector>
+            <label>Flows On and Final Event</label>
+        </rules>
+    </decisions>
+    <description>Runs when Revenue Cloud publishes the final Create Asset Order Event for an Order, meaning its Assets have been created after Order activation. Checks Assets Created on the Order, which starts Order - Assets Created - Create Renewal. The renewal work isn&apos;t done here because platform event-triggered flows can&apos;t call subflows or flow actions. Only listens to the event; it doesn&apos;t change it, so other subscribers still receive it. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <environments>Default</environments>
+    <interviewLabel>Create Asset Order Event - Mark Order Assets Created {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Create Asset Order Event - Mark Order Assets Created</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Checks Assets Created on the Order named in the event, if it isn&apos;t already checked.</description>
+        <name>Mark_Order_Assets_Created</name>
+        <label>Mark Order Assets Created</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.OrderIdentifier</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Assets_Created__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Assets_Created__c</field>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputAssignments>
+        <object>Order</object>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Run_Flows</targetReference>
+        </connector>
+        <object>CreateAssetOrderEvent</object>
+        <triggerType>PlatformEvent</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
