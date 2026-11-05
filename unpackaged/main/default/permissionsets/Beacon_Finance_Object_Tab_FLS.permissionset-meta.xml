@@ -286,7 +286,17 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Beacon_Module_Count_Price__c.Price_Book__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Beacon_Multi_Module_Discount__c.Max_Modules__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Beacon_Multi_Module_Discount__c.Price_Book__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -317,6 +327,16 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Beacon_Subscription__c.Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Beacon_Tier_Price__c.Price_Book__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Beacon_Tier_Price__c.Product__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
