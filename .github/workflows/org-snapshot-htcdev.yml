@@ -1,0 +1,87 @@
+# Retrieves HTCDEV's current version of every component a feature branch
+# changes, and stores it on the branch org-snapshot/htcdev/<branch>. The
+# metadata diff review (Claude skill) reads that ref to show org-vs-branch
+# diffs and flag drift before anything is merged into dev-sandbox.
+name: Org snapshot (HTCDEV)
+
+on:
+  push:
+    branches-ignore: [master, main, dev-sandbox, "org-snapshot/**"]
+    paths: ["unpackaged/**"]
+  workflow_dispatch:
+
+concurrency:
+  group: org-snapshot-${{ github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write # to push the snapshot ref
+
+env:
+  TARGET_ORG: htcdev
+  OUT: .org-snapshot
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: htcdev
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Salesforce CLI and sfdx-git-delta
+        run: |
+          npm install --global @salesforce/cli
+          echo y | sf plugins install sfdx-git-delta
+
+      - name: Work out what the branch changes
+        id: delta
+        run: |
+          if git rev-parse -q --verify origin/dev-sandbox >/dev/null; then BASE=origin/dev-sandbox; else BASE=origin/master; fi
+          FROM=$(git merge-base HEAD "$BASE")
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+          mkdir -p .delta
+          sf sgd source delta --from "$FROM" --to HEAD --source-dir unpackaged --output-dir .delta
+          cat .delta/package/package.xml .delta/destructiveChanges/destructiveChanges.xml
+
+      - name: Authenticate to HTCDEV
+        env:
+          SFDX_AUTH_URL: ${{ secrets.HTCDEV_SFDX_AUTH_URL }}
+        run: |
+          [[ -n "$SFDX_AUTH_URL" ]] || { echo "::error::Secret HTCDEV_SFDX_AUTH_URL is not set"; exit 1; }
+          echo "$SFDX_AUTH_URL" > authurl.txt
+          sf org login sfdx-url --sfdx-url-file authurl.txt --alias "$TARGET_ORG"
+          rm -f authurl.txt
+
+      - name: Retrieve org versions
+        run: |
+          mkdir -p "$OUT/org"
+          for M in .delta/package/package.xml .delta/destructiveChanges/destructiveChanges.xml; do
+            if [[ -f "$M" ]] && grep -q '<types>' "$M"; then
+              # Components that don't exist in the org yet are reported as warnings, not failures.
+              sf project retrieve start --manifest "$M" --target-org "$TARGET_ORG" \
+                --output-dir "$OUT/org" --wait 30 || echo "::warning::Retrieve reported problems for $M"
+            fi
+          done
+          cat > "$OUT/snapshot.json" <<EOF
+          {"org": "HTCDEV", "branch": "${GITHUB_REF_NAME}", "base": "${{ steps.delta.outputs.base }}",
+           "commit": "${GITHUB_SHA}", "retrieved_at": "$(date -u '+%Y-%m-%d %H:%M UTC')"}
+          EOF
+          find "$OUT" -type f | head -100
+
+      - name: Publish snapshot ref
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          export GIT_INDEX_FILE="$RUNNER_TEMP/snapshot.idx"
+          git --work-tree="$OUT" add -A .
+          TREE=$(git --work-tree="$OUT" write-tree)
+          COMMIT=$(git commit-tree "$TREE" -m "HTCDEV snapshot for $GITHUB_REF_NAME at ${GITHUB_SHA::7}")
+          git push -f origin "$COMMIT:refs/heads/org-snapshot/htcdev/$GITHUB_REF_NAME"
+          echo "Snapshot pushed to org-snapshot/htcdev/$GITHUB_REF_NAME" >> "$GITHUB_STEP_SUMMARY"
