@@ -206,7 +206,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Account.Case_Safe_ID__c</field>
+        <field>Account.Account_CaseSafeId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -351,7 +351,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>AccountTeamMember.Case_Safe_ID__c</field>
+        <field>AccountTeamMember.Account_Team_Member_CaseSafeId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -1236,12 +1236,12 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Campaign.Case_Safe_ID__c</field>
+        <field>Campaign.Campaign_CaseSafeId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>CampaignMember.Case_Safe_ID__c</field>
+        <field>CampaignMember.Campaign_Member_CaseSafeId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -1471,7 +1471,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Contact.Case_Safe_ID__c</field>
+        <field>Contact.Contact_CaseSafeId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -1666,7 +1666,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Lead.Case_Safe_ID__c</field>
+        <field>Lead.Lead_CaseSafeId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -1936,17 +1936,17 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Opportunity.Case_Safe_ID__c</field>
+        <field>Opportunity.Opportunity_CaseSafeId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>OpportunityContactRole.Case_Safe_ID__c</field>
+        <field>OpportunityContactRole.Opportunity_Contact_Role_CaseSafeId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>OpportunityTeamMember.Case_Safe_ID__c</field>
+        <field>OpportunityTeamMember.Opportunity_Team_Member_CaseSafeId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
