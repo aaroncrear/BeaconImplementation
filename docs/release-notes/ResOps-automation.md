@@ -23,6 +23,7 @@
     - **Body** = ResOps Case {Case Number} has been created. Please review. "Case {Case Number}" links to the Case, using the `formRecordLink` formula.
     - **Sender** = the **Beacon Salesforce Automations** org-wide email address.
     - **Recipients** = the **ResOps Manager**, **ResOps Primary** and **ResOps Secondary** of the Campaign (Parent Campaign record type) whose **Primary Module** matches the Primary Module of the Case's Opportunity.
+11. Create a **Case - On Create - Before Save** Flow for **ResOps Request** Cases that sets the Case Owner to the **ResOps Primary** from the Campaign, using the same Campaign matching as Opportunity - On Update - After Save.
 
 ## Release Notes
 
@@ -64,15 +65,15 @@ AND(
 4. **Assign Contract Cleanup Case** (Assignment). Sets the record type, Subject (`New Customer - Contract ResOps Cleanup`) and Type (`Contract Cleanup`). It also sets the Case's **Opportunity** to the triggering Opportunity and **Account** to its Account. These two weren't in the request, but they link the Case to the deal. They make the Case appear in the Opportunity's Cases related list, and they let the Case's Primary Module formula work.
 5. **Get Primary Contact Role** (Get Records). Finds the Opportunity Contact Role on the triggering Opportunity where **Primary** is checked.
 6. **Primary Contact Role Found?** (Decision). If one is found, **Assign Case Contact** sets the Case **Contact** to that Contact Role's Contact. If the Opportunity has no primary Contact Role, the Case is created without a Contact.
-7. **Get Parent Campaign Record Type** (Get Records). Finds the Campaign record type with developer name `Parent_Campaign`.
+7. **Get Parent Campaign Record Type** (Get Records). Finds the active Campaign record type with developer name `Parent_Campaign`.
 8. **Can Look Up Parent Campaign?** (Decision). Continues only if the Opportunity has a Primary Module and the Parent Campaign record type was found. Without this check, a blank value in the next lookup could match the wrong Campaign. If the Parent Campaign record type isn't found, no Campaign is used at all.
-9. **Get Parent Campaign** (Get Records). Filters on **Record Type = Parent Campaign** (by the Id found in step 7), so Sub Campaigns are never matched. It finds the Campaign whose Primary Module equals the Opportunity's Primary Module and whose ResOps Primary isn't blank. Both Primary Module fields use the shared Primary Module global value set, so the values match exactly. If more than one Campaign matches, the oldest one (by Created Date) is used.
+9. **Get Parent Campaign** (Get Records). Filters on **Record Type = Parent Campaign** (by the Id found in step 7), so Sub Campaigns are never matched. It finds the **active** Campaign whose Primary Module equals the Opportunity's Primary Module and whose ResOps Primary isn't blank. Inactive Campaigns are ignored. Both Primary Module fields use the shared Primary Module global value set, so the values match exactly. If more than one Campaign matches, the oldest one (by Created Date) is used.
 10. **Parent Campaign Found?** (Decision). If a Campaign is found, **Assign Case Owner** sets the Case Owner to its ResOps Primary.
 11. **Create Contract Cleanup Case** (Create Records). Creates the Case. Status defaults to New from the ResOps Request support process.
 
 **When no Owner can be found** (the Opportunity has no Primary Module, or no Parent Campaign with that module has a ResOps Primary), the Case is still created. It's owned by the user who moved the Opportunity to Contract. This way the request isn't lost, and the Case can be reassigned.
 
-**Errors.** If any Get Records or the Create Records step fails, the Flow calls the existing **Fault Path Subflow** to send the error notification. For example, it fails if the ResOps Primary user is inactive.
+**Errors.** If the Create Records step fails, the Flow calls the existing **Fault Path Subflow** to send the error notification. For example, it fails if the ResOps Primary user is inactive.
 
 **Works with Quote - On Update - After Save.** When a synced Quote is Accepted, that Flow moves the Opportunity to Contract. That update also triggers this Flow, so a Subscription New Opportunity moved to Contract by an accepted Quote also gets a Contract Cleanup Case.
 
@@ -91,13 +92,41 @@ AND(
 
 It has a single step, **ResOps Case Created Notification**, which calls the **Email Subflow** with `varObject` = `Case`, `varRecordID` = the Case Id and `varTrigger` = `ResOps Case Created`. The Flow runs for every new ResOps Request Case, whether it's created from the **ResOps Request** action on an Opportunity or by **Opportunity - On Update - After Save**.
 
+### Case - On Create - Before Save Flow
+
+A new record-triggered Flow, **Case - On Create - Before Save** (`Case_On_Create_Before_Save`), sets the Owner of every new ResOps Request Case to the ResOps Primary of the matching Parent Campaign.
+
+**Entry conditions** (Formula Evaluates to True):
+
+```
+AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    {!$Record.RecordType.DeveloperName} = "ResOps_Request"
+)
+```
+
+**Flow steps** (the same Campaign matching as steps 7–10 of Opportunity - On Update - After Save):
+
+1. **Get Parent Campaign Record Type** (Get Records). Finds the active Campaign record type with developer name `Parent_Campaign`.
+2. **Can Look Up Parent Campaign?** (Decision). Continues only if the Case's Opportunity has a Primary Module (`$Record.Opportunity__r.Primary_Module__c`) and the Parent Campaign record type was found.
+3. **Get Parent Campaign** (Get Records). Finds the active Campaign on the Parent Campaign record type with the same Primary Module and a ResOps Primary. If more than one matches, the oldest one is used.
+4. **Parent Campaign Found?** (Decision). If a Campaign is found, **Assign Case Owner** sets the Case Owner (`$Record.OwnerId`) to its ResOps Primary.
+
+**Why Before Save:** the Owner is set on the Case as it's saved, so no extra update is needed. It also runs before Case - On Create - After Save, so the new Case already has its Owner when the ResOps Case Created email is sent.
+
+**When no Owner can be found** (the Case has no Opportunity, its Opportunity has no Primary Module, or no active Parent Campaign with that module has a ResOps Primary), the Owner is left as it is. That's normally the user who created the Case.
+
+**Applies to every ResOps Request Case.** This covers Cases from the **ResOps Request** action on an Opportunity and the Contract Cleanup Cases created by Opportunity - On Update - After Save. That Flow already sets the same Owner, so for those Cases this Flow sets the same value again.
+
+Before Save Flows can't call subflows, so this Flow has no Fault Path Subflow. If a Get Records step fails, the Case save fails and the user sees the error.
+
 ### Email Subflow – ResOps Case Created path
 
 The **Case** outcome on **Which Object?** now runs **Get Case** (Get Records), which gets the Case that triggered the Subflow. Every Case trigger can then use the Case's fields. **Which Case Trigger?** follows, and its **Case Placeholder** outcome was replaced by a **ResOps Case Created** outcome (`varTrigger` = `ResOps Case Created`). The ResOps Case Created path:
 
 1. **Get Parent Campaign Record Type** (Get Records). Finds the Campaign record type with developer name `Parent_Campaign`.
 2. **Can Look Up Campaign?** (Decision). Continues only if the Case was found, its Opportunity has a Primary Module (`Get_Case.Opportunity__r.Primary_Module__c`), and the Parent Campaign record type was found. Otherwise no email is sent.
-3. **Get Campaign** (Get Records). Finds the Campaign on the Parent Campaign record type whose Primary Module matches the Case's Opportunity's Primary Module, and that has a ResOps Primary. If more than one matches, the oldest one is used. This uses the same rules as Opportunity - On Update - After Save, so the email goes to the team that owns the Case.
+3. **Get Campaign** (Get Records). Finds the active Campaign on the Parent Campaign record type whose Primary Module matches the Case's Opportunity's Primary Module, and that has a ResOps Primary. If more than one matches, the oldest one is used. This uses the same rules as Opportunity - On Update - After Save, so the email goes to the team that owns the Case.
 4. **Campaign Found?** (Decision). If no Campaign is found, no email is sent.
 5. **Add ResOps Recipient Emails** (Assignment). Adds the email addresses of the Campaign's ResOps Manager, ResOps Primary and ResOps Secondary to `collResOpsCaseRecipients`, read straight from the Campaign's user lookups (for example `Get_Campaign.ResOps_Manager__r.Email`). ResOps Primary is always filled in, because Get Campaign requires it, so the list always has at least one address. There's no separate check for a blank ResOps Manager or ResOps Secondary. See the Acceptance Criteria test for blank recipients.
 6. **Send ResOps Case Created Email** (Send Email action). Subject: `ResOps Case {Case Number} - {Type}`. Body (rich text): `ResOps Case {Case Number} has been created. Please review.`, where **Case {Case Number}** links to the Case through `formRecordLink`. It's sent from the **Beacon Salesforce Automations** org-wide email address (`digital.salesforce@beaconintel.com`). The address is the same in HTCDEV and UAT.
@@ -130,7 +159,7 @@ The **Case** outcome on **Which Object?** now runs **Get Case** (Get Records), w
     1. Add a **User** level On/Off Switch record for your user with **Run Flows** unchecked.
     2. Move a Subscription New Opportunity to Contract. Confirm no Case is created.
     3. Delete the User level record afterwards.
-14. **Flows are active.** In Setup → Flows, confirm **Case - On Create - After Save** and **Email Subflow** are **Active**.
+14. **Flows are active.** In Setup → Flows, confirm **Case - On Create - Before Save**, **Case - On Create - After Save** and **Email Subflow** are **Active**.
 15. **Email on a new ResOps Case:**
     1. On the Parent Campaign for *Module A*, fill in **ResOps Manager**, **ResOps Primary** and **ResOps Secondary** with three active users whose inboxes you can check.
     2. On an Opportunity with Primary Module *Module A*, click **ResOps Request** and create a Case.
@@ -140,12 +169,17 @@ The **Case** outcome on **Which Object?** now runs **Get Case** (Get Records), w
 17. **Blank recipients.** Clear **ResOps Manager** and **ResOps Secondary** on the Campaign and create another ResOps Request Case. Confirm the Case saves and the ResOps Primary still gets the email, with no Fault Path Subflow error email. If the email fails, report it: a check for blank fields needs to be added to the Email Subflow.
 18. **No matching Campaign.** Create a ResOps Request Case from an Opportunity whose Primary Module isn't on any Parent Campaign with a ResOps Primary, or that has no Primary Module. Confirm the Case saves and no email is sent.
 19. **Sub Campaigns are ignored.** Using the *Module B* Sub Campaign from step 8, create a ResOps Request Case on a *Module B* Opportunity. Confirm the Sub Campaign's users get no email.
-20. **On/Off Switch.** With a **User** level On/Off Switch record for your user with **Run Flows** unchecked, create a ResOps Request Case. Confirm no email is sent. Delete the record afterwards.
+20. **On/Off Switch.** With a **User** level On/Off Switch record for your user with **Run Flows** unchecked, create a ResOps Request Case. Confirm the Case is owned by you and no email is sent. Delete the record afterwards.
+
+21. **Owner on a manually created ResOps Case.** On an Opportunity with Primary Module *Module A*, click **ResOps Request** and create a Case. Confirm the Case **Owner** is the *Module A* Parent Campaign's **ResOps Primary**, not you.
+22. **Owner left alone when there's no match.** Create a ResOps Request Case from an Opportunity with no Primary Module, or whose Primary Module isn't on any active Parent Campaign with a ResOps Primary. Confirm the Case saves and is owned by you.
+23. **Inactive Campaigns are ignored.** Uncheck **Active** on the *Module A* Parent Campaign. Create a ResOps Request Case on a *Module A* Opportunity. Confirm the Case is owned by you and no ResOps Case Created email is sent. Re-check **Active** afterwards.
+24. **Other Case record types are skipped.** Create a Case on the master record type. Confirm its Owner is you.
 
 ## Post Deployment Items
 
 1. Fill in **ResOps Primary** (and **ResOps Manager**, if needed) on each active Parent Campaign so Contract Cleanup Cases get the right Owner.
-2. Make sure each Primary Module is on only one active Parent Campaign that has a ResOps Primary. If more than one matches, the Flows use the oldest Campaign.
+2. Make sure each Primary Module is on only one active Parent Campaign that has a ResOps Primary. Inactive Campaigns are ignored. If more than one active Campaign matches, the Flows use the oldest one.
 3. Confirm the **Beacon Salesforce Automations** org-wide email address (`digital.salesforce@beaconintel.com`) exists and is verified in each target org. The email can't be sent from it otherwise. It's already set up in HTCDEV and UAT.
 4. Confirm **Deliverability** (Setup → Deliverability) is set to **All email** in the org you're testing in. Sandboxes default to System email only, which blocks these emails.
 
@@ -170,3 +204,4 @@ Github Branch: https://github.com/aaroncrear/BeaconImplementation/tree/ResOps-au
 | 13 | Flow | Opportunity | Opportunity_On_Update_After_Save | Opportunity - On Update - After Save | Created | Record-triggered After Save Flow. When a Subscription New Opportunity's Stage changes to Contract, creates a Contract Cleanup ResOps Request Case linked to the Opportunity's primary Contact Role Contact and owned by the ResOps Primary of the Parent Campaign (Parent Campaign record type only) with the matching Primary Module. Honors the On/Off Switch. |
 | 14 | Flow | Case | Case_On_Create_After_Save | Case - On Create - After Save | Created | Record-triggered After Save Flow. When a ResOps Request Case is created, calls the Email Subflow (ResOps Case Created Notification) with varObject = Case, varRecordID = the Case Id and varTrigger = ResOps Case Created. Honors the On/Off Switch. |
 | 15 | Flow | N/A | Email_Subflow | Email Subflow | Updated | The Case outcome now gets the triggering Case first. Replaced the Case Placeholder outcome with a ResOps Case Created path. It finds the Parent Campaign matching the Case's Opportunity Primary Module and emails its ResOps Manager, ResOps Primary and ResOps Secondary from the Beacon Salesforce Automations org-wide address, with a link to the Case. Added fault handling and activated the Flow. |
+| 16 | Flow | Case | Case_On_Create_Before_Save | Case - On Create - Before Save | Created | Record-triggered Before Save Flow. When a ResOps Request Case is created, sets its Owner to the ResOps Primary of the active Parent Campaign matching its Opportunity's Primary Module, using the same matching as Opportunity - On Update - After Save. Honors the On/Off Switch. |
