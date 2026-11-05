@@ -8,10 +8,9 @@
     NOT(ISPICKVAL(Status, "Draft")),
     OR(
         Lines_Missing_Users__c &gt; 0,
-        Lines_Invalid_Users__c &gt; 0,
         Lines_Wrong_Quantity__c &gt; 0
     )
 )</errorConditionFormula>
     <errorDisplayField>Status</errorDisplayField>
-    <errorMessage>Before moving the quote out of Draft, every line needs Quantity 1 and Number of Users of 1 or more. Check the Lines Wrong Quantity, Lines Missing Users and Lines Invalid Users fields.</errorMessage>
+    <errorMessage>Before moving the quote out of Draft, every line needs Quantity 1 and Number of Users of 1 or more. Check the Lines Wrong Quantity and Lines Missing Users fields.</errorMessage>
 </ValidationRule>

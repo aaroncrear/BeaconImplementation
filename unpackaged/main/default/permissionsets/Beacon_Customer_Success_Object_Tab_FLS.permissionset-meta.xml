@@ -1381,7 +1381,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Quote.Lines_Invalid_Users__c</field>
+        <field>Quote.Lines_With_Users__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

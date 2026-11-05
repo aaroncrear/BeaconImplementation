@@ -81,12 +81,12 @@ These are Revenue Cloud records, not metadata. They were created directly in HTC
 
 - **In Browse Catalogs and the quote line editor**, a Revenue Cloud **product configuration rule** (built in Setup, see Post Deployment Items) stops reps choosing any quantity other than 1 on a Beacon Module, and shows the message where they're working.
 - **No validation rule errors while the quote is Draft.** Reps build quotes in Browse Catalogs and the quote line editor while the quote is Draft, so the line-level rules below don't apply to Draft quotes. There, the configuration rule keeps quantity at 1 and the required attribute captures Number of Users, with the messages shown in the UI.
-- **Lines Valid Before Leaving Draft** (Quote) checks every line once, when the quote's Status changes away from Draft. It uses three roll-ups on the Quote:
+- **Lines Valid Before Leaving Draft** (Quote) checks every line once, when the quote's Status changes away from Draft. It uses these Quote fields:
   - **Lines Wrong Quantity** (`Lines_Wrong_Quantity__c`): lines whose Quantity isn't 1
-  - **Lines Missing Users** (`Lines_Missing_Users__c`): lines with no Number of Users
-  - **Lines Invalid Users** (`Lines_Invalid_Users__c`): lines with Number of Users below 1
+  - **Lines With Users** (`Lines_With_Users__c`): roll-up count of lines with Number of Users of 1 or more
+  - **Lines Missing Users** (`Lines_Missing_Users__c`): formula, Line Items minus Lines With Users, so it counts lines that are blank or below 1. It's a formula instead of a roll-up filtered on a blank value, because that kind of filter is hard for deployment tools to read.
 
-  If any is above 0, the Status change is blocked with one message that says what to fix. Lines Missing Users is normally 0, because the attribute is required. If a rep moves the quote out of Draft within a few seconds of a change, before the copy has run, they may see the message once. Saving again a moment later works.
+  If either Lines Wrong Quantity or Lines Missing Users is above 0, the Status change is blocked with one message that says what to fix. Lines Missing Users is normally 0, because the attribute is required. If a rep moves the quote out of Draft within a few seconds of a change, before the copy has run, they may see the message once. Saving again a moment later works.
 - **Quantity Must Be One** (Quote Line Item) and **Number of Users At Least One** (Quote Line Item) only apply once the quote is out of Draft. They catch changes made later, outside Browse Catalogs, for example a direct edit, a data load or an integration. **Quantity Must Be One** on Opportunity Product is unchanged. Opportunity products are created by Quote sync, not in Browse Catalogs.
 
 ### Number of Users from quote to Asset and renewal
@@ -153,7 +153,7 @@ The pricing procedure, decision tables and context mapping are Revenue Cloud set
 **Quantity and users**
 
 6. In **Browse Catalogs**, add a module and set its quantity to 2. Confirm the configuration rule message appears and the quantity can't be saved. Confirm no validation rule error appears at any point while the quote is Draft.
-7. **Leaving Draft:** on a Draft quote, set one line's Quantity to 2 directly on the Quote Line Item record. Confirm it saves (no error while Draft). Change the quote Status to Presented. Confirm the error "Before moving the quote out of Draft, every line needs Quantity 1 and Number of Users of 1 or more…" and that Lines Wrong Quantity shows 1. Set the Quantity back to 1 and confirm the Status change saves. On the now-Presented quote, edit a line's Quantity to 2 directly. Confirm the error "Quantity must be 1. Enter the number of users in Number of Users." Do the same with Number of Users 0 and confirm "Number of Users must be 1 or more."
+7. **Leaving Draft:** on a Draft quote, set one line's Quantity to 2 directly on the Quote Line Item record. Confirm it saves (no error while Draft). Change the quote Status to Presented. Confirm the error "Before moving the quote out of Draft, every line needs Quantity 1 and Number of Users of 1 or more…" and that Lines Wrong Quantity shows 1. Set a line's Number of Users to 0 and confirm Lines Missing Users goes up by 1. Set the Quantity back to 1 and confirm the Status change saves. On the now-Presented quote, edit a line's Quantity to 2 directly. Confirm the error "Quantity must be 1. Enter the number of users in Number of Users." Do the same with Number of Users 0 and confirm "Number of Users must be 1 or more."
 8. From **Browse Catalogs**, add a module to a Draft quote. Confirm the configuration step opens and won't continue until **Number of Users** is entered. Enter 8.
    - After a few seconds, confirm the quote line's Number of Users field shows 8.
    - Reconfigure the line to 5 users. Confirm the field changes to 5.
@@ -273,7 +273,7 @@ Github Branch: [Pricing-Model-Rebuild](https://github.com/aaroncrear/BeaconImple
 | 37 | Flow | QuoteLineItem | Quote_Line_Item_On_Create_Update_After_Save | Quote Line Item - On Create or Update - After Save | Created | Copies Number of Users to the matching opportunity product when a syncing quote line is created or its users change. |
 | 38 | Layout | QuoteLineItem | QuoteLineItem-Quote Line Item Layout | Quote Line Item Layout | Updated | Added Number of Users, Pricing Users and User Tier. |
 | 39 | Layout | OpportunityLineItem | OpportunityLineItem-Opportunity Product Layout | Opportunity Product Layout | Updated | Added Number of Users (read-only). |
-| 40 | Layout | Quote | Quote-Quote Layout | Quote Layout | Updated | Added Module Count, Max Number of Users, Lines Missing Users, Lines Invalid Users and Lines Wrong Quantity to Totals. |
+| 40 | Layout | Quote | Quote-Quote Layout | Quote Layout | Updated | Added Module Count, Max Number of Users, Lines Missing Users, Lines With Users and Lines Wrong Quantity to Totals. |
 | 41 | Layout | Pricebook2 | Pricebook2-Price Book Layout | Price Book Layout | Updated | Added Pricing Method. |
 | 42 | PermissionSet | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin Object Tab FLS | Updated | Full access to the 3 price objects and tabs. Edit access to Pricing Method and Number of Users. Read access to the formula and roll-up fields. |
 | 43 | PermissionSet | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales Object Tab FLS | Updated | Edit access to Number of Users. Read access to the other new fields and the price objects. |
@@ -282,7 +282,7 @@ Github Branch: [Pricing-Model-Rebuild](https://github.com/aaroncrear/BeaconImple
 | 46 | PermissionSet | N/A | Beacon_Consulting, Beacon_Customer_Success, Beacon_Marketing, Beacon_Product, Beacon_ResOps, Beacon_Tech _Object_Tab_FLS | Persona Object Tab FLS | Updated | Read access to Asset and Order Product Number of Users and Quote Lines Missing Users (all 10 persona sets get these; Admin can edit the two Number of Users fields). |
 | 47 | Anonymous Apex script | N/A | scripts/apex/Pricing_Model_Rebuild_Load_Prices.apex | Load Prices | Created | Sets Pricing Method, upserts 612 tier prices, 65 module count totals and 6 discounts, and backfills Asset Number of Users from Current Quantity. Run after deploy. |
 | 48 | Anonymous Apex script | N/A | scripts/apex/Pricing_Model_Rebuild_Remove_Old_Pricing.apex | Remove Old Pricing | Created | Removes bundles, seat band and multi-year schedules, and price book entries with no selling model in UAT and Prod. |
-| 49 | CustomField | Quote | Lines_Missing_Users__c | Lines Missing Users | Created | Roll-up COUNT of quote lines with no Number of Users. |
+| 49 | CustomField | Quote | Lines_Missing_Users__c | Lines Missing Users | Created | Formula: Line Items minus Lines With Users (lines with Number of Users blank or below 1). |
 | 50 | ValidationRule | Quote | Lines_Valid_Before_Leaving_Draft | Lines Valid Before Leaving Draft | Created | Blocks a Status change away from Draft while any line has Quantity other than 1, or Number of Users blank or below 1. |
 | 51 | CustomField | OrderItem | Number_of_Users__c | Number of Users | Created | Users for this module, copied from the quote line. |
 | 52 | CustomField | Asset | Number_of_Users__c | Number of Users | Created | Users for this module, set from the Order Product. Drives Beacon Subscriptions and renewal quote lines. |
@@ -294,4 +294,4 @@ Github Branch: [Pricing-Model-Rebuild](https://github.com/aaroncrear/BeaconImple
 | 58 | Layout | OrderItem | OrderItem-Order Product Layout | Order Product Layout | Updated | Added Number of Users (read-only). |
 | 59 | Flow | Quote | Quote_Pricing_Complete_Sync_Number_of_Users | Quote - Pricing Complete - Sync Number of Users | Created | When a Draft quote finishes pricing, copies each line's Number of Users attribute into the quote line field, updating only changed lines. |
 | 60 | CustomField | Quote | Lines_Wrong_Quantity__c | Lines Wrong Quantity | Created | Roll-up COUNT of quote lines whose Quantity isn't 1. |
-| 61 | CustomField | Quote | Lines_Invalid_Users__c | Lines Invalid Users | Created | Roll-up COUNT of quote lines with Number of Users below 1. |
+| 61 | CustomField | Quote | Lines_With_Users__c | Lines With Users | Created | Roll-up COUNT of quote lines with Number of Users of 1 or more. |

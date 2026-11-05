@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Lines_Missing_Users__c</fullName>
-    <description>Number of quote lines with no Number of Users. The quote can't leave Draft while this is more than 0.</description>
+    <description>Number of quote lines whose Number of Users is blank or below 1 (Line Items minus Lines With Users). The quote can't leave Draft while this is more than 0.</description>
     <externalId>false</externalId>
-    <inlineHelpText>Lines that still need Number of Users. Enter users on every line before moving the quote out of Draft.</inlineHelpText>
+    <formula>BLANKVALUE(LineItemCount, 0) - BLANKVALUE(Lines_With_Users__c, 0)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Lines that still need Number of Users of 1 or more. Fix them before moving the quote out of Draft.</inlineHelpText>
     <label>Lines Missing Users</label>
-    <summaryFilterItems>
-        <field>QuoteLineItem.Number_of_Users__c</field>
-        <operation>equals</operation>
-    </summaryFilterItems>
-    <summaryForeignKey>QuoteLineItem.QuoteId</summaryForeignKey>
-    <summaryOperation>count</summaryOperation>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
     <trackHistory>false</trackHistory>
-    <type>Summary</type>
+    <type>Number</type>
+    <unique>false</unique>
 </CustomField>

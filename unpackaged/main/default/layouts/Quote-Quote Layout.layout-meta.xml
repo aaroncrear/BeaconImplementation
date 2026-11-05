@@ -75,7 +75,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>
-                <field>Lines_Invalid_Users__c</field>
+                <field>Lines_With_Users__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>
