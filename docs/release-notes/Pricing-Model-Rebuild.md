@@ -209,18 +209,20 @@ Run these in each org (UAT, then Prod) after Gearset deploys this branch. In HTC
 3. **Build the Revenue Cloud pricing setup** (Setup):
    1. **Decision tables.** Create and activate three decision tables:
       - **Beacon Tier Price**, from Beacon Tier Price. Inputs: Price Book, Product, Tier (equals). Output: List Price.
-      - **Beacon Module Count Price**, from Beacon Module Count Price. Inputs: Price Book (equals), Min Modules (≤ module count), Max Modules (≥ module count, blank = no limit), Min Users (≤ max users), Max Users (≥ max users, blank = no limit). Output: Quote Total.
-      - **Beacon Multi-Module Discount**, from Beacon Multi-Module Discount. Inputs: Price Book (equals), Min Modules (≤ module count), Max Modules (≥ module count, blank = no limit). Output: Discount Percent.
-   2. **Context definition.** Extend the sales transaction context used by quotes. Map the price book's `Pricing_Method__c`. Number of Users comes from the line's `Number_of_Users` attribute, which is already in the context. Work out the tier (1–3, 4–5, 6–10, 11–20, 21–50, 51+) from the attribute in the procedure, not from the `User_Tier__c` formula, because the field is filled just after the save.
+      - **Beacon Module Count Price**, from Beacon Module Count Price. Inputs: Price Book (Equals), Min Modules (Greater Or Equal), Max Modules (Less Or Equal), Min Users (Greater Or Equal), Max Users (Less Or Equal), with Consider Null Value on so blank maximums mean no limit. Output: Quote Total.
+      - **Beacon Multi-Module Discount**, from Beacon Multi-Module Discount. Inputs: Price Book (Equals), Min Modules (Greater Or Equal), Max Modules (Less Or Equal), with Consider Null Value on. Output: Discount Percent.
+   2. **Context definition: no change needed.** The procedure takes Number of Users from the line's `Number_of_Users` attribute, which is already in SalesTransactionContextAuto. It doesn't need the price book's Pricing Method, because the price tables separate the two kinds of price book (discount rows only exist for Per Module books, module count rows only for Module Count books). Work out the tier from the attribute in the procedure, not from the `User_Tier__c` formula, because the field is filled just after the save.
    3. **Pricing procedure.** Clone **Revenue Management Default Pricing Procedure Auto** as **Beacon Pricing Procedure**. Set up these steps:
       - Look up List Price from Beacon Tier Price by price book, product and User Tier, replacing the standard list price step.
       - Remove the volume (seat band) and term adjustment steps.
       - Count the module lines on the quote and find the highest Pricing Users.
-      - On Per Module price books, apply the Beacon Multi-Module Discount percent to every line.
-      - On Module Count price books, look up the Beacon Module Count Price total and set each line's net price to total ÷ module count, with any rounding on the last line.
+      - Look up the Beacon Multi-Module Discount; when a row is found (Per Module books only), apply the percent to every line.
+      - Look up the Beacon Module Count Price total; when a row is found (Module Count books only), set each line's net price to total ÷ module count, with any rounding on the last line.
+
+      Full steps: `docs/setup/Pricing-Model-Rebuild-Pricing-Setup.md`.
 
       Activate it and set it as the default pricing procedure in **Salesforce Pricing Setup**.
-   4. Retrieve the decision tables, context definition and pricing procedure with Gearset into a follow-up branch, so UAT and Prod get the same setup by deployment.
+   4. Retrieve the decision tables and pricing procedure with Gearset into a follow-up branch, so UAT and Prod get the same setup by deployment.
 4. **Quantity rule** (each org, in Setup). Create a product configuration rule:
    - Type: Validation (error).
    - Applies to: products based on the Beacon Module classification.
