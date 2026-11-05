@@ -5,7 +5,7 @@
 - Remove every bundle that was built in Revenue Cloud and start over. Reps sell each module on its own quote line.
 - Every product is sold at **Quantity 1**. The number of users is captured in a new field, not in Quantity.
 - Price modules from user tiers (slab pricing) using the Rev Ops price sheets. Each tab of the sheet is a price book.
-- Users are always entered on the quote line, as **Number of Users**.
+- Users are always entered on the quote line, as **Number of Users**, and are **required in the Browse Catalogs window** when a module is added.
 - Number of Users must be reportable on the Quote Line, Opportunity Product, Order Product and Asset, and must carry through to the Asset.
 - Beacon Subscriptions are created from the Asset's Number of Users (one per user), instead of from quantity.
 - Renewal quotes start with the Asset's Number of Users.
@@ -58,11 +58,30 @@ Each row has a unique **Price Key** (for example `Contract Orgs (>200 Heads)|Sta
 
 On Module Count price books, each module line keeps its list price from the tier table. A pricing adjustment then brings the lines down to the module count total, split evenly across the lines. Every module has the same list price on these books, so the split is always even. On those books, the Entry row (1 module) is the same as the per-module list price, so a single module gets no adjustment.
 
+### Number of Users in Browse Catalogs (product attribute)
+
+Browse Catalogs can't show or require a custom quote line field. It can require a **product attribute**, which reps fill in when they add a product. So Number of Users is entered as a required attribute, then copied into the quote line field:
+
+- **Attribute Definition** `Number_of_Users` (Number, Active, Required).
+- **Product Classification** "Beacon Module" (code `BEACON_MODULE`, Active), with the attribute set to Required and Price Impacting.
+- All 17 modules are based on "Beacon Module", with **Configure During Sale = Allowed** so the configuration step opens when they're added.
+
+These are Revenue Cloud records, not metadata. They were created directly in HTCDEV on 5 Nov 2026.
+
+**Copying the attribute to the field.** Quote Line Item Attribute can't start a record-triggered flow. A rep changing only the attribute doesn't always save the quote line again either. But every add, remove or reconfigure reprices the quote, which changes the Quote's **Calculation Status**. The new **Quote - Pricing Complete - Sync Number of Users** flow:
+
+- runs when Calculation Status changes to Completed With Pricing (or Completed With Tax) on a **Draft** quote, on the Run Asynchronously path, after the save has finished;
+- gets the Number of Users attribute values for all the quote's lines in one query, and updates only the lines whose `Number_of_Users__c` is different.
+
+**No recursion.** Updating a quote line directly doesn't reprice the quote. This was tested in HTCDEV on 5 Nov 2026: Last Priced Date and Calculation Status didn't change. So the flow's update can't start it again. Because only changed lines are updated, an unexpected second run would find nothing to change and stop. No manual sync is needed: the existing Quote Line Item flow copies the value to the Opportunity Product.
+
+**Pricing reads the attribute, not the field.** The copy happens just after the save, so the pricing procedure takes Number of Users from the attribute in the pricing context. The field is used for reporting, the Lines Missing Users check, and the Order, Asset, subscription and renewal steps.
+
 ### Quantity and users rules
 
 - **Quantity Must Be One** validation rules on Quote Line Item and Opportunity Product block any quantity other than 1.
-- **Number of Users At Least One** on Quote Line Item blocks a value below 1. A blank value is allowed, because **Browse Catalogs adds lines without it**: Browse Catalogs saves new lines as soon as products are added, and it can't show or require a custom quote line field. A rule that required the field on every line would stop reps adding products.
-- **Lines Missing Users** (`Quote.Lines_Missing_Users__c`) counts the lines with no Number of Users. **Users Required Before Leaving Draft** on Quote blocks any Status change away from Draft while that count is above 0. Reps enter users in the quote line editor after adding products. A line with no users has no User Tier, so it isn't priced from the tier table until users are entered.
+- **Number of Users At Least One** on Quote Line Item blocks a value below 1. A blank value is allowed, because the field is filled from the attribute just after the line is saved. A rule that required the field on save would stop reps adding products.
+- **Lines Missing Users** (`Quote.Lines_Missing_Users__c`) counts the lines with no Number of Users. **Users Required Before Leaving Draft** on Quote blocks any Status change away from Draft while that count is above 0. This is a backstop: with the attribute required, every line should already have users. If a rep moves the quote out of Draft within a few seconds of a change, before the copy has run, they may see this message once. Saving again a moment later works.
 
 ### Number of Users from quote to Asset and renewal
 
@@ -129,7 +148,10 @@ The pricing procedure, decision tables and context mapping are Revenue Cloud set
 
 6. On a quote line, set Quantity to 2 and save. Confirm the error "Quantity must be 1. Enter the number of users in Number of Users."
 7. Set Number of Users to 0 on a quote line and save. Confirm the error "Number of Users must be 1 or more."
-8. From **Browse Catalogs**, add two modules to a Draft quote. Confirm they're added with Number of Users blank. Try to change the quote Status to Presented. Confirm the error "Enter Number of Users on every quote line before moving the quote out of Draft." Enter users on both lines and confirm the Status change now saves.
+8. From **Browse Catalogs**, add a module to a Draft quote. Confirm the configuration step opens and won't continue until **Number of Users** is entered. Enter 8.
+   - After a few seconds, confirm the quote line's Number of Users field shows 8.
+   - Reconfigure the line to 5 users. Confirm the field changes to 5.
+   - Confirm the quote's Last Priced Date only changes when you reconfigure, not when the field is copied.
 
 **Per Module pricing (Top 1-50 Pharma)**
 
@@ -169,12 +191,16 @@ The pricing procedure, decision tables and context mapping are Revenue Cloud set
 Run these in each org (UAT, then Prod) after Gearset deploys this branch. In HTCDEV, steps 1 and 2 are still needed after the metadata deploys. The cleanup in step 3 is already done there.
 
 1. **Load the prices and backfill Assets.** Claude can do this through the org connection after the deploy. To run it yourself instead, open Developer Console, then **Debug → Open Execute Anonymous Window**, paste in `scripts/apex/Pricing_Model_Rebuild_Load_Prices.apex` and run it. The debug log should show "Price books updated: 6, tier prices: 612, module count prices: 65, discounts: 6" and the number of Assets backfilled. The script sets Pricing Method on each price book and upserts all price rows. It also sets Number of Users on existing module Assets from their Current Quantity, so renewals of those Assets get users. Those Assets already have one Beacon Subscription per seat, so no extra subscriptions are created. It's safe to run again.
-2. **Build the Revenue Cloud pricing setup** (Setup):
+2. **Revenue Cloud attribute (UAT and Prod).** HTCDEV already has these. In each other org, create:
+   - the `Number_of_Users` Attribute Definition (Number, Active, Required);
+   - the "Beacon Module" Product Classification with that attribute (Required, Price Impacting);
+   - set every module's **Based On** to Beacon Module and **Configure During Sale** to Allowed.
+3. **Build the Revenue Cloud pricing setup** (Setup):
    1. **Decision tables.** Create and activate three decision tables:
       - **Beacon Tier Price**, from Beacon Tier Price. Inputs: Price Book, Product, Tier (equals). Output: List Price.
       - **Beacon Module Count Price**, from Beacon Module Count Price. Inputs: Price Book (equals), Min Modules (≤ module count), Max Modules (≥ module count, blank = no limit), Min Users (≤ max users), Max Users (≥ max users, blank = no limit). Output: Quote Total.
       - **Beacon Multi-Module Discount**, from Beacon Multi-Module Discount. Inputs: Price Book (equals), Min Modules (≤ module count), Max Modules (≥ module count, blank = no limit). Output: Discount Percent.
-   2. **Context definition.** Extend the sales transaction context used by quotes. Map the quote line's `User_Tier__c` and `Pricing_Users__c`, and the price book's `Pricing_Method__c`.
+   2. **Context definition.** Extend the sales transaction context used by quotes. Map the price book's `Pricing_Method__c`. Number of Users comes from the line's `Number_of_Users` attribute, which is already in the context. Work out the tier (1–3, 4–5, 6–10, 11–20, 21–50, 51+) from the attribute in the procedure, not from the `User_Tier__c` formula, because the field is filled just after the save.
    3. **Pricing procedure.** Clone **Revenue Management Default Pricing Procedure Auto** as **Beacon Pricing Procedure**. Set up these steps:
       - Look up List Price from Beacon Tier Price by price book, product and User Tier, replacing the standard list price step.
       - Remove the volume (seat band) and term adjustment steps.
@@ -184,10 +210,10 @@ Run these in each org (UAT, then Prod) after Gearset deploys this branch. In HTC
 
       Activate it and set it as the default pricing procedure in **Salesforce Pricing Setup**.
    4. Retrieve the decision tables, context definition and pricing procedure with Gearset into a follow-up branch, so UAT and Prod get the same setup by deployment.
-3. **Remove the old pricing** (UAT and Prod only). Run `scripts/apex/Pricing_Model_Rebuild_Remove_Old_Pricing.apex` the same way. To see what it would change first, set `PREVIEW = true`. The script:
+4. **Remove the old pricing** (UAT and Prod only). Run `scripts/apex/Pricing_Model_Rebuild_Remove_Old_Pricing.apex` the same way. To see what it would change first, set `PREVIEW = true`. The script:
    - deletes bundle components and groups, seat band and multi-year schedules, and unused entries with no selling model
    - deletes bundles, or deactivates any bundle still used on a quote, opportunity, order or asset (Prod has no quote or opportunity lines today).
-4. **HTCDEV test data:** Core Bundle is deactivated, not deleted, because test orders, assets, opportunities and quotes use it. To remove it completely, those test records must be deleted first. Only do this with Rev Ops' go-ahead.
+5. **HTCDEV test data:** Core Bundle is deactivated, not deleted, because test orders, assets, opportunities and quotes use it. To remove it completely, those test records must be deleted first. Only do this with Rev Ops' go-ahead.
 
 ## Component Manifest
 
@@ -253,3 +279,4 @@ Github Branch: [Pricing-Model-Rebuild](https://github.com/aaroncrear/BeaconImple
 | 56 | Flow | Asset | Asset_On_Create_Or_Update_After_Save | Asset - On Create or Update - After Save | Updated | Creates one Beacon Subscription per Number of Users instead of per Current Quantity. |
 | 57 | Layout | Asset | Asset-Asset Layout | Asset Layout | Updated | Added Number of Users (read-only). |
 | 58 | Layout | OrderItem | OrderItem-Order Product Layout | Order Product Layout | Updated | Added Number of Users (read-only). |
+| 59 | Flow | Quote | Quote_Pricing_Complete_Sync_Number_of_Users | Quote - Pricing Complete - Sync Number of Users | Created | When a Draft quote finishes pricing, copies each line's Number of Users attribute into the quote line field, updating only changed lines. |
