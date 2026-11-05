@@ -22,3 +22,10 @@ Required sections, in order:
    `#`, `Component Type`, `Object`, `API Name`, `Label`, `Created/Updated/Deleted`, `Description`.
 
 Add one row per component changed — don't leave unused blank rows.
+
+## Deployment to HTCDEV
+
+Pushes to the `dev-sandbox` branch auto-deploy the metadata delta to the Beacon
+HTCDEV sandbox via `.github/workflows/deploy-htcdev.yml` (details in
+`docs/devops/htcdev-deploy.md`). Merge or push feature work to `dev-sandbox` to
+deploy it; check the Actions run summary for the deployed manifest.

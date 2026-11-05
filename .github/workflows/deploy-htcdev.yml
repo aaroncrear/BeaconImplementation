@@ -1,0 +1,129 @@
+# Deploys only the changed metadata to the Beacon HTCDEV sandbox on every
+# push to the dev-sandbox branch. See docs/devops/htcdev-deploy.md for setup.
+name: Deploy delta to HTCDEV
+
+on:
+  push:
+    branches: [dev-sandbox]
+    paths:
+      - "unpackaged/**"
+      - "sfdx-project.json"
+      - ".forceignore"
+  workflow_dispatch:
+    inputs:
+      from_ref:
+        description: "Optional commit/tag/branch to diff from (blank = last successful deploy)"
+        required: false
+        default: ""
+      validate_only:
+        description: "Validate (check-only deploy) without saving changes"
+        type: boolean
+        default: false
+
+# One deploy at a time per org; a newer push waits rather than cancelling a
+# deploy that is already running in the sandbox.
+concurrency:
+  group: deploy-htcdev
+  cancel-in-progress: false
+
+permissions:
+  contents: write # to move the baseline tag after a successful deploy
+
+env:
+  BASELINE_TAG: htcdev-last-deploy
+  DELTA_DIR: .delta
+  TARGET_ORG: htcdev
+  # Repo variables (Settings → Secrets and variables → Actions → Variables)
+  TEST_LEVEL: ${{ vars.HTCDEV_TEST_LEVEL || 'NoTestRun' }}
+  DEPLOY_DELETES: ${{ vars.HTCDEV_DEPLOY_DELETES || 'false' }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: htcdev
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Salesforce CLI and sfdx-git-delta
+        run: |
+          npm install --global @salesforce/cli
+          echo y | sf plugins install sfdx-git-delta
+          sf version
+
+      - name: Build delta package
+        id: delta
+        run: scripts/ci/build-delta.sh "$BASELINE_TAG" "$DELTA_DIR" "${{ inputs.from_ref }}"
+
+      - name: Show delta
+        run: |
+          {
+            echo "### HTCDEV delta"
+            echo "From \`${{ steps.delta.outputs.from }}\` to \`${{ steps.delta.outputs.to }}\` — ${{ steps.delta.outputs.reason }}"
+            echo
+            echo "**package.xml**"
+            echo '```xml'; cat "$DELTA_DIR/package/package.xml"; echo '```'
+            if [[ "${{ steps.delta.outputs.has_deletes }}" == "true" ]]; then
+              echo "**destructiveChanges.xml** (deploy deletes: $DEPLOY_DELETES)"
+              echo '```xml'; cat "$DELTA_DIR/destructiveChanges/destructiveChanges.xml"; echo '```'
+            fi
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Authenticate to HTCDEV
+        if: steps.delta.outputs.has_changes == 'true' || (steps.delta.outputs.has_deletes == 'true' && env.DEPLOY_DELETES == 'true')
+        env:
+          SFDX_AUTH_URL: ${{ secrets.HTCDEV_SFDX_AUTH_URL }}
+        run: |
+          if [[ -z "$SFDX_AUTH_URL" ]]; then
+            echo "::error::Secret HTCDEV_SFDX_AUTH_URL is not set. See docs/devops/htcdev-deploy.md."
+            exit 1
+          fi
+          echo "$SFDX_AUTH_URL" > ./authurl.txt
+          sf org login sfdx-url --sfdx-url-file ./authurl.txt --alias "$TARGET_ORG"
+          rm -f ./authurl.txt
+          sf org display --target-org "$TARGET_ORG" | grep -E "Username|Instance Url"
+
+      - name: Deploy delta
+        if: steps.delta.outputs.has_changes == 'true' || (steps.delta.outputs.has_deletes == 'true' && env.DEPLOY_DELETES == 'true')
+        run: |
+          ARGS=(--target-org "$TARGET_ORG" --test-level "$TEST_LEVEL" --wait 60 --verbose)
+
+          if [[ "${{ steps.delta.outputs.has_changes }}" == "true" ]]; then
+            ARGS+=(--manifest "$DELTA_DIR/package/package.xml")
+          else
+            # Deletes only: deploy an empty package with the destructive file.
+            ARGS+=(--manifest "$DELTA_DIR/destructiveChanges/package.xml")
+          fi
+          if [[ "${{ steps.delta.outputs.has_deletes }}" == "true" && "$DEPLOY_DELETES" == "true" ]]; then
+            ARGS+=(--post-destructive-changes "$DELTA_DIR/destructiveChanges/destructiveChanges.xml")
+          fi
+
+          if [[ "${{ inputs.validate_only }}" == "true" ]]; then
+            sf project deploy validate "${ARGS[@]}"
+          else
+            sf project deploy start "${ARGS[@]}"
+          fi
+
+      - name: Record successful deploy
+        if: success() && inputs.validate_only != true
+        run: |
+          git tag -f "$BASELINE_TAG" "${{ steps.delta.outputs.to }}"
+          git push -f origin "refs/tags/$BASELINE_TAG"
+          echo "Baseline tag $BASELINE_TAG now at ${{ steps.delta.outputs.to }}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep delta for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: htcdev-delta-${{ github.run_number }}
+          path: ${{ env.DELTA_DIR }}
+          if-no-files-found: ignore
