@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Account_Id_Pendo__c</fullName>
+    <description>Unique identifier that links this Account to its Account record in Pendo. Must match the Pendo Account Id so Pendo usage data syncs to the correct Salesforce Account. Used strictly for the Pendo integration.</description>
     <externalId>false</externalId>
     <inlineHelpText>This is a unique identifier which is used for integrating Pendo to Salesforce. Populate this field with the Account Id from Pendo to ensure that Pendo data populates into Salesforce</inlineHelpText>
     <label>Account Id Pendo</label>
