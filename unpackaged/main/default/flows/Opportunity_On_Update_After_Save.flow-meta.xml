@@ -82,7 +82,7 @@
         </connector>
     </assignments>
     <decisions>
-        <description>Checks that the Opportunity has a Primary Module and the Campaign Parent Campaign record type was found before looking up the Parent Campaign. Without both, the lookup could match the wrong Campaign, so the Case is created without setting the Owner.</description>
+        <description>Checks that the Opportunity has a Primary Module and the Campaign Parent Campaign record type was found before looking up the Parent Campaign. Without both, the lookup could match the wrong Campaign, so no Case is created.</description>
         <name>Can_Look_Up_Parent_Campaign</name>
         <label>Can Look Up Parent Campaign?</label>
         <locationX>0</locationX>
@@ -135,7 +135,7 @@
         </rules>
     </decisions>
     <decisions>
-        <description>Checks that a Parent Campaign with a matching Primary Module and a ResOps Primary was found. If not, the Case is created without setting the Owner.</description>
+        <description>Checks that an active Parent Campaign with a matching Primary Module and a ResOps Primary was found. If not, no Case is created.</description>
         <name>Parent_Campaign_Found</name>
         <label>Parent Campaign Found?</label>
         <locationX>0</locationX>
@@ -206,7 +206,7 @@
             <label>Record Type Found</label>
         </rules>
     </decisions>
-    <description>When a Subscription New Opportunity&apos;s Stage is changed to Contract, creates a Contract Cleanup ResOps Request Case linked to the Opportunity, its Account and the Contact on its primary Contact Role. The Case is owned by the ResOps Primary on the Parent Campaign whose Primary Module matches the Opportunity&apos;s Primary Module. If no such Campaign is found, the Case is owned by the user who updated the Opportunity. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>When a Subscription New Opportunity&apos;s Stage is changed to Contract, creates a Contract Cleanup ResOps Request Case linked to the Opportunity, its Account and the Contact on its primary Contact Role. The Case is owned by the ResOps Primary on the active Parent Campaign whose Primary Module matches the Opportunity&apos;s Primary Module. If no such Campaign is found, no Case is created. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Opportunity - On Update - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Opportunity - On Update - After Save</label>
@@ -241,7 +241,7 @@
         <inputReference>varContractCleanupCase</inputReference>
     </recordCreates>
     <recordLookups>
-        <description>Finds the Campaign on the Parent Campaign record type (Sub Campaigns and Campaigns on other record types are never matched) whose Primary Module matches the Opportunity&apos;s Primary Module and that has a ResOps Primary. If more than one matches, the oldest Campaign is used.</description>
+        <description>Finds the active Campaign on the Parent Campaign record type (Sub Campaigns and Campaigns on other record types are never matched) whose Primary Module matches the Opportunity&apos;s Primary Module and that has a ResOps Primary. If more than one matches, the oldest Campaign is used.</description>
         <name>Get_Parent_Campaign</name>
         <label>Get Parent Campaign</label>
         <locationX>0</locationX>
