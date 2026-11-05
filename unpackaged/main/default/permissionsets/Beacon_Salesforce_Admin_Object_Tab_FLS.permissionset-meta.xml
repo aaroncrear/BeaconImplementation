@@ -351,11 +351,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>AccountTeamMember.Account_Team_Member_CaseSafeId__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
         <field>Beacon_Subscription__c.Active__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -1942,11 +1937,6 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>OpportunityContactRole.Opportunity_Contact_Role_CaseSafeId__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>OpportunityTeamMember.Opportunity_Team_Member_CaseSafeId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
