@@ -2,8 +2,12 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Number_of_Users_At_Least_One</fullName>
     <active>true</active>
-    <description>Number of Users can be blank while a quote is being built, because Browse Catalogs adds lines without it. When it's entered it must be 1 or more. Quote rule Users_Required_Before_Leaving_Draft makes sure every line has users before the quote leaves Draft.</description>
-    <errorConditionFormula>AND(NOT(ISBLANK(Number_of_Users__c)), Number_of_Users__c &lt; 1)</errorConditionFormula>
+    <description>Number of Users must be 1 or more. Only applies once the quote is out of Draft, so reps never see this error while they work in Browse Catalogs. Lines_Valid_Before_Leaving_Draft checks every line when the quote leaves Draft.</description>
+    <errorConditionFormula>AND(
+    NOT(ISBLANK(Number_of_Users__c)),
+    Number_of_Users__c &lt; 1,
+    NOT(ISPICKVAL(Quote.Status, "Draft"))
+)</errorConditionFormula>
     <errorDisplayField>Number_of_Users__c</errorDisplayField>
     <errorMessage>Number of Users must be 1 or more.</errorMessage>
 </ValidationRule>
