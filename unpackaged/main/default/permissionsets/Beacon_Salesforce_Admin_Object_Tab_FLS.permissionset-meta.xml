@@ -351,6 +351,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>AccountTeamMember.Case_Safe_ID__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Beacon_Subscription__c.Active__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -1235,6 +1240,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>CampaignMember.Case_Safe_ID__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Case.Due_Date_Required__c</field>
         <readable>true</readable>
@@ -1927,6 +1937,16 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Opportunity.Case_Safe_ID__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>OpportunityContactRole.Case_Safe_ID__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>OpportunityTeamMember.Case_Safe_ID__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
