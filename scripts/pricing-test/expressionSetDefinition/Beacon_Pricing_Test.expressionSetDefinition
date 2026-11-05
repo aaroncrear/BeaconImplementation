@@ -249,6 +249,13 @@
                 </parameters>
                 <parameters>
                     <input>true</input>
+                    <name>Quantity</name>
+                    <output>false</output>
+                    <type>Parameter</type>
+                    <value>LineItemQuantity</value>
+                </parameters>
+                <parameters>
+                    <input>true</input>
                     <name>ListPriceField</name>
                     <output>false</output>
                     <type>Parameter</type>
