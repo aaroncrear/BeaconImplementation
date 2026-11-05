@@ -134,7 +134,7 @@
         </defaultConnector>
         <defaultConnectorLabel>No</defaultConnectorLabel>
         <rules>
-            <name>Matches</name>
+            <name>Source_Matches</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
                 <leftValueReference>Loop_Match_Sources.AssetActionId</leftValueReference>
@@ -160,7 +160,7 @@
         </defaultConnector>
         <defaultConnectorLabel>No</defaultConnectorLabel>
         <rules>
-            <name>Matches</name>
+            <name>Order_Item_Matches</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
                 <leftValueReference>Loop_Match_Order_Items.Id</leftValueReference>

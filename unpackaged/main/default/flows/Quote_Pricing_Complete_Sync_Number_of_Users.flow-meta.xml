@@ -159,7 +159,7 @@
             <label>Has Lines To Update</label>
         </rules>
     </decisions>
-    <description>When Revenue Cloud finishes pricing a Draft quote, copies each line&apos;s Number of Users product attribute (entered in Browse Catalogs, where it is required) into the quote line&apos;s Number of Users field, which is used for reporting, the Lines Missing Users check, and the Opportunity Product, Order Product, Asset and renewal steps. Quote Line Item Attribute can&apos;t trigger a flow, and a rep changing only the attribute doesn&apos;t always save the line again, but every add, remove or reconfigure reprices the quote, which changes Calculation Status. Runs on the Run Asynchronously path, after the save has finished, so the attribute records exist. Only updates lines whose value is different. Updating a quote line directly doesn&apos;t reprice the quote (tested in HTCDEV on 5 Nov 2026) and doesn&apos;t change Calculation Status, so this flow can&apos;t trigger itself. Only runs while the Quote is Draft, and when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>When Revenue Cloud finishes pricing a Draft quote, copies each line&apos;s Number of Users product attribute (entered in Browse Catalogs, where it is required) into the quote line&apos;s Number of Users field, which is used for reporting, the Lines Missing Users check, and the Opportunity Product, Order Product, Asset and renewal steps. Quote Line Item Attribute can&apos;t trigger a flow, and a rep changing only the attribute doesn&apos;t always save the line again, but every add, remove or reconfigure reprices the quote, which moves Calculation Status through its in-progress values and back to Completed With Pricing. The flow runs only when the quote is updated to meet its conditions, so it runs each time pricing completes, not on every Quote save. Runs on the Run Asynchronously path, after the save has finished, so the attribute records exist. Only updates lines whose value is different. Updating a quote line directly doesn&apos;t reprice the quote (tested in HTCDEV on 5 Nov 2026) and doesn&apos;t change Calculation Status, so this flow can&apos;t trigger itself. Only runs while the Quote is Draft, and when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <formulas>
         <description>The Number of Users attribute value as a number. Blank when the attribute has no value.</description>
@@ -345,10 +345,9 @@
     <start>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
-    ISCHANGED({!$Record.CalculationStatus}),
     OR(
         ISPICKVAL({!$Record.CalculationStatus}, &quot;CompletedWithPricing&quot;),
         ISPICKVAL({!$Record.CalculationStatus}, &quot;CompletedWithTax&quot;)

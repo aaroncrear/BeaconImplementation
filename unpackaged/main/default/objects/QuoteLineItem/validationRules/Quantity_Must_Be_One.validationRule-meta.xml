@@ -2,7 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Quantity_Must_Be_One</fullName>
     <active>true</active>
-    <description>Every module is sold at quantity 1. Only applies once the quote is out of Draft, so reps never see this error while they work in Browse Catalogs or the quote line editor. There, a product configuration rule keeps quantity at 1, and Lines_Valid_Before_Leaving_Draft checks every line when the quote leaves Draft. This rule catches changes made later, outside that window (direct edits, data loads, integrations).</description>
+    <description>Quantity must be 1. Skips Draft quotes, where Browse Catalogs keeps quantity at 1 and Lines_Valid_Before_Leaving_Draft checks lines. Catches later direct edits, data loads and integrations.</description>
     <errorConditionFormula>AND(
     Quantity &lt;&gt; 1,
     NOT(ISPICKVAL(Quote.Status, "Draft"))

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Price_Book__c</fullName>
-    <deleteConstraint>Restrict</deleteConstraint>
+    <deleteConstraint>SetNull</deleteConstraint>
     <description>Module Count price book this total applies to.</description>
     <externalId>false</externalId>
     <label>Price Book</label>
     <referenceTo>Pricebook2</referenceTo>
     <relationshipLabel>Beacon Module Count Prices</relationshipLabel>
     <relationshipName>Beacon_Module_Count_Prices</relationshipName>
-    <required>true</required>
+    <required>false</required>
     <trackHistory>true</trackHistory>
     <type>Lookup</type>
 </CustomField>

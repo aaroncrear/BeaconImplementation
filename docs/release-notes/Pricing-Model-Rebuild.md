@@ -54,6 +54,8 @@ The prices live in three new custom objects, so Rev Ops can change a price by ed
 | **Beacon Module Count Price** (`Beacon_Module_Count_Price__c`) | 65 | Quote total for one module level and one user band on a Module Count price book |
 | **Beacon Multi-Module Discount** (`Beacon_Multi_Module_Discount__c`) | 6 | Discount for 2, 3 and 4+ modules on each Per Module price book |
 
+The Price Book and Product lookups are optional and are cleared if the price book or product is deleted. Salesforce doesn't allow required (restrict-delete) lookups to Product or Price Book. The load script always fills them.
+
 Each row has a unique **Price Key** (for example `Contract Orgs (>200 Heads)|Starter|Up to 10 users`). That makes the load script safe to run again: it updates rows instead of creating duplicates.
 
 On Module Count price books, each module line keeps its list price from the tier table. A pricing adjustment then brings the lines down to the module count total, split evenly across the lines. Every module has the same list price on these books, so the split is always even. On those books, the Entry row (1 module) is the same as the per-module list price, so a single module gets no adjustment.
