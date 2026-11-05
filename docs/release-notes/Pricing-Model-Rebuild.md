@@ -79,7 +79,8 @@ These are Revenue Cloud records, not metadata. They were created directly in HTC
 
 ### Quantity and users rules
 
-- **Quantity Must Be One** validation rules on Quote Line Item and Opportunity Product block any quantity other than 1.
+- **In Browse Catalogs and the quote line editor**, a Revenue Cloud **product configuration rule** (built in Setup, see Post Deployment Items) stops reps choosing any quantity other than 1 on a Beacon Module, and shows the message where they're working.
+- **Quantity Must Be One** validation rules on Quote Line Item and Opportunity Product are kept as a backstop. They block a quantity other than 1 when a line is changed outside that window, for example a direct edit, a data load or an integration.
 - **Number of Users At Least One** on Quote Line Item blocks a value below 1. A blank value is allowed, because the field is filled from the attribute just after the line is saved. A rule that required the field on save would stop reps adding products.
 - **Lines Missing Users** (`Quote.Lines_Missing_Users__c`) counts the lines with no Number of Users. **Users Required Before Leaving Draft** on Quote blocks any Status change away from Draft while that count is above 0. This is a backstop: with the attribute required, every line should already have users. If a rep moves the quote out of Draft within a few seconds of a change, before the copy has run, they may see this message once. Saving again a moment later works.
 
@@ -146,7 +147,7 @@ The pricing procedure, decision tables and context mapping are Revenue Cloud set
 
 **Quantity and users**
 
-6. On a quote line, set Quantity to 2 and save. Confirm the error "Quantity must be 1. Enter the number of users in Number of Users."
+6. In **Browse Catalogs**, add a module and set its quantity to 2. Confirm the configuration rule message appears and the quantity can't be saved. Then edit a quote line's Quantity to 2 directly on the Quote Line Item record and save. Confirm the validation rule error "Quantity must be 1. Enter the number of users in Number of Users."
 7. Set Number of Users to 0 on a quote line and save. Confirm the error "Number of Users must be 1 or more."
 8. From **Browse Catalogs**, add a module to a Draft quote. Confirm the configuration step opens and won't continue until **Number of Users** is entered. Enter 8.
    - After a few seconds, confirm the quote line's Number of Users field shows 8.
@@ -210,10 +211,17 @@ Run these in each org (UAT, then Prod) after Gearset deploys this branch. In HTC
 
       Activate it and set it as the default pricing procedure in **Salesforce Pricing Setup**.
    4. Retrieve the decision tables, context definition and pricing procedure with Gearset into a follow-up branch, so UAT and Prod get the same setup by deployment.
-4. **Remove the old pricing** (UAT and Prod only). Run `scripts/apex/Pricing_Model_Rebuild_Remove_Old_Pricing.apex` the same way. To see what it would change first, set `PREVIEW = true`. The script:
+4. **Quantity rule** (each org, in Setup). Create a product configuration rule:
+   - Type: Validation (error).
+   - Applies to: products based on the Beacon Module classification.
+   - Condition: Quantity is not equal to 1.
+   - Message: "Quantity must be 1. Enter the number of users in Number of Users."
+
+   Activate it. Product2 has no minimum or maximum quantity setting for products that aren't in a bundle, so this rule is the standard way to enforce quantity 1 in Browse Catalogs. HTCDEV has no configuration rules yet. Once it's built in HTCDEV, retrieve it with Gearset along with the pricing procedure.
+5. **Remove the old pricing** (UAT and Prod only). Run `scripts/apex/Pricing_Model_Rebuild_Remove_Old_Pricing.apex` the same way. To see what it would change first, set `PREVIEW = true`. The script:
    - deletes bundle components and groups, seat band and multi-year schedules, and unused entries with no selling model
    - deletes bundles, or deactivates any bundle still used on a quote, opportunity, order or asset (Prod has no quote or opportunity lines today).
-5. **HTCDEV test data:** Core Bundle is deactivated, not deleted, because test orders, assets, opportunities and quotes use it. To remove it completely, those test records must be deleted first. Only do this with Rev Ops' go-ahead.
+6. **HTCDEV test data:** Core Bundle is deactivated, not deleted, because test orders, assets, opportunities and quotes use it. To remove it completely, those test records must be deleted first. Only do this with Rev Ops' go-ahead.
 
 ## Component Manifest
 
