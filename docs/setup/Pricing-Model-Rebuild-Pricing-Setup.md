@@ -100,14 +100,9 @@ So each quote gets either the discount or the module count total, never both. No
 3. Name it **Beacon Pricing Procedure**. Keep the context **SalesTransactionContextAuto**.
 4. Open the new version in the builder.
 
-### 2B. Remove what's no longer used
+### 2B. Leave the existing steps as they are
 
-Delete or disable:
-- **Volume / Tier discount**: the seat band schedules are gone.
-- **Term discount**: the multi-year escalator is gone.
-- **Bundle-based adjustment**: there are no bundles.
-
-Keep **Pricing Setting**, **List Price**, **Manual Discount** and the totals or subtotal steps.
+You don't need to remove anything. The old seat-band schedules, multi-year escalators and bundles were removed from the data, so the **Volume Discount**, **Tier Discount** and **Bundle-Based Price** steps find nothing and change no prices.
 
 ### 2C. Add the Beacon steps, after List Price
 
