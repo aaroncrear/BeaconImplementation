@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Adjustment_Value__c</fullName>
+    <description>Same as List Price. The pricing procedure's Price Adjustment Matrix step reads the price from this field. Set by the Pricing_Model_Rebuild_Set_Adjustment_Fields script.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Same as List Price. Used by the pricing procedure.</inlineHelpText>
+    <label>Adjustment Value</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+</CustomField>
