@@ -45,11 +45,14 @@ Create three decision tables. For each one:
   | Field | Operator | Compared to |
   |---|---|---|
   | Price Book (`Price_Book__c`) | Equals | the quote's price book |
-  | Min Modules (`Min_Modules__c`) | Less Or Equal | module count |
-  | Max Modules (`Max_Modules__c`) | Greater Or Equal | module count |
-  | Min Users (`Min_Users__c`) | Less Or Equal | highest Number of Users on the quote |
-  | Max Users (`Max_Users__c`) | Greater Or Equal | highest Number of Users on the quote |
+  | Min Modules (`Min_Modules__c`) | Greater Or Equal | module count |
+  | Max Modules (`Max_Modules__c`) | Less Or Equal | module count |
+  | Min Users (`Min_Users__c`) | Greater Or Equal | highest Number of Users on the quote |
+  | Max Users (`Max_Users__c`) | Less Or Equal | highest Number of Users on the quote |
 - **Output:** Quote Total (`Quote_Total__c`)
+- **Behaviours:** turn **Consider Null Value** on, so rows with a blank maximum (no upper limit) match.
+
+The operator compares the **input** with the row's value: "module count Greater Or Equal Min Modules". This is how Revenue Cloud's own tier table is set up (LowerBound = Greater Or Equal, UpperBound = Less Or Equal, Consider Null Value on).
 
 ### 1C. Beacon Multi-Module Discount
 
@@ -59,9 +62,10 @@ Create three decision tables. For each one:
   | Field | Operator |
   |---|---|
   | Price Book (`Price_Book__c`) | Equals |
-  | Min Modules (`Min_Modules__c`) | Less Or Equal (module count) |
-  | Max Modules (`Max_Modules__c`) | Greater Or Equal (module count) |
+  | Min Modules (`Min_Modules__c`) | Greater Or Equal (module count) |
+  | Max Modules (`Max_Modules__c`) | Less Or Equal (module count) |
 - **Output:** Discount Percent (`Discount_Percent__c`)
+- **Behaviours:** turn **Consider Null Value** on, so the 4+ modules row (blank Max Modules) matches.
 
 ### Check the tables
 
