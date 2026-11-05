@@ -270,6 +270,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Asset.Number_of_Users__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Beacon_Feedback__c.Account_Manager__c</field>
         <readable>true</readable>
@@ -1367,6 +1372,16 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Opportunity.Unique_Invoice_No__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>OrderItem.Number_of_Users__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Quote.Lines_Missing_Users__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <objectPermissions>

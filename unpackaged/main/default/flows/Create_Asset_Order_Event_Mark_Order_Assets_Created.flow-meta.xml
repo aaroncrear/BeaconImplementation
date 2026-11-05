@@ -2,6 +2,71 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>68.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Adds the Order Product Id to the list used to find its Asset Action Sources.</description>
+        <name>Add_Order_Item_Id</name>
+        <label>Add Order Item Id</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varOrderItemIds</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Loop_Order_Items.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Order_Items</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Adds the Asset Action Id to the list used to find the Assets.</description>
+        <name>Add_Asset_Action_Id</name>
+        <label>Add Asset Action Id</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varAssetActionIds</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Loop_Asset_Action_Sources.AssetActionId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Asset_Action_Sources</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Sets the matched Asset&apos;s Number of Users from its Order Product and adds it to the list of Assets to update.</description>
+        <name>Add_Asset_Users</name>
+        <label>Add Asset Users</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varAsset.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Asset_Actions.AssetId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varAsset.Number_of_Users__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Match_Order_Items.Number_of_Users__c</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varAssetsToUpdate</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>varAsset</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Match_Order_Items</targetReference>
+        </connector>
+    </assignments>
     <decisions>
         <description>Continues only when Run Flows is checked on the On/Off Switch custom setting and this is the final event for the Order (Final Event). Platform event-triggered flows can&apos;t filter in the Start element, so the check is here.</description>
         <name>Run_Flows</name>
@@ -27,15 +92,194 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Mark_Order_Assets_Created</targetReference>
+                <targetReference>Get_Order_Items</targetReference>
             </connector>
             <label>Flows On and Final Event</label>
         </rules>
     </decisions>
-    <description>Runs when Revenue Cloud publishes the final Create Asset Order Event for an Order, meaning its Assets have been created after Order activation. Checks Assets Created on the Order, which starts Order - Assets Created - Create Renewal. The renewal work isn&apos;t done here because platform event-triggered flows can&apos;t call subflows or flow actions. Only listens to the event; it doesn&apos;t change it, so other subscribers still receive it. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <decisions>
+        <description>Checks whether the Order has Order Products with Number of Users. If not, there is nothing to set on the Assets.</description>
+        <name>Order_Items_Found</name>
+        <label>Order Products With Users?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Mark_Order_Assets_Created</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Has_Order_Items</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Order_Items</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Loop_Order_Items</targetReference>
+            </connector>
+            <label>Has Order Products</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks whether this Asset Action Source belongs to the current Asset Action.</description>
+        <name>Source_Matches_Action</name>
+        <label>Source Matches Action?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Loop_Match_Sources</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Matches</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Loop_Match_Sources.AssetActionId</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Loop_Asset_Actions.Id</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Loop_Match_Order_Items</targetReference>
+            </connector>
+            <label>Matches</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks whether this Order Product is the one the Asset Action Source was created from.</description>
+        <name>Order_Item_Matches_Source</name>
+        <label>Order Product Matches Source?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Loop_Match_Order_Items</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Matches</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Loop_Match_Order_Items.Id</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Loop_Match_Sources.ReferenceEntityItemId</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Add_Asset_Users</targetReference>
+            </connector>
+            <label>Matches</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks whether any Assets were matched to an Order Product with Number of Users.</description>
+        <name>Assets_To_Update_Found</name>
+        <label>Assets To Update?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Mark_Order_Assets_Created</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Has_Assets</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varAssetsToUpdate</leftValueReference>
+                <operator>IsEmpty</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Asset_Users</targetReference>
+            </connector>
+            <label>Has Assets</label>
+        </rules>
+    </decisions>
+    <description>Runs when Revenue Cloud publishes the final Create Asset Order Event for an Order, meaning its Assets have been created after Order activation. First sets Number of Users on each of the Order&apos;s Assets from its Order Product (Order Product, then Asset Action Source, then Asset Action, then Asset), which creates the Beacon Subscriptions. Then checks Assets Created on the Order, which starts Order - Assets Created - Create Renewal. The renewal work isn&apos;t done here because platform event-triggered flows can&apos;t call subflows or flow actions. Only listens to the event; it doesn&apos;t change it, so other subscribers still receive it. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Create Asset Order Event - Mark Order Assets Created {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Create Asset Order Event - Mark Order Assets Created</label>
+    <loops>
+        <description>Collects the Order Product Ids.</description>
+        <name>Loop_Order_Items</name>
+        <label>Loop Order Products</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Order_Items</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Add_Order_Item_Id</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Get_Asset_Action_Sources</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>Collects the Asset Action Ids.</description>
+        <name>Loop_Asset_Action_Sources</name>
+        <label>Loop Asset Action Sources</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Asset_Action_Sources</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Add_Asset_Action_Id</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Get_Asset_Actions</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>For each Asset Action (one per Asset), finds its Order Product.</description>
+        <name>Loop_Asset_Actions</name>
+        <label>Loop Asset Actions</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Asset_Actions</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Loop_Match_Sources</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Assets_To_Update_Found</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>Finds the Asset Action Source for the current Asset Action.</description>
+        <name>Loop_Match_Sources</name>
+        <label>Loop Match Sources</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Asset_Action_Sources</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Source_Matches_Action</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Loop_Asset_Actions</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>Finds the Order Product for the current Asset Action Source.</description>
+        <name>Loop_Match_Order_Items</name>
+        <label>Loop Match Order Products</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Order_Items</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Order_Item_Matches_Source</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Loop_Match_Sources</targetReference>
+        </noMoreValuesConnector>
+    </loops>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -55,6 +299,97 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Gets the Order&apos;s Order Products that have Number of Users.</description>
+        <name>Get_Order_Items</name>
+        <label>Get Order Products</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Order_Items_Found</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>OrderId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.OrderIdentifier</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Number_of_Users__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>OrderItem</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Number_of_Users__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Asset Action Sources created from the Order Products. Asset has no direct link to its Order, so Order Product to Asset Action Source to Asset Action is the path.</description>
+        <name>Get_Asset_Action_Sources</name>
+        <label>Get Asset Action Sources</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Loop_Asset_Action_Sources</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>ReferenceEntityItemId</field>
+            <operator>In</operator>
+            <value>
+                <elementReference>varOrderItemIds</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>AssetActionSource</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>AssetActionId</queriedFields>
+        <queriedFields>ReferenceEntityItemId</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Asset Actions, which hold the Asset Id.</description>
+        <name>Get_Asset_Actions</name>
+        <label>Get Asset Actions</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Loop_Asset_Actions</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>In</operator>
+            <value>
+                <elementReference>varAssetActionIds</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>AssetAction</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>AssetId</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Saves Number of Users on the Assets. When it changes, Asset - On Create or Update - After Save creates the missing Beacon Subscriptions. This runs before Assets Created is checked, so the renewal quote is created from Assets that already have Number of Users.</description>
+        <name>Update_Asset_Users</name>
+        <label>Update Asset Users</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Mark_Order_Assets_Created</targetReference>
+        </connector>
+        <inputReference>varAssetsToUpdate</inputReference>
+    </recordUpdates>
     <recordUpdates>
         <description>Checks Assets Created on the Order named in the event, if it isn&apos;t already checked.</description>
         <name>Mark_Order_Assets_Created</name>
@@ -94,4 +429,38 @@
         <triggerType>PlatformEvent</triggerType>
     </start>
     <status>Active</status>
+    <variables>
+        <description>Asset record used to build each Number of Users update.</description>
+        <name>varAsset</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Asset</objectType>
+    </variables>
+    <variables>
+        <description>Assets to update with Number of Users.</description>
+        <name>varAssetsToUpdate</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Asset</objectType>
+    </variables>
+    <variables>
+        <description>Ids of the Order&apos;s Order Products.</description>
+        <name>varOrderItemIds</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Ids of the Asset Actions created from the Order Products.</description>
+        <name>varAssetActionIds</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
 </Flow>

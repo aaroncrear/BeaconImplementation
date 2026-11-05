@@ -46,6 +46,10 @@
                 <field>Quantity</field>
             </layoutItems>
             <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>Number_of_Users__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Edit</behavior>
                 <field>PurchaseDate</field>
             </layoutItems>

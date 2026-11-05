@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Number_of_Users__c</fullName>
+    <description>Number of users for this module. Set from the Order Product when Revenue Cloud creates or updates the Asset (Create Asset Order Event - Mark Order Assets Created). Drives how many Beacon Subscriptions the Asset has, and is copied to renewal quote lines.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>How many users this module is for. Sets the number of Beacon Subscriptions.</inlineHelpText>
+    <label>Number of Users</label>
+    <precision>6</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

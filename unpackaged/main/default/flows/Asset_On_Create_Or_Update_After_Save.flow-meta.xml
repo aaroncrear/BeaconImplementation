@@ -72,7 +72,7 @@
         </connector>
     </assignments>
     <decisions>
-        <description>Checks whether the Asset has more seats (Current Quantity, rounded down) than it has Beacon Subscriptions. If not, there is nothing to create.</description>
+        <description>Checks whether the Asset has more users (Number of Users, rounded down) than it has Beacon Subscriptions. If not, there is nothing to create.</description>
         <name>Seats_To_Create</name>
         <label>Seats to Create?</label>
         <locationX>0</locationX>
@@ -121,13 +121,13 @@
             <label>More Seats</label>
         </rules>
     </decisions>
-    <description>Creates one Beacon Subscription per seat when an Asset is created by Order activation (Revenue Cloud assetization). Runs when the Asset&apos;s Current Quantity is set or changes to 1 or more, the Asset has an Account and a Product, and it is not the Platform Bundle parent. Revenue Cloud leaves Asset Quantity blank and sets Current Quantity from the Asset State Period just after the Asset is created, so Current Quantity is used as the seat count. Creates only the seats that don&apos;t already have a Beacon Subscription (Current Quantity, rounded down, minus existing subscriptions), so it never creates duplicates. Start Date and End Date come from the Asset&apos;s Lifecycle Start Date and Current Lifecycle End Date (falling back to Lifecycle End Date). Contact is left blank. Does not remove subscriptions when the quantity goes down. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>Creates one Beacon Subscription per user when an Asset gets its Number of Users. Every module is sold at quantity 1, so the seat count is Number of Users, not quantity. Number of Users is set on the Asset from its Order Product just after Revenue Cloud creates or updates the Asset (Create Asset Order Event - Mark Order Assets Created), so this flow runs when Number of Users is set or changes to 1 or more, the Asset has an Account and a Product, and it is not the Platform Bundle parent. Creates only the users that don&apos;t already have a Beacon Subscription (Number of Users, rounded down, minus existing subscriptions), so it never creates duplicates. Start Date and End Date come from the Asset&apos;s Lifecycle Start Date and Current Lifecycle End Date (falling back to Lifecycle End Date). Contact is left blank. Does not remove subscriptions when Number of Users goes down. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <formulas>
-        <description>The number of Beacon Subscriptions still to create: Current Quantity rounded down, minus the subscriptions the Asset already has.</description>
+        <description>The number of Beacon Subscriptions still to create: Number of Users rounded down, minus the subscriptions the Asset already has.</description>
         <name>formSeatsToCreate</name>
         <dataType>Number</dataType>
-        <expression>FLOOR( BLANKVALUE( {!$Record.CurrentQuantity}, 0 ) ) - {!varExistingSubscriptionCount}</expression>
+        <expression>FLOOR( BLANKVALUE( {!$Record.Number_of_Users__c}, 0 ) ) - {!varExistingSubscriptionCount}</expression>
         <scale>0</scale>
     </formulas>
     <formulas>
@@ -211,10 +211,10 @@
     NOT( ISBLANK( {!$Record.AccountId} ) ),
     NOT( ISBLANK( {!$Record.Product2Id} ) ),
     NOT( ISPICKVAL( {!$Record.Product2.Family}, &quot;Platform Bundle&quot; ) ),
-    {!$Record.CurrentQuantity} &gt;= 1,
+    {!$Record.Number_of_Users__c} &gt;= 1,
     OR(
         ISNEW(),
-        ISCHANGED( {!$Record.CurrentQuantity} )
+        ISCHANGED( {!$Record.Number_of_Users__c} )
     )
 )</filterFormula>
         <object>Asset</object>

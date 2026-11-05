@@ -346,6 +346,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Asset.Number_of_Users__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Beacon_Module_Count_Price__c.Max_Modules__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -1941,7 +1946,17 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>OrderItem.Number_of_Users__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Pricebook2.Pricing_Method__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Quote.Lines_Missing_Users__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

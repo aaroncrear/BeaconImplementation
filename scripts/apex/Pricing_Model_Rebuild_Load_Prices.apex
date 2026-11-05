@@ -1,6 +1,8 @@
 // Pricing Model Rebuild: loads the Beacon price tables and sets each price book's Pricing Method.
 // Run in Developer Console > Debug > Open Execute Anonymous Window, after the Pricing-Model-Rebuild
 // metadata is deployed. Safe to run more than once: rows are upserted on Price Key.
+// Also backfills Number of Users on existing module Assets from their Current Quantity, so renewal
+// quotes created from them get Number of Users.
 // Source: Rev Ops price sheets (Beacon Pricing - Update for SF.xlsx and the module count tables).
 
 Map<String, String> pricingMethod = new Map<String, String>{
@@ -253,5 +255,14 @@ for (String row : discountRows) {
 }
 upsert discounts Beacon_Multi_Module_Discount__c.Price_Key__c;
 
+// Existing module Assets: Number of Users = Current Quantity (the seat count before this release).
+// Each Asset already has one Beacon Subscription per seat, so no extra subscriptions are created.
+List<Asset> assetsToBackfill = new List<Asset>();
+for (Asset a : [SELECT Id, CurrentQuantity FROM Asset
+                WHERE Number_of_Users__c = null AND CurrentQuantity >= 1 AND Product2.Type != 'Bundle']) {
+    assetsToBackfill.add(new Asset(Id = a.Id, Number_of_Users__c = Math.floor(a.CurrentQuantity)));
+}
+update assetsToBackfill;
+
 System.debug('Price books updated: ' + books.size() + ', tier prices: ' + tierPrices.size()
-    + ', module count prices: ' + mcPrices.size() + ', discounts: ' + discounts.size());
+    + ', module count prices: ' + mcPrices.size() + ', discounts: ' + discounts.size() + ', assets backfilled: ' + assetsToBackfill.size());

@@ -6,6 +6,9 @@
 - Every product is sold at **Quantity 1**. The number of users is captured in a new field, not in Quantity.
 - Price modules from user tiers (slab pricing) using the Rev Ops price sheets. Each tab of the sheet is a price book.
 - Users are always entered on the quote line, as **Number of Users**.
+- Number of Users must be reportable on the Quote Line, Opportunity Product, Order Product and Asset, and must carry through to the Asset.
+- Beacon Subscriptions are created from the Asset's Number of Users (one per user), instead of from quantity.
+- Renewal quotes start with the Asset's Number of Users.
 - Price books that didn't have bundles (**Top 1-50 Pharma**, **>200 Heads**) price each module from its own Number of Users. Tiers: 1–3, 4–5, 6–10, 11–20, 21–50, 51+ users.
 - On those two price books, apply an automatic multi-module discount to every module line: 2 modules = 10%, 3 = 20%, 4 or more = 30%.
 - Price books that had bundles (**<50 Heads**, **51-200 Heads**, **PE-VC**, **Contract Orgs (>200 Heads)**) price the whole quote from the number of modules and the **highest** Number of Users on any module. When one module moves into a higher user band, every module on the quote moves with it.
@@ -58,7 +61,24 @@ On Module Count price books, each module line keeps its list price from the tier
 ### Quantity and users rules
 
 - **Quantity Must Be One** validation rules on Quote Line Item and Opportunity Product block any quantity other than 1.
-- **Number of Users Required** on Quote Line Item blocks a line with no users or fewer than 1.
+- **Number of Users At Least One** on Quote Line Item blocks a value below 1. A blank value is allowed, because **Browse Catalogs adds lines without it**: Browse Catalogs saves new lines as soon as products are added, and it can't show or require a custom quote line field. A rule that required the field on every line would stop reps adding products.
+- **Lines Missing Users** (`Quote.Lines_Missing_Users__c`) counts the lines with no Number of Users. **Users Required Before Leaving Draft** on Quote blocks any Status change away from Draft while that count is above 0. Reps enter users in the quote line editor after adding products. A line with no users has no User Tier, so it isn't priced from the tier table until users are entered.
+
+### Number of Users from quote to Asset and renewal
+
+Number of Users is a number field at every step, so it can be reported on and summed at each level.
+
+| Step | How it gets there |
+|---|---|
+| Quote Line → Opportunity Product | `Quote Line Item - On Create or Update - After Save` and `Opportunity Product - On Create - Before Save` (standard Quote sync doesn't copy custom fields) |
+| Quote Line → Order Product | **New** `Order Product - On Create - Before Save` copies it from the Order Product's Quote Line Item when Create Orders From Quote creates the Order |
+| Order Product → Asset | **Updated** `Create Asset Order Event - Mark Order Assets Created`. When Revenue Cloud finishes creating an Order's Assets, it sets each Asset's Number of Users from its Order Product (Order Product → Asset Action Source → Asset Action → Asset, the same path the renewal flow uses), **then** checks Assets Created. Asset has no direct link to its Order, so this is the only reliable path. |
+| Asset → Beacon Subscriptions | **Updated** `Asset - On Create or Update - After Save` now creates one subscription per **Number of Users** (it used Current Quantity). It runs when Number of Users is set or changes, and still only creates the missing subscriptions. |
+| Asset → renewal quote line | **New** `Quote Line Item - On Create - Before Save` copies the Asset's Number of Users onto lines created for an existing Asset (renewals and amendments), found through the line's Quote Action (Source Asset). Because Assets get their users before Assets Created is checked, the renewal quote created by `Order - Assets Created - Create Renewal` already has them. |
+
+When a renewal Order is activated, the same event flow updates the Asset's Number of Users from the renewal Order Product. If the customer added users, the subscription flow creates the extra subscriptions. It never removes subscriptions.
+
+**Built on the Renewal-Automation branch.** The renewal, order and asset flows are only in the `Renewal-Automation` branch, which has newer versions than HTCDEV. That branch is merged into this one, so this branch deploys the renewal automation and the pricing changes together. `Renewal-Automation` should be merged to master before, or together with, this branch.
 
 ### Copying users to the Opportunity
 
@@ -108,38 +128,47 @@ The pricing procedure, decision tables and context mapping are Revenue Cloud set
 **Quantity and users**
 
 6. On a quote line, set Quantity to 2 and save. Confirm the error "Quantity must be 1. Enter the number of users in Number of Users."
-7. Clear Number of Users on a quote line and save. Confirm the error "Enter 1 or more in Number of Users."
+7. Set Number of Users to 0 on a quote line and save. Confirm the error "Number of Users must be 1 or more."
+8. From **Browse Catalogs**, add two modules to a Draft quote. Confirm they're added with Number of Users blank. Try to change the quote Status to Presented. Confirm the error "Enter Number of Users on every quote line before moving the quote out of Draft." Enter users on both lines and confirm the Status change now saves.
 
 **Per Module pricing (Top 1-50 Pharma)**
 
-8. Create a quote on Top 1-50 Pharma. Add Oncology with 8 users, CVRM with 20 users and ADC with 3 users.
-9. Confirm User Tier is 3, 4 and 1. Confirm list prices are £155,000, £190,000 and £60,000.
-10. Confirm Module Count is 3 and each line gets a 20% discount. Confirm net prices are £124,000, £152,000 and £48,000, and the quote total is £324,000.
-11. Delete ADC. Confirm the discount changes to 10% on the two remaining lines.
+9. Create a quote on Top 1-50 Pharma. Add Oncology with 8 users, CVRM with 20 users and ADC with 3 users.
+10. Confirm User Tier is 3, 4 and 1. Confirm list prices are £155,000, £190,000 and £60,000.
+11. Confirm Module Count is 3 and each line gets a 20% discount. Confirm net prices are £124,000, £152,000 and £48,000, and the quote total is £324,000.
+12. Delete ADC. Confirm the discount changes to 10% on the two remaining lines.
 
 **Module Count pricing**
 
-12. Create a quote on Contract Orgs (>200 Heads). Add ADC with 3 users and Cell Therapy with 8 users.
-13. Confirm Max Number of Users is 8 and both lines show Pricing Users 8 and User Tier 3. Confirm the quote total is **£100,000** (Starter, Up to 10 users), split £50,000 per line.
-14. Change Cell Therapy to 12 users. Confirm both lines move to the Up to 20 users band and the total is £150,000.
-15. Create a quote on <50 Heads with Oncology for 2 users and ADC for 2 users. Confirm the total is £23,000 (Starter, Up to 3 users). Change ADC to 4 users. Confirm the total is £26,000 (Starter, Enterprise).
-16. On a Module Count quote, add 4 modules. Confirm the price is the Core total. Add 2 more (6 modules). Confirm the price is the Platform total.
+13. Create a quote on Contract Orgs (>200 Heads). Add ADC with 3 users and Cell Therapy with 8 users.
+14. Confirm Max Number of Users is 8 and both lines show Pricing Users 8 and User Tier 3. Confirm the quote total is **£100,000** (Starter, Up to 10 users), split £50,000 per line.
+15. Change Cell Therapy to 12 users. Confirm both lines move to the Up to 20 users band and the total is £150,000.
+16. Create a quote on <50 Heads with Oncology for 2 users and ADC for 2 users. Confirm the total is £23,000 (Starter, Up to 3 users). Change ADC to 4 users. Confirm the total is £26,000 (Starter, Enterprise).
+17. On a Module Count quote, add 4 modules. Confirm the price is the Core total. Add 2 more (6 modules). Confirm the price is the Platform total.
 
 **Opportunity sync**
 
-17. On the synced quote from step 12, confirm the Opportunity's products show Number of Users 3 and 8.
-18. Change a quote line's Number of Users. Confirm the matching opportunity product updates.
-19. Add a User-level On/Off Switch record with Run Flows unchecked. Change Number of Users on a quote line. Confirm the opportunity product doesn't change. Delete the switch record.
+18. On the synced quote from step 13, confirm the Opportunity's products show Number of Users 3 and 8.
+19. Change a quote line's Number of Users. Confirm the matching opportunity product updates.
+20. Add a User-level On/Off Switch record with Run Flows unchecked. Change Number of Users on a quote line. Confirm the opportunity product doesn't change. Delete the switch record.
+
+**Order, Asset, subscriptions and renewal**
+
+22. Accept and close won the Contract Orgs quote from step 13 (ADC 3 users, Cell Therapy 12 users). Wait for the Closed Won automation to finish.
+23. Open the Order. Confirm each Order Product shows Number of Users 3 and 12.
+24. Open the ADC and Cell Therapy Assets. Confirm Number of Users is 3 and 12, and that ADC has 3 Beacon Subscriptions and Cell Therapy has 12.
+25. Open the renewal Quote created by the automation. Confirm each line shows the Asset's Number of Users (3 and 12) and the renewal is priced from them.
+26. On a report of Assets, confirm Number of Users can be shown and summed.
 
 **Access**
 
-20. Log in as a Beacon Sales user. Confirm you can edit Number of Users and can view, but not edit, the price objects.
+21. Log in as a Beacon Sales user. Confirm you can edit Number of Users and can view, but not edit, the price objects.
 
 ## Post Deployment Items
 
 Run these in each org (UAT, then Prod) after Gearset deploys this branch. In HTCDEV, steps 1 and 2 are still needed after the metadata deploys. The cleanup in step 3 is already done there.
 
-1. **Load the prices.** Open Developer Console, then **Debug → Open Execute Anonymous Window**. Paste in `scripts/apex/Pricing_Model_Rebuild_Load_Prices.apex` and run it. The debug log should show "Price books updated: 6, tier prices: 612, module count prices: 65, discounts: 6". The script sets Pricing Method on each price book and upserts all price rows. It's safe to run again.
+1. **Load the prices and backfill Assets.** Claude can do this through the org connection after the deploy. To run it yourself instead, open Developer Console, then **Debug → Open Execute Anonymous Window**, paste in `scripts/apex/Pricing_Model_Rebuild_Load_Prices.apex` and run it. The debug log should show "Price books updated: 6, tier prices: 612, module count prices: 65, discounts: 6" and the number of Assets backfilled. The script sets Pricing Method on each price book and upserts all price rows. It also sets Number of Users on existing module Assets from their Current Quantity, so renewals of those Assets get users. Those Assets already have one Beacon Subscription per seat, so no extra subscriptions are created. It's safe to run again.
 2. **Build the Revenue Cloud pricing setup** (Setup):
    1. **Decision tables.** Create and activate three decision tables:
       - **Beacon Tier Price**, from Beacon Tier Price. Inputs: Price Book, Product, Tier (equals). Output: List Price.
@@ -173,7 +202,7 @@ Github Branch: [Pricing-Model-Rebuild](https://github.com/aaroncrear/BeaconImple
 | 5 | CustomField | QuoteLineItem | Pricing_Users__c | Pricing Users | Created | Formula: the line's users on Per Module books, the quote's Max Number of Users on Module Count books. |
 | 6 | CustomField | QuoteLineItem | User_Tier__c | User Tier | Created | Formula: Tier 1–6 from Pricing Users (1–3, 4–5, 6–10, 11–20, 21–50, 51+). |
 | 7 | ValidationRule | QuoteLineItem | Quantity_Must_Be_One | Quantity Must Be One | Created | Blocks any quantity other than 1. |
-| 8 | ValidationRule | QuoteLineItem | Number_of_Users_Required | Number of Users Required | Created | Blocks a line with no users or fewer than 1. |
+| 8 | ValidationRule | QuoteLineItem | Number_of_Users_At_Least_One | Number of Users At Least One | Created | Blocks Number of Users below 1. Blank is allowed so Browse Catalogs can add lines. |
 | 9 | CustomField | OpportunityLineItem | Number_of_Users__c | Number of Users | Created | Users for this module, copied from the synced quote line. |
 | 10 | ValidationRule | OpportunityLineItem | Quantity_Must_Be_One | Quantity Must Be One | Created | Blocks any quantity other than 1. |
 | 11 | CustomObject | Beacon_Tier_Price__c | Beacon_Tier_Price__c | Beacon Tier Price | Created | List price per price book, module and tier (612 rows). |
@@ -203,13 +232,24 @@ Github Branch: [Pricing-Model-Rebuild](https://github.com/aaroncrear/BeaconImple
 | 35 | CustomTab | Beacon_Multi_Module_Discount__c | Beacon_Multi_Module_Discount__c | Beacon Multi-Module Discounts | Created | Tab for maintaining multi-module discounts. |
 | 36 | Flow | OpportunityLineItem | Opportunity_Product_On_Create_Before_Save | Opportunity Product - On Create - Before Save | Created | Copies Number of Users from the matching synced quote line when sync creates an opportunity product. |
 | 37 | Flow | QuoteLineItem | Quote_Line_Item_On_Create_Update_After_Save | Quote Line Item - On Create or Update - After Save | Created | Copies Number of Users to the matching opportunity product when a syncing quote line is created or its users change. |
-| 38 | Layout | QuoteLineItem | QuoteLineItem-Quote Line Item Layout | Quote Line Item Layout | Updated | Added Number of Users (required), Pricing Users and User Tier. |
+| 38 | Layout | QuoteLineItem | QuoteLineItem-Quote Line Item Layout | Quote Line Item Layout | Updated | Added Number of Users, Pricing Users and User Tier. |
 | 39 | Layout | OpportunityLineItem | OpportunityLineItem-Opportunity Product Layout | Opportunity Product Layout | Updated | Added Number of Users (read-only). |
-| 40 | Layout | Quote | Quote-Quote Layout | Quote Layout | Updated | Added Module Count and Max Number of Users to Totals. |
+| 40 | Layout | Quote | Quote-Quote Layout | Quote Layout | Updated | Added Module Count, Max Number of Users and Lines Missing Users to Totals. |
 | 41 | Layout | Pricebook2 | Pricebook2-Price Book Layout | Price Book Layout | Updated | Added Pricing Method. |
 | 42 | PermissionSet | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin Object Tab FLS | Updated | Full access to the 3 price objects and tabs. Edit access to Pricing Method and Number of Users. Read access to the formula and roll-up fields. |
 | 43 | PermissionSet | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales Object Tab FLS | Updated | Edit access to Number of Users. Read access to the other new fields and the price objects. |
 | 44 | PermissionSet | N/A | Beacon_Finance_Object_Tab_FLS | Beacon Finance Object Tab FLS | Updated | Read access to the new fields and price objects. |
 | 45 | PermissionSet | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive Object Tab FLS | Updated | Read access to the new fields and price objects. |
-| 46 | Anonymous Apex script | N/A | scripts/apex/Pricing_Model_Rebuild_Load_Prices.apex | Load Prices | Created | Sets Pricing Method and upserts 612 tier prices, 65 module count totals and 6 discounts. Run after deploy. |
-| 47 | Anonymous Apex script | N/A | scripts/apex/Pricing_Model_Rebuild_Remove_Old_Pricing.apex | Remove Old Pricing | Created | Removes bundles, seat band and multi-year schedules, and price book entries with no selling model in UAT and Prod. |
+| 46 | PermissionSet | N/A | Beacon_Consulting, Beacon_Customer_Success, Beacon_Marketing, Beacon_Product, Beacon_ResOps, Beacon_Tech _Object_Tab_FLS | Persona Object Tab FLS | Updated | Read access to Asset and Order Product Number of Users and Quote Lines Missing Users (all 10 persona sets get these; Admin can edit the two Number of Users fields). |
+| 47 | Anonymous Apex script | N/A | scripts/apex/Pricing_Model_Rebuild_Load_Prices.apex | Load Prices | Created | Sets Pricing Method, upserts 612 tier prices, 65 module count totals and 6 discounts, and backfills Asset Number of Users from Current Quantity. Run after deploy. |
+| 48 | Anonymous Apex script | N/A | scripts/apex/Pricing_Model_Rebuild_Remove_Old_Pricing.apex | Remove Old Pricing | Created | Removes bundles, seat band and multi-year schedules, and price book entries with no selling model in UAT and Prod. |
+| 49 | CustomField | Quote | Lines_Missing_Users__c | Lines Missing Users | Created | Roll-up COUNT of quote lines with no Number of Users. |
+| 50 | ValidationRule | Quote | Users_Required_Before_Leaving_Draft | Users Required Before Leaving Draft | Created | Blocks a Status change away from Draft while any line has no Number of Users. |
+| 51 | CustomField | OrderItem | Number_of_Users__c | Number of Users | Created | Users for this module, copied from the quote line. |
+| 52 | CustomField | Asset | Number_of_Users__c | Number of Users | Created | Users for this module, set from the Order Product. Drives Beacon Subscriptions and renewal quote lines. |
+| 53 | Flow | OrderItem | Order_Product_On_Create_Before_Save | Order Product - On Create - Before Save | Created | Copies Number of Users from the Order Product's quote line. |
+| 54 | Flow | QuoteLineItem | Quote_Line_Item_On_Create_Before_Save | Quote Line Item - On Create - Before Save | Created | Copies Number of Users from the Source Asset onto renewal and amendment quote lines. |
+| 55 | Flow | CreateAssetOrderEvent | Create_Asset_Order_Event_Mark_Order_Assets_Created | Create Asset Order Event - Mark Order Assets Created | Updated | Now sets each Asset's Number of Users from its Order Product before checking Assets Created. |
+| 56 | Flow | Asset | Asset_On_Create_Or_Update_After_Save | Asset - On Create or Update - After Save | Updated | Creates one Beacon Subscription per Number of Users instead of per Current Quantity. |
+| 57 | Layout | Asset | Asset-Asset Layout | Asset Layout | Updated | Added Number of Users (read-only). |
+| 58 | Layout | OrderItem | OrderItem-Order Product Layout | Order Product Layout | Updated | Added Number of Users (read-only). |

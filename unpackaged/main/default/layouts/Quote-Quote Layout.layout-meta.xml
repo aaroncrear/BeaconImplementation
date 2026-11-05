@@ -69,6 +69,10 @@
                 <behavior>Readonly</behavior>
                 <field>Max_Number_of_Users__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>Lines_Missing_Users__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>

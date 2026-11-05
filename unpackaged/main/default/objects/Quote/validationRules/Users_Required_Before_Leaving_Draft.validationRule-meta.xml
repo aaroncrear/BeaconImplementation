@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Users_Required_Before_Leaving_Draft</fullName>
+    <active>true</active>
+    <description>Every quote line must have Number of Users before the quote moves out of Draft, because users set the price tier. Lines can be added from Browse Catalogs without users while the quote is a Draft.</description>
+    <errorConditionFormula>AND(
+    ISCHANGED(Status),
+    NOT(ISPICKVAL(Status, "Draft")),
+    Lines_Missing_Users__c &gt; 0
+)</errorConditionFormula>
+    <errorDisplayField>Status</errorDisplayField>
+    <errorMessage>Enter Number of Users on every quote line before moving the quote out of Draft.</errorMessage>
+</ValidationRule>

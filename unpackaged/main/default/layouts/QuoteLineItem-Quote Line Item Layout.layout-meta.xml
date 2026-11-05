@@ -31,7 +31,7 @@
                 <field>Quantity</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Required</behavior>
+                <behavior>Edit</behavior>
                 <field>Number_of_Users__c</field>
             </layoutItems>
             <layoutItems>
