@@ -87,9 +87,6 @@
         <label>Can Look Up Parent Campaign?</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>Create_Contract_Cleanup_Case</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Missing Primary Module or Record Type</defaultConnectorLabel>
         <rules>
             <name>Primary_Module_And_Record_Type_Found</name>
@@ -143,9 +140,6 @@
         <label>Parent Campaign Found?</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>Create_Contract_Cleanup_Case</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Parent Campaign Not Found</defaultConnectorLabel>
         <rules>
             <name>Campaign_Found</name>
@@ -212,7 +206,7 @@
             <label>Record Type Found</label>
         </rules>
     </decisions>
-    <description>When a Subscription New Opportunity&apos;s Stage is changed to Contract, creates a Contract Cleanup ResOps Request Case linked to the Opportunity, its Account and the Contact on its primary Contact Role. The Case is owned by the ResOps Primary on the active Parent Campaign whose Primary Module matches the Opportunity&apos;s Primary Module. If no such Campaign is found, the Case is owned by the user who updated the Opportunity. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>When a Subscription New Opportunity&apos;s Stage is changed to Contract, creates a Contract Cleanup ResOps Request Case linked to the Opportunity, its Account and the Contact on its primary Contact Role. The Case is owned by the ResOps Primary on the Parent Campaign whose Primary Module matches the Opportunity&apos;s Primary Module. If no such Campaign is found, the Case is owned by the user who updated the Opportunity. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
     <interviewLabel>Opportunity - On Update - After Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Opportunity - On Update - After Save</label>
@@ -247,7 +241,7 @@
         <inputReference>varContractCleanupCase</inputReference>
     </recordCreates>
     <recordLookups>
-        <description>Finds the active Campaign on the Parent Campaign record type (Sub Campaigns and Campaigns on other record types are never matched) whose Primary Module matches the Opportunity&apos;s Primary Module and that has a ResOps Primary. If more than one matches, the oldest Campaign is used.</description>
+        <description>Finds the Campaign on the Parent Campaign record type (Sub Campaigns and Campaigns on other record types are never matched) whose Primary Module matches the Opportunity&apos;s Primary Module and that has a ResOps Primary. If more than one matches, the oldest Campaign is used.</description>
         <name>Get_Parent_Campaign</name>
         <label>Get Parent Campaign</label>
         <locationX>0</locationX>
