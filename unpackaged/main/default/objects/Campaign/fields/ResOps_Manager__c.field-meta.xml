@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ResOps_Manager__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>ResOps Manager responsible for the campaign. Lookup to User, shown above ResOps Primary on the Beacon Parent Campaign Record Page.</description>
+    <label>ResOps Manager</label>
+    <referenceTo>User</referenceTo>
+    <relationshipName>Campaigns_ResOps_Manager</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

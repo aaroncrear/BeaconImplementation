@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>When a ResOps Request Case is created, calls the Email Subflow to email the ResOps Manager, ResOps Primary and ResOps Secondary on the Parent Campaign whose Primary Module matches the Case&apos;s Opportunity. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <environments>Default</environments>
+    <interviewLabel>Case - On Create - After Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Case - On Create - After Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>ResOps_Case_Created_Notification</targetReference>
+        </connector>
+        <filterFormula>AND(
+    {!$Setup.On_Off_Switch__c.Run_Flows__c},
+    {!$Record.RecordType.DeveloperName} = &quot;ResOps_Request&quot;
+)</filterFormula>
+        <object>Case</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <subflows>
+        <description>Calls the Email Subflow&apos;s ResOps Case Created path to notify the ResOps team from the Case&apos;s Parent Campaign.</description>
+        <name>ResOps_Case_Created_Notification</name>
+        <label>ResOps Case Created Notification</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>Email_Subflow</flowName>
+        <inputAssignments>
+            <name>varObject</name>
+            <value>
+                <stringValue>Case</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varRecordID</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varTrigger</name>
+            <value>
+                <stringValue>ResOps Case Created</stringValue>
+            </value>
+        </inputAssignments>
+    </subflows>
+</Flow>

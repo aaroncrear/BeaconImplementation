@@ -518,6 +518,16 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
+                <fieldItem>Record.ResOps_Manager__c</fieldItem>
+                <identifier>RecordResOps_Manager__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
                 <fieldItem>Record.ResOps_Primary__c</fieldItem>
                 <identifier>RecordResOps_Primary__cField</identifier>
             </fieldInstance>

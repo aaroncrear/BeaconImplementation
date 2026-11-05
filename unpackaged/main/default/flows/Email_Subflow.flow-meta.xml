@@ -1,7 +1,148 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Emails the ResOps Manager, ResOps Primary and ResOps Secondary from the Case&apos;s Parent Campaign that a ResOps Case was created, with a link to the Case. Sent from the Beacon Salesforce Automations org-wide email address.</description>
+        <name>Send_ResOps_Case_Created_Email</name>
+        <label>Send ResOps Case Created Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>collResOpsCaseRecipients</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <stringValue>digital.salesforce@beaconintel.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>ttResOpsCaseCreatedSubject</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>ttResOpsCaseCreatedBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>sendRichBody</name>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Adds the email addresses of the Campaign&apos;s ResOps Manager, ResOps Primary and ResOps Secondary to the list of ResOps Case notification recipients.</description>
+        <name>Add_ResOps_Recipient_Emails</name>
+        <label>Add ResOps Recipient Emails</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>collResOpsCaseRecipients</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Get_Campaign.ResOps_Manager__r.Email</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>collResOpsCaseRecipients</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Get_Campaign.ResOps_Primary__r.Email</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>collResOpsCaseRecipients</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Get_Campaign.ResOps_Secondary__r.Email</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Send_ResOps_Case_Created_Email</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>Checks that a Parent Campaign with a matching Primary Module and a ResOps Primary was found. If not, no email is sent.</description>
+        <name>Campaign_Found</name>
+        <label>Campaign Found?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Campaign Not Found</defaultConnectorLabel>
+        <rules>
+            <name>Matching_Campaign_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Campaign</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Add_ResOps_Recipient_Emails</targetReference>
+            </connector>
+            <label>Matching Campaign Found</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks that the Case was found, its Opportunity has a Primary Module, and the Campaign Parent Campaign record type was found before looking up the Campaign. Without all three, the lookup could match the wrong Campaign, so no email is sent.</description>
+        <name>Can_Look_Up_Campaign</name>
+        <label>Can Look Up Campaign?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Missing Case, Primary Module or Record Type</defaultConnectorLabel>
+        <rules>
+            <name>Case_Primary_Module_And_Record_Type_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Case</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Case.Opportunity__r.Primary_Module__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Parent_Campaign_Record_Type</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Campaign</targetReference>
+            </connector>
+            <label>Case, Primary Module and Record Type Found</label>
+        </rules>
+    </decisions>
     <decisions>
         <description>What was the specific trigger from the record-triggered Flow?</description>
         <name>Which_Account_Trigger</name>
@@ -30,16 +171,19 @@
         <locationY>0</locationY>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
-            <name>Case_Placeholder</name>
+            <name>ResOps_Case_Created</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
                 <leftValueReference>varTrigger</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
-                    <stringValue>Placeholder</stringValue>
+                    <stringValue>ResOps Case Created</stringValue>
                 </rightValue>
             </conditions>
-            <label>Case Placeholder</label>
+            <connector>
+                <targetReference>Get_Parent_Campaign_Record_Type</targetReference>
+            </connector>
+            <label>ResOps Case Created</label>
         </rules>
     </decisions>
     <decisions>
@@ -160,7 +304,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Which_Case_Trigger</targetReference>
+                <targetReference>Get_Case</targetReference>
             </connector>
             <label>Case</label>
         </rules>
@@ -214,6 +358,118 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Finds the active Campaign on the Parent Campaign record type whose Primary Module matches the Primary Module of the Case&apos;s Opportunity and that has a ResOps Primary. If more than one matches, the oldest Campaign is used, the same as in Opportunity - On Update - After Save.</description>
+        <name>Get_Campaign</name>
+        <label>Get Campaign</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Campaign_Found</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Parent_Campaign_Record_Type.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Primary_Module__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Case.Opportunity__r.Primary_Module__c</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>ResOps_Primary__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>IsActive</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Campaign</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>ResOps_Primary__c</queriedFields>
+        <queriedFields>ResOps_Secondary__c</queriedFields>
+        <queriedFields>ResOps_Manager__c</queriedFields>
+        <queriedFields>Primary_Module__c</queriedFields>
+        <queriedFields>RecordTypeId</queriedFields>
+        <sortField>CreatedDate</sortField>
+        <sortOrder>Asc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Case record that triggered this Subflow</description>
+        <name>Get_Case</name>
+        <label>Get Case</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Which_Case_Trigger</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>varRecordID</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Case</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Retrieves the Campaign Parent Campaign record type by its developer name (Parent_Campaign), so its Id isn&apos;t hardcoded.</description>
+        <name>Get_Parent_Campaign_Record_Type</name>
+        <label>Get Parent Campaign Record Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Can_Look_Up_Campaign</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Campaign</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Parent_Campaign</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <start>
         <locationX>0</locationX>
         <locationY>0</locationY>
@@ -221,7 +477,41 @@
             <targetReference>Which_Object</targetReference>
         </connector>
     </start>
-    <status>Draft</status>
+    <status>Active</status>
+    <subflows>
+        <description>Used to send email notification</description>
+        <name>Fault_Path_Subflow</name>
+        <label>Fault Path Subflow</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>Fault_Path_Subflow</flowName>
+        <inputAssignments>
+            <name>varFaultMessage</name>
+            <value>
+                <elementReference>$Flow.FaultMessage</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <textTemplates>
+        <description>Body of the ResOps Case Created email. &quot;Case {Case Number}&quot; links to the Case.</description>
+        <name>ttResOpsCaseCreatedBody</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;ResOps &lt;a href=&quot;{!formRecordLink}&quot;&gt;Case {!Get_Case.CaseNumber}&lt;/a&gt; has been created. Please review.&lt;/p&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <description>Subject of the ResOps Case Created email.</description>
+        <name>ttResOpsCaseCreatedSubject</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>ResOps Case {!Get_Case.CaseNumber} - {!Get_Case.Type}</text>
+    </textTemplates>
+    <variables>
+        <description>Collection of email addresses for recipients of ResOps Case notifications</description>
+        <name>collResOpsCaseRecipients</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
     <variables>
         <description>The Object that triggered this Subflow</description>
         <name>varObject</name>
