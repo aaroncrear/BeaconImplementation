@@ -6,18 +6,34 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – do these in order
 
-_Last updated: full pricing proven on a real quote; next, retrieve Scratch Test._
+_Last updated: Beacon Pricing Procedure V2 ready to deploy._
 
-### Step 1. Retrieve Scratch Test with Workbench
-Claude will build the real **Beacon Pricing Procedure** (new Draft version) from Scratch Test's exact settings.
+**Beacon Pricing Procedure V2** = your current V1 (all 30 standard steps, unchanged) + the six proven Beacon steps as **steps 16–21**, after list price and volume discounts and **before manual discounts** (so reps can still discount on top):
 
-1. Download `Scratch_Test_and_Beacon_package.xml` (sent in chat; also in the branch under `scripts/retrieve/`).
-2. **workbench.developerforce.com** → Sandbox → log in to HTCDEV.
-3. **migration → Retrieve** → Unpackaged Manifest: choose the file → **Next → Retrieve → Download ZIP File**.
-4. Upload the zip in chat.
+| Step | Name | What it does |
+|---|---|---|
+| 16 | BeaconSetLineTier | Tier 1-6 from the line's Number of Users |
+| 17 | BeaconCountModules | `SUM(LineItemQuantity)` → module count |
+| 18 | BeaconHighestTier | `MAX(BeaconTier__c)` → highest tier |
+| 19 | BeaconTierPrice | Line price from Beacon Tier Price |
+| 20 | BeaconMultiModuleDiscount | 10/20/30% off (Per Module books) |
+| 21 | BeaconModuleCountPrice | Quote total ÷ modules per line (Module Count books) |
 
-### Leave as-is for now
-- **Revenue Settings** and **Salesforce Pricing Setup** both point to **Scratch Test**. Leave them – HTCDEV quotes price with Scratch Test until the Beacon procedure is ready. (Scratch Test doesn't have manual discounts or the standard subscription steps, so don't rely on HTCDEV quote totals for anything else meanwhile.)
+V1 stays as it is. V2 deploys as **Draft**.
+
+### Step 1. Deploy with Workbench
+1. Download **Beacon_Pricing_Procedure_V2.zip** (sent in chat).
+2. Workbench → **migration → Deploy** → choose the zip → tick **Single Package** → **Next → Deploy**.
+3. If it fails, screenshot the error for Claude.
+
+### Step 2. Activate V2 and point both settings at it
+1. **Setup → Pricing Procedures → Beacon Pricing Procedure** → open **V2** → **Activate**. (If it asks, deactivate V1.)
+2. **Revenue Settings** → pricing procedure → **Beacon Pricing Procedure**.
+3. **Salesforce Pricing Setup** → default pricing procedure → **Beacon Pricing Procedure**.
+4. **Sync Pricing Data.**
+
+### Step 3. Reprice Product Config 1
+Change Oncology to 3 users and back to 2 (or any edit that reprices). **Expected:** ADC £13,000 + Oncology £13,000 = **£26,000**. Tell Claude – Claude checks the quote.
 
 ---
 
