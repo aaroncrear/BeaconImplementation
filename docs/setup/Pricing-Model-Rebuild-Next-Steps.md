@@ -6,14 +6,12 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – Number of Users column in the Transaction Line Editor
 
-_Last updated: Step 1 checked – add the Order mapping, then Step 2._
+_Last updated: Step 1 done – deploy V3 next._
 
 Reps add modules with Browse Catalogs, then set **Number of Users** in a column in the Transaction Line Editor. Pricing reads the quote line field instead of the product attribute. Tier, discount and module count pricing don't change.
 
-### Step 1. Add a context field for Number of Users – ⚠️ one mapping left
-Claude checked HTCDEV: `BeaconUsers__c` exists on SalesTransactionItem (number, input/output), its tag exists, and it's mapped in **QuoteEntitiesMapping** to QuoteLineItem `Number_of_Users__c`. ✅
-
-Still to do: **Map Data → OrderEntitiesMapping → Edit SObject Mapping** → SalesTransactionItem: `BeaconUsers__c` → OrderItem **Number_of_Users__c** → **Save and Publish**. (Unmapped custom context fields broke context loading before, so this protects order pricing.)
+### Step 1. Add a context field for Number of Users ✅ Done
+`BeaconUsers__c` mapped to `Number_of_Users__c` in QuoteEntitiesMapping and OrderEntitiesMapping (checked by Claude).
 
 ### Step 2. Deploy Beacon Pricing Procedure V3
 Only change from V2: the tier step reads `BeaconUsers__c` (the field) instead of the attribute. A blank Number of Users prices as Tier 1.
