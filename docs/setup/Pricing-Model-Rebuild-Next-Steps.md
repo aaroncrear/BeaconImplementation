@@ -6,49 +6,22 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – do these in order
 
-_Last updated: BeaconMaxUsers__c set by hand in the Step 4 JSON._
+_Last updated: module count pricing proven; testing MAX._
 
-### Step 1. Fill in the four empty constants
-In Scratch Test V3, open the **Resource Manager** and search **Constant_Adjustment**. Set the **Value** of the four without one:
+### Step 1. Test MAX on a standard field
+This tells us whether MAX itself fails, or only MAX on our custom `BeaconTier__c`.
 
-| Constant (starts with) | Value |
-|---|---|
-| `Constant_AdjustmentType_Beacon_Module_Count_Price` | `Adjustment_Type__c` |
-| `Constant_AdjustmentValue_Beacon_Module_Count_Price` | `Adjustment_Value__c` |
-| `Constant_AdjustmentType_Beacon_Multi_Module_Discount` | `Adjustment_Type__c` |
-| `Constant_AdjustmentValue_Beacon_Multi_Module_Discount` | `Adjustment_Value__c` |
-
-(The two Beacon Tier Price constants already have values.)
-
-### Step 2. Check both new matrix steps
-On **Beacon Multi-Module Discount** and **Beacon Module Count Price**:
-- **Output Rule Variables:** leave all empty.
-- **Input Variables:** Quantity → `LineItemQuantity`, Input Unit Price → `NetUnitPrice`.
-- **Output Variables:** Net Unit Price → `NetUnitPrice`, Subtotal → `ItemNetTotalPrice`.
-
-Input Rule Variables:
-
-| Step | Field | Value |
-|---|---|---|
-| Discount | Price Book | `PriceBooks` |
-| Discount | Min Modules, Max Modules | `BeaconModuleCount__c` |
-| Module Count | Price Book | `PriceBooks` |
-| Module Count | Min Modules, Max Modules | `BeaconModuleCount__c` |
-| Module Count | Min Tier, Max Tier | `BeaconMaxUsers__c` |
-
-### Step 3. Delete the MAX step, then Save
-Delete the `MAX(BeaconTier__c)` Aggregate step (it's the likely cause of *Invalid tag attribute name key: BeaconTier__c*). Keep the `SUM(LineItemQuantity)` step. **Save.**
-
-### Step 4. Simulate
-1. **Context Mapping:** `QuoteEntitiesMapping` (check it every run – it resets).
-2. **Input Mode:** Advanced. Paste:
+1. Add an **Aggregate Price** step right after the SUM one:
+   - **Formula:** `MAX(LineItemQuantity)`
+   - **Output Variable:** `BeaconMaxUsers__c`
+2. **Save.**
+3. **Simulate** (Advanced, Context Mapping **QuoteEntitiesMapping**) with the JSON below. It's the same as before, without `BeaconMaxUsers__c`.
 
 ```json
 {
   "SalesTransaction": [
     {
       "PriceBooks": "01sS9000008iu6kIAA",
-      "BeaconMaxUsers__c": "2",
       "SalesTransactionItem": [
         {
           "LineItem": "line1",
@@ -74,11 +47,10 @@ Delete the `MAX(BeaconTier__c)` Aggregate step (it's the likely cause of *Invali
 }
 ```
 
-3. `BeaconMaxUsers__c` is set by hand to **2** (the highest tier: ADC at 4 users), standing in for the deleted MAX step. If the simulator still asks for it, click **Fix Input** and enter `2`.
-4. **Expected:** **£13,000 per line**, £26,000 total (<50 Heads, 2 modules = Starter, Tier 2 = Enterprise). This proves the module count step works; then only the highest-tier calculation is left.
-5. Send Claude a screenshot:
-   - **Runs:** the MAX step was the problem – Claude gives you another way to get the highest tier.
-   - **Fails:** send the JSON Details from the Output tab.
+4. **Expected:** **£11,500 per line**. MAX of quantity = 1, so it uses Tier 1 = "Up to 3 users" band: £23,000 ÷ 2. (The number is wrong for this quote on purpose – it just shows MAX ran.)
+5. Send Claude the result:
+   - **£11,500:** MAX works; the problem is aggregating our custom tag. Claude will give you the workaround.
+   - **Error:** MAX isn't usable here; Claude will give you a different approach.
 
 ---
 
@@ -94,6 +66,9 @@ Delete the `MAX(BeaconTier__c)` Aggregate step (it's the likely cause of *Invali
 ---
 
 ## Proven so far
+
+- **Module count pricing works:** SUM(LineItemQuantity) → `BeaconModuleCount__c` = 2, and the Module Count matrix with max tier 2 overrode both lines to **£13,000** (<50 Heads, Starter, Enterprise). Discount step correctly did nothing on a Module Count book.
+- `MAX(BeaconTier__c)` fails at run time with *Invalid tag attribute name key: BeaconTier__c* (being investigated).
 
 - Price Adjustment Matrix can read the Beacon tables once each table is **registered to it in the Pricing Recipe** (done in HTCDEV for all three tables).
 - Tables need **Adjustment Type** and **Adjustment Value** outputs (added).
