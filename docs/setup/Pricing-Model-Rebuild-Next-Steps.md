@@ -6,12 +6,19 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now
 
-### A. Add the max-tier step to Scratch Test V3
-1. Add an **Aggregate Price** step right after the SUM one:
-   - **Formula:** `MAX(BeaconTier__c)`
-   - **Output Variable:** `BeaconMaxUsers__c`
-   - Leave Group By, Roll Up Price, conditions and Write Back empty.
-2. **Save.** If it won't save, tell Claude (MAX may not be supported).
+### Isolate the MAX step
+Simulate fails with *Invalid tag attribute name key: BeaconTier__c* even with BeaconTier__c set to 0. The only step that reads BeaconTier__c across lines is the **MAX** Aggregate, so test without it:
+
+1. Deactivate the version if it's active, then **delete** the `MAX(BeaconTier__c)` Aggregate step. Keep everything else. **Save.**
+2. **Simulate** with the step C JSON below (Context Mapping **QuoteEntitiesMapping**). You can drop the `"BeaconTier__c": "0"` lines if the simulator complains about them.
+3. Expected without the MAX step (the module count lookup finds no band, so lines keep their tier price):
+   - ADC (4 users): **£21,000**
+   - Oncology (2 users): **£18,000**
+4. Send Claude the result:
+   - **It runs:** the MAX step is the problem. Claude will give you a different way to get the quote's highest tier.
+   - **Same error:** the problem is elsewhere (Claude will check the SUM step next).
+
+### A. (done) Max-tier step – being isolated above
 
 ### B. Add the two Price Adjustment Matrix steps
 Add them **after** the Beacon Tier Price step, in this order.
