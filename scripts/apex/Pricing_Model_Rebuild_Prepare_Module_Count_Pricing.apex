@@ -2,7 +2,7 @@
 // Price Adjustment Matrix steps. Safe to run more than once.
 // 1. Module Count Price: one row per exact module count (1-17) instead of ranges (3-4, 6+), with the user band as a
 //    tier range and Adjustment Value = Quote Total / module count (the price on each line).
-// 2. Multi-Module Discount: Adjustment Type = Percentage, Adjustment Value = Discount Percent.
+// 2. Multi-Module Discount: one row per exact module count, Adjustment Type = Percentage, Adjustment Value = Discount Percent.
 Integer maxModules = 17;
 List<Beacon_Module_Count_Price__c> rows = [SELECT Price_Book__c, Price_Book__r.Name, Module_Level__c, User_Band__c, Min_Users__c, Max_Users__c,
     Min_Modules__c, Max_Modules__c, Quote_Total__c, Price_Key__c FROM Beacon_Module_Count_Price__c];
@@ -26,10 +26,19 @@ for (Beacon_Module_Count_Price__c r : rows) {
 upsert out.values() Price_Key__c;
 List<Beacon_Module_Count_Price__c> old = [SELECT Id FROM Beacon_Module_Count_Price__c WHERE Price_Key__c NOT IN :out.keySet()];
 delete old;
-List<Beacon_Multi_Module_Discount__c> disc = [SELECT Id, Discount_Percent__c FROM Beacon_Multi_Module_Discount__c];
-for (Beacon_Multi_Module_Discount__c d : disc) {
-    d.Adjustment_Type__c = 'Percentage';
-    d.Adjustment_Value__c = d.Discount_Percent__c;
+// Discount: one row per exact module count (the 4+ row becomes 4, 5, ... 17), because the decision table matches with Equals.
+Map<String, Beacon_Multi_Module_Discount__c> disc = new Map<String, Beacon_Multi_Module_Discount__c>();
+for (Beacon_Multi_Module_Discount__c d : [SELECT Price_Book__c, Price_Book__r.Name, Min_Modules__c, Max_Modules__c, Discount_Percent__c
+                                          FROM Beacon_Multi_Module_Discount__c]) {
+    Integer hi = d.Max_Modules__c == null ? maxModules : d.Max_Modules__c.intValue();
+    for (Integer n = d.Min_Modules__c.intValue(); n <= hi; n++) {
+        String key = d.Price_Book__r.Name + '|' + n;
+        if (!disc.containsKey(key)) {
+            disc.put(key, new Beacon_Multi_Module_Discount__c(Price_Key__c = key, Price_Book__c = d.Price_Book__c,
+                Min_Modules__c = n, Max_Modules__c = n, Discount_Percent__c = d.Discount_Percent__c,
+                Adjustment_Type__c = 'Percentage', Adjustment_Value__c = d.Discount_Percent__c));
+        }
+    }
 }
-update disc;
+upsert disc.values() Price_Key__c;
 System.debug('Module count rows: ' + out.size() + ', old range rows removed: ' + old.size() + ', discount rows: ' + disc.size());
