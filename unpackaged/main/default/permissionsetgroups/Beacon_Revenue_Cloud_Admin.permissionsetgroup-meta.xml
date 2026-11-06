@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Revenue Cloud setup permission sets for admins: product catalog and classifications, pricing procedures and decision tables, configuration rules and rule libraries, context definitions, product discovery, document generation and tax setup. Assign together with Beacon - Revenue Cloud User so admins can also quote. Each user also needs the matching permission set licenses.</description>
+    <description>Revenue Cloud setup permission sets: catalog, pricing procedures, decision tables, configuration rules, context definitions, product discovery, DocGen and tax. Assign with Beacon - Revenue Cloud User; needs matching licenses.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Beacon - Revenue Cloud Admin</label>
     <permissionSets>force__AdvancedConfiguratorDesigner</permissionSets>

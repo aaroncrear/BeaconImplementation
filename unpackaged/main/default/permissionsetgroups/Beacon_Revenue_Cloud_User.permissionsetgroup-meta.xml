@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Revenue Cloud permission sets for people who sell: browse the catalog, configure and price quotes (including Beacon pricing and the Number of Users context fields), create orders and contracts, and amend, renew or cancel assets. Each user also needs the matching permission set licenses.</description>
+    <description>Revenue Cloud permission sets for people who quote: catalog, configurator, pricing, quotes, orders, contracts, and asset amend, renew and cancel. Users also need the matching permission set licenses.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Beacon - Revenue Cloud User</label>
     <permissionSets>force__BRERuntime</permissionSets>
