@@ -6,34 +6,26 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – do these in order
 
-_Last updated: MAX works on standard fields; next, a real-quote test._
+_Last updated: real-quote test 1 – Beacon steps didn't run._
 
-MAX works (`MAX(LineItemQuantity)` gave £11,500 as expected). It only fails on our custom `BeaconTier__c` **in Simulate**. Simulate has already failed on custom tags once where the real engine may not, so the next test is a **real quote**. Everything else is proven.
+**What Claude found on Product Config 1:** both lines are at the price book price (£18,000 each, £36,000 total), and Pricing Tier / Module Count / Max User Tier are all blank – so none of the Beacon steps ran. Two likely reasons:
+- **Scratch Test V2 and V3 are both active.** The default procedure is Scratch Test, but the engine may be running V2.
+- **ADC is at 3 users, not 4** (both lines are Tier 1). That changes the expected price, not whether the steps run.
 
-### Step 1. Put the real MAX back
-In Scratch Test V3, change the second Aggregate step's formula from `MAX(LineItemQuantity)` back to **`MAX(BeaconTier__c)`** (output stays `BeaconMaxUsers__c`). **Save.**
+### Step 1. Leave only V3 active
+1. Open **Scratch Test V2** → **Deactivate**.
+2. Check **Scratch Test V3** is still **Active**.
 
-Check the steps are in this order:
-1. Pricing Setting
-2. Formula Based Pricing → `BeaconTier__c` (tick **Exclude Price Waterfall**)
-3. Aggregate Price `SUM(LineItemQuantity)` → `BeaconModuleCount__c`
-4. Aggregate Price `MAX(BeaconTier__c)` → `BeaconMaxUsers__c`
-5. Price Adjustment Matrix – Beacon Tier Price
-6. Price Adjustment Matrix – Beacon Multi-Module Discount
-7. Price Adjustment Matrix – Beacon Module Count Price
+### Step 2. Sync
+**Setup → Salesforce Pricing Setup → Sync Pricing Data.** Wait for it to finish.
 
-### Step 2. Make Scratch Test the live procedure (HTCDEV only)
-1. **Activate** Scratch Test V3.
-2. **Setup → Salesforce Pricing Setup** → set the **default pricing procedure** to **Scratch Test**.
-3. **Sync Pricing Data** and wait for it to finish.
-
-### Step 3. Price a real quote
-1. Open quote **Product Config 1** (<50 Heads, ADC at 4 users) in Browse Catalogs.
-2. Add **Oncology Module** with **Number of Users = 2**. Save / reprice.
-3. **Expected:** ADC **£13,000**, Oncology **£13,000**, total **£26,000** (Starter, Enterprise).
-4. Tell Claude when it's saved – Claude will check the line prices, Pricing Tier, Pricing Module Count and Pricing Max User Tier in HTCDEV.
-
-If pricing errors, screenshot the message. Either way, leave the default on Scratch Test until Claude says to switch it back (HTCDEV quotes priced with the standard procedure until now anyway).
+### Step 3. Reprice the quote
+1. Open **Product Config 1** in Browse Catalogs.
+2. Set **ADC Number of Users = 4** (Oncology stays at 2). Save / reprice.
+3. **Expected:** ADC **£13,000**, Oncology **£13,000**, total **£26,000**.
+   (If you leave ADC at 3 users, expect **£11,500** each, £23,000 – the "Up to 3 users" band.)
+4. Tell Claude – Claude will check the prices and the Pricing Tier / Module Count / Max User Tier fields.
+5. If the prices are still £18,000: on one quote line, open the **price waterfall / price details** and screenshot it. It shows which pricing steps ran.
 
 ---
 
