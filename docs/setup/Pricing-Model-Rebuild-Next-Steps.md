@@ -6,26 +6,18 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – do these in order
 
-_Last updated: real-quote test 1 – Beacon steps didn't run._
+_Last updated: full pricing proven on a real quote; next, retrieve Scratch Test._
 
-**What Claude found on Product Config 1:** both lines are at the price book price (£18,000 each, £36,000 total), and Pricing Tier / Module Count / Max User Tier are all blank – so none of the Beacon steps ran. Two likely reasons:
-- **Scratch Test V2 and V3 are both active.** The default procedure is Scratch Test, but the engine may be running V2.
-- **ADC is at 3 users, not 4** (both lines are Tier 1). That changes the expected price, not whether the steps run.
+### Step 1. Retrieve Scratch Test with Workbench
+Claude will build the real **Beacon Pricing Procedure** (new Draft version) from Scratch Test's exact settings.
 
-### Step 1. Leave only V3 active
-1. Open **Scratch Test V2** → **Deactivate**.
-2. Check **Scratch Test V3** is still **Active**.
+1. Download `Scratch_Test_and_Beacon_package.xml` (sent in chat; also in the branch under `scripts/retrieve/`).
+2. **workbench.developerforce.com** → Sandbox → log in to HTCDEV.
+3. **migration → Retrieve** → Unpackaged Manifest: choose the file → **Next → Retrieve → Download ZIP File**.
+4. Upload the zip in chat.
 
-### Step 2. Sync
-**Setup → Salesforce Pricing Setup → Sync Pricing Data.** Wait for it to finish.
-
-### Step 3. Reprice the quote
-1. Open **Product Config 1** in Browse Catalogs.
-2. Set **ADC Number of Users = 4** (Oncology stays at 2). Save / reprice.
-3. **Expected:** ADC **£13,000**, Oncology **£13,000**, total **£26,000**.
-   (If you leave ADC at 3 users, expect **£11,500** each, £23,000 – the "Up to 3 users" band.)
-4. Tell Claude – Claude will check the prices and the Pricing Tier / Module Count / Max User Tier fields.
-5. If the prices are still £18,000: on one quote line, open the **price waterfall / price details** and screenshot it. It shows which pricing steps ran.
+### Leave as-is for now
+- **Revenue Settings** and **Salesforce Pricing Setup** both point to **Scratch Test**. Leave them – HTCDEV quotes price with Scratch Test until the Beacon procedure is ready. (Scratch Test doesn't have manual discounts or the standard subscription steps, so don't rely on HTCDEV quote totals for anything else meanwhile.)
 
 ---
 
@@ -41,6 +33,9 @@ _Last updated: real-quote test 1 – Beacon steps didn't run._
 ---
 
 ## Proven so far
+
+- **Real quote works end to end** (Product Config 1, <50 Heads): ADC 4 users (Tier 2) + Oncology 2 users (Tier 1) → Module Count 2, Max Tier 2 → **£13,000 + £13,000 = £26,000**. `MAX(BeaconTier__c)` works on real quotes – its error was Simulate-only.
+- The procedure used by quotes is set in **two** places: **Revenue Settings** (pricing procedure) and **Salesforce Pricing Setup** (default pricing procedure). Both must point to the Beacon procedure.
 
 - **Module count pricing works:** SUM(LineItemQuantity) → `BeaconModuleCount__c` = 2, and the Module Count matrix with max tier 2 overrode both lines to **£13,000** (<50 Heads, Starter, Enterprise). Discount step correctly did nothing on a Module Count book.
 - `MAX(LineItemQuantity)` works in Aggregate Price; `MAX(BeaconTier__c)` fails **in Simulate** with *Invalid tag attribute name key: BeaconTier__c* – being tested on a real quote.
@@ -58,7 +53,7 @@ _Last updated: real-quote test 1 – Beacon steps didn't run._
 - Context definition SalesTransactionContextAuto: attributes and tags `BeaconTier__c`, `BeaconModuleCount__c`, `BeaconMaxUsers__c`, mapped in QuoteEntitiesMapping and OrderEntitiesMapping to the `Pricing_…` fields.
 - Decision table changes (outputs and Tier conditions).
 - Scripts: tier prices, adjustment fields, module count / discount prep.
-- Default pricing procedure set to Beacon Pricing Procedure.
+- Default pricing procedure set to Beacon Pricing Procedure in **both** Revenue Settings and Salesforce Pricing Setup.
 
 ## Reference
 
