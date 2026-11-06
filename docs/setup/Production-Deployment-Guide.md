@@ -136,7 +136,10 @@ Open any quote → ⚙ → **Edit Page** → click the **Quote Line Items** (Tra
 1. Assign yourself the permission sets used in HTCDEV for rule building (**Product Configuration Rules Designer**, **BRE Designer** and the Context Service designer set, as offered).
 2. **Rule Library**: create **Beacon Configuration Rules**, version **V1**, activate it.
 3. **Sub-Type Mapping**: `PC_ProductBasedOn` → `ProductBasedOn` (lets a rule target the Beacon Module classification).
-4. **Product Configuration Rule** "Beacon Module Quantity Must Be 1": scope **Product Classification = Beacon Module** (one rule covers all 17 modules), condition Quantity ≠ 1 → warning message *"Quantity must be 1. Enter the number of users in Number of Users."*, effective to 2099 → Validate → Activate.
+4. **Product Configuration Rule** "Beacon Module Quantity Must Be 1" – Usage Sub Type **Product Classification**, effective to 2099:
+   - **Condition:** Product Classification (ProductBasedOn) **equals Beacon Module**, and Quantity (ItemDetailQuantity) **not equals 1**.
+   - **Action:** Validate, message *"Quantity must be 1. Enter the number of users in Number of Users."* – set the action's **target to the Beacon Module classification**, not to a single product. (HTCDEV's rule has the right condition but its action targets ADC only.)
+   - Validate → Activate.
 
 If the classification scope isn't offered, add the 17 modules to the same rule and tell Claude.
 

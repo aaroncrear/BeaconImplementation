@@ -55,7 +55,7 @@ Tick each box as you go. 🤖 = tell Claude, who checks or completes that step b
 - [ ] Assign yourself the rule-building permission sets (Product Configuration Rules Designer, BRE Designer, Context Service designer)
 - [ ] Create Rule Library **Beacon Configuration Rules**, version **V1**, activate
 - [ ] Sub-Type Mapping: `PC_ProductBasedOn` → `ProductBasedOn`
-- [ ] Create rule **Beacon Module Quantity Must Be 1** – scope Product Classification **Beacon Module**, Quantity ≠ 1 → warning, effective to 2099 → Validate → Activate
+- [ ] Create rule **Beacon Module Quantity Must Be 1** – condition and action target both Product Classification **Beacon Module** (not a single product), Quantity ≠ 1 → message, effective to 2099 → Validate → Activate
 
 ## 8. Users and permissions
 - [ ] Assign the Revenue Cloud permission set licenses to each user (list in the guide, step 8)
