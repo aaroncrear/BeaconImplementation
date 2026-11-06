@@ -7,7 +7,7 @@ Tick each box as you go. 🤖 = tell Claude, who checks or completes that step b
 ---
 
 ## 1. Deploy metadata (Gearset)
-- [ ] Compare branch `Pricing-Model-Rebuild` → **Beacon Production** using `manifest/Production-Pricing-and-Renewals-package.xml` (90 components)
+- [ ] Compare branch `Pricing-Model-Rebuild` → **Beacon Production** using `manifest/Production-Pricing-and-Renewals-package.xml` (92 components)
 - [ ] Review the comparison for the **5 layouts**, **12 permission sets** and **Opportunity_On_Create_After_Save** – stop and tell Claude if there are Production changes you don't recognise
 - [ ] Deploy
 - [ ] **Setup → Flows**: confirm all 17 deployed flows are **Active**
@@ -58,6 +58,9 @@ Tick each box as you go. 🤖 = tell Claude, who checks or completes that step b
 - [ ] Create rule **Beacon Module Quantity Must Be 1** – scope Product Classification **Beacon Module**, Quantity ≠ 1 → warning, effective to 2099 → Validate → Activate
 
 ## 8. Users and permissions
+- [ ] Assign the Revenue Cloud permission set licenses to each user (list in the guide, step 8)
+- [ ] Assign **Beacon - Revenue Cloud User** to everyone who quotes
+- [ ] Assign **Beacon - Revenue Cloud Admin** (plus the User group) to Revenue Cloud admins
 - [ ] Every rep has their persona `Beacon_*_Object_Tab_FLS` permission set
 - [ ] Assign **Edit Closed Opportunities** / **Edit Closed Won Quotes** to the approved people only
 - [ ] Custom Settings → **On/Off Switch** → **Run Flows** is on

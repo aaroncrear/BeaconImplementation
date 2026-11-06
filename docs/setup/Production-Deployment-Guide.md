@@ -22,7 +22,7 @@ Production had no quote lines, so nothing existing was affected.
 
 ## 1. Deploy the metadata (Gearset)
 
-Deploy from branch **`Pricing-Model-Rebuild`** to **Beacon Production** using the manifest **`manifest/Production-Pricing-and-Renewals-package.xml`** (90 components). Use **Run specified tests / no tests** as your Production policy allows (no Apex in this package).
+Deploy from branch **`Pricing-Model-Rebuild`** to **Beacon Production** using the manifest **`manifest/Production-Pricing-and-Renewals-package.xml`** (92 components). Use **Run specified tests / no tests** as your Production policy allows (no Apex in this package).
 
 | Type | Components |
 |---|---|
@@ -38,6 +38,7 @@ Deploy from branch **`Pricing-Model-Rebuild`** to **Beacon Production** using th
 | **Flows (17)** | Pricing: `Quote_Line_Item_On_Create_Before_Save`, `Quote_Line_Item_On_Create_Update_After_Save`, `Opportunity_Product_On_Create_Before_Save`, `Order_Product_On_Create_Before_Save`. Renewals / Closed Won: `Closed_Won_Revenue_Automation`, `Opportunity_Closed_Won_After_Save`, `Opportunity_On_Create_After_Save`, `Opportunity_On_Update_After_Save`, `Quote_On_Create_Before_Save`, `Quote_Create_Order_Screen_Flow`, `Beacon_Create_Contract_From_Quote`, `Contract_On_Create_Before_Save`, `Order_On_Create_Before_Save`, `Order_Create_Assets`, `Create_Asset_Order_Event_Mark_Order_Assets_Created`, `Order_Assets_Created_Create_Renewal`, `Asset_On_Create_Or_Update_After_Save` |
 | **Layouts (5)** | Quote, Quote Line Item, Opportunity Product, Order Product, Asset |
 | **Permission sets (12)** | The 10 persona `Beacon_*_Object_Tab_FLS` sets, plus `Edit_Closed_Opportunities`, `Edit_Closed_Won_Quotes` |
+| **Permission set groups (2)** | `Beacon_Revenue_Cloud_User` (17 Salesforce Revenue Cloud permission sets for quoting through renewal), `Beacon_Revenue_Cloud_Admin` (14 setup/designer permission sets) |
 | **Custom permissions (2)** | `Edit_Closed_Opportunities`, `Edit_Closed_Won_Quotes` |
 
 > **Check the Gearset comparison before deploying.** Layouts, permission sets and `Opportunity_On_Create_After_Save` already exist in Production and deploy as whole files. If Gearset shows differences you don't recognise (changes made directly in Production), stop and tell Claude.
@@ -142,6 +143,9 @@ If the classification scope isn't offered, add the 17 modules to the same rule a
 ---
 
 ## 8. Users and permissions
+
+- **Permission set licenses first.** A group can only be assigned to users who hold the licenses of its permission sets. For **Beacon - Revenue Cloud User**: Revenue Cloud User, Product Catalog Management Viewer, Product Discovery User, Salesforce Pricing Run Time, Product Configuration User, Business Rules Engine Runtime, Context Service Runtime, Decimal Quantity Runtime User, Fulfillment User PSL, DocGen Designer, OmniStudio. Admins additionally need: Product Catalog Management Administrator, Salesforce Pricing Design Time, Business Rules Engine Designer, Context Service Admin, Decimal Quantity DesignTime User.
+- Assign **Beacon - Revenue Cloud User** to everyone who quotes; assign **Beacon - Revenue Cloud Admin** *and* the User group to Revenue Cloud admins.
 
 - Confirm reps have their persona `Beacon_*_Object_Tab_FLS` permission set (new fields are included).
 - Assign **Edit Closed Opportunities** / **Edit Closed Won Quotes** only to the people allowed to change closed records.
