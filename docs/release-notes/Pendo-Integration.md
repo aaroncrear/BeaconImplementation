@@ -39,7 +39,7 @@ Fifteen custom fields were added: nine on Account and six on Contact. Each one h
 
 ### Beacon - Pendo Integration permission set
 
-A new permission set, **Beacon - Pendo Integration** (`Beacon_Pendo_Integration`), uses the **Salesforce API Integration** license, the same as Beacon - Hubspot Integration. Its description matches the HubSpot one: "Holds system and Object level permission for the Pendo integration. This is not part of a Pendo package."
+A new permission set, **Beacon - Pendo Integration** (`Beacon_Pendo_Integration`), uses the **Salesforce API Integration** license, the same as Beacon - Hubspot Integration. Salesforce API Integration is a permission set license, not a user license. So the metadata names it by its developer name, `SalesforceAPIIntegrationPsl`. The deploy fails with "License: Salesforce API Integration doesn't exist" if the label is used instead. Its description matches the HubSpot one: "Holds system and Object level permission for the Pendo integration. This is not part of a Pendo package."
 
 It gives:
 

@@ -3,7 +3,7 @@
     <description>Holds system and Object level permission for the Pendo integration. This is not part of a Pendo package.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Beacon - Pendo Integration</label>
-    <license>Salesforce API Integration</license>
+    <license>SalesforceAPIIntegrationPsl</license>
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Account_Id_Pendo__c</field>
