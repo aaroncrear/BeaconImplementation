@@ -6,7 +6,7 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – Number of Users column in the Transaction Line Editor
 
-_Last updated: V4 deploy failed – make the change in the builder (Step 2)._
+_Last updated: V3 active (V2 deactivated); column setting found on the Lightning page component._
 
 Reps add modules with Browse Catalogs, then set **Number of Users** in a column in the Transaction Line Editor. Pricing reads the quote line field instead of the product attribute. Tier, discount and module count pricing don't change.
 
@@ -34,7 +34,7 @@ What it does: if a line's Number of Users field is empty, the catalog (gear) val
 **Keep** the Number of Users attribute on the **Beacon Module** classification (still required in the catalog).
 
 ### Step 4. Add the column to the Transaction Line Editor
-Open a **Draft** quote → in the Transaction Line Editor grid, use the column settings (usually a gear or **Columns** option at the top right of the grid) → add **Number of Users**. If there's no such option, screenshot the grid's header for Claude. The column is editable once Step 1 maps the field.
+The columns are set **on the line editor component in the Quote Lightning page**: quote → ⚙ → **Edit Page** → click the Quote Line Items component → add **Number of Users** in its column setting → **Save**. (Do Step 3 first, or the sync flow overwrites edits in the column.)
 
 ### Step 5. Test
 On **Product Config 1**, change ADC's Number of Users in the line editor column (4 → 6). Also add a new module through the catalog with users set in the gear → after pricing, its column should show that number. **Expected for ADC 6:** ADC Tier 3, max tier 3 → for <50 Heads still the Enterprise band → £13,000 + £13,000. Then set ADC to 3 → both Tier 1 → "Up to 3 users" → **£11,500 + £11,500**.
@@ -85,6 +85,8 @@ Send Claude the quote names – Claude checks every line. A total can be a penny
 - An **active** version can't be edited – Deactivate first. The page may need a refresh after deactivating.
 
 ## Items UAT and Prod will need (not metadata)
+
+- Quote Lightning page: Number of Users column on the line editor component (retrieve the FlexiPage with Gearset once settled).
 
 - Pricing Recipe registrations: Beacon Tier Price, Beacon Module Count Price and Beacon Multi-Module Discount → Price Adjustment Matrix.
 - Context definition SalesTransactionContextAuto: attributes and tags `BeaconTier__c`, `BeaconModuleCount__c`, `BeaconMaxUsers__c`, mapped in QuoteEntitiesMapping and OrderEntitiesMapping to the `Pricing_…` fields.
