@@ -6,17 +6,14 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – Number of Users column in the Transaction Line Editor
 
-_Last updated: column change is the current task (do it before price book testing)._
+_Last updated: Step 1 checked – add the Order mapping, then Step 2._
 
 Reps add modules with Browse Catalogs, then set **Number of Users** in a column in the Transaction Line Editor. Pricing reads the quote line field instead of the product attribute. Tier, discount and module count pricing don't change.
 
-### Step 1. Add a context field for Number of Users
-Same screens as the Beacon tags before. **SalesTransactionContextAuto:**
-1. **Structure / attributes step** → node **SalesTransactionItem** → **Add Attributes**: Name `BeaconUsers`, Type **INPUT OUTPUT**, Data Type **NUMBER**. (Salesforce will add `__c`.)
-2. **Context Tags** tab → give it the tag `BeaconUsers` (shows as `BeaconUsers__c`).
-3. **Map Data → QuoteEntitiesMapping → Edit SObject Mapping** → SalesTransactionItem: `BeaconUsers__c` → **Number_of_Users__c**. **Save and Publish.**
-4. **OrderEntitiesMapping** → SalesTransactionItem: `BeaconUsers__c` → OrderItem **Number_of_Users__c**. **Save and Publish.**
-5. Tell Claude – Claude checks the tag and mappings.
+### Step 1. Add a context field for Number of Users – ⚠️ one mapping left
+Claude checked HTCDEV: `BeaconUsers__c` exists on SalesTransactionItem (number, input/output), its tag exists, and it's mapped in **QuoteEntitiesMapping** to QuoteLineItem `Number_of_Users__c`. ✅
+
+Still to do: **Map Data → OrderEntitiesMapping → Edit SObject Mapping** → SalesTransactionItem: `BeaconUsers__c` → OrderItem **Number_of_Users__c** → **Save and Publish**. (Unmapped custom context fields broke context loading before, so this protects order pricing.)
 
 ### Step 2. Deploy Beacon Pricing Procedure V3
 Only change from V2: the tier step reads `BeaconUsers__c` (the field) instead of the attribute. A blank Number of Users prices as Tier 1.
