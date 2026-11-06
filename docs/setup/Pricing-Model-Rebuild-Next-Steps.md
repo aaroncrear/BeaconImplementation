@@ -4,73 +4,44 @@ This page is kept up to date. Work from **Now** down.
 
 ---
 
-## Now
+## Now – do these in order
 
-### Fill in the matrix constants (blocking Save)
-The builder warns *Adjustment Type Field / Adjustment Value Field – Enter a value for the constant resource field* on the Module Count step (and probably the Discount step too). Same fix as for Tier Price:
+_Last updated: matrix constants and MAX test._
 
-1. Open the **Resource Manager** panel.
-2. Set these constants' **Value**:
+### Step 1. Fill in the four empty constants
+In Scratch Test V3, open the **Resource Manager** and search **Constant_Adjustment**. Set the **Value** of the four without one:
 
-| Constant | Value |
+| Constant (starts with) | Value |
 |---|---|
-| `Constant_AdjustmentType_Beacon_Module_Count_…` | `Adjustment_Type__c` |
-| `Constant_AdjustmentValue_Beacon_Module_Count_…` | `Adjustment_Value__c` |
-| `Constant_AdjustmentType_Beacon_Multi_Module_…` | `Adjustment_Type__c` |
-| `Constant_AdjustmentValue_Beacon_Multi_Module_…` | `Adjustment_Value__c` |
+| `Constant_AdjustmentType_Beacon_Module_Count_Price` | `Adjustment_Type__c` |
+| `Constant_AdjustmentValue_Beacon_Module_Count_Price` | `Adjustment_Value__c` |
+| `Constant_AdjustmentType_Beacon_Multi_Module_Discount` | `Adjustment_Type__c` |
+| `Constant_AdjustmentValue_Beacon_Multi_Module_Discount` | `Adjustment_Value__c` |
 
-3. **Save**, then carry on below.
+(The two Beacon Tier Price constants already have values.)
 
-### Isolate the MAX step
-Simulate fails with *Invalid tag attribute name key: BeaconTier__c* even with BeaconTier__c set to 0. The only step that reads BeaconTier__c across lines is the **MAX** Aggregate, so test without it:
+### Step 2. Check both new matrix steps
+On **Beacon Multi-Module Discount** and **Beacon Module Count Price**:
+- **Output Rule Variables:** leave all empty.
+- **Input Variables:** Quantity → `LineItemQuantity`, Input Unit Price → `NetUnitPrice`.
+- **Output Variables:** Net Unit Price → `NetUnitPrice`, Subtotal → `ItemNetTotalPrice`.
 
-1. Deactivate the version if it's active, then **delete** the `MAX(BeaconTier__c)` Aggregate step. Keep everything else. **Save.**
-2. **Simulate** with the step C JSON below (Context Mapping **QuoteEntitiesMapping**). You can drop the `"BeaconTier__c": "0"` lines if the simulator complains about them.
-3. Expected without the MAX step (the module count lookup finds no band, so lines keep their tier price):
-   - ADC (4 users): **£21,000**
-   - Oncology (2 users): **£18,000**
-4. Send Claude the result:
-   - **It runs:** the MAX step is the problem. Claude will give you a different way to get the quote's highest tier.
-   - **Same error:** the problem is elsewhere (Claude will check the SUM step next).
+Input Rule Variables:
 
-### A. (done) Max-tier step – being isolated above
-
-### B. Add the two Price Adjustment Matrix steps
-Add them **after** the Beacon Tier Price step, in this order.
-
-**Beacon Multi-Module Discount**
-
-| Section | Field | Value |
+| Step | Field | Value |
 |---|---|---|
-| Input Rule Variables | Price Book | `PriceBooks` |
-| | Min Modules | `BeaconModuleCount__c` |
-| | Max Modules | `BeaconModuleCount__c` |
-| Input Variables | Adjustment Type / Value Field | leave as filled in (check the constants hold `Adjustment_Type__c` / `Adjustment_Value__c`) |
-| | Quantity | `LineItemQuantity` |
-| | Input Unit Price | `NetUnitPrice` |
-| Output Variables | Net Unit Price | `NetUnitPrice` |
-| | Subtotal | `ItemNetTotalPrice` |
+| Discount | Price Book | `PriceBooks` |
+| Discount | Min Modules, Max Modules | `BeaconModuleCount__c` |
+| Module Count | Price Book | `PriceBooks` |
+| Module Count | Min Modules, Max Modules | `BeaconModuleCount__c` |
+| Module Count | Min Tier, Max Tier | `BeaconMaxUsers__c` |
 
-**Beacon Module Count Price**
+### Step 3. Delete the MAX step, then Save
+Delete the `MAX(BeaconTier__c)` Aggregate step (it's the likely cause of *Invalid tag attribute name key: BeaconTier__c*). Keep the `SUM(LineItemQuantity)` step. **Save.**
 
-| Section | Field | Value |
-|---|---|---|
-| Input Rule Variables | Price Book | `PriceBooks` |
-| | Min Modules | `BeaconModuleCount__c` |
-| | Max Modules | `BeaconModuleCount__c` |
-| | Min Tier | `BeaconMaxUsers__c` |
-| | Max Tier | `BeaconMaxUsers__c` |
-| Input Variables | Adjustment Type / Value Field | leave as filled in (constants `Adjustment_Type__c` / `Adjustment_Value__c`) |
-| | Quantity | `LineItemQuantity` |
-| | Input Unit Price | `NetUnitPrice` |
-| Output Variables | Net Unit Price | `NetUnitPrice` |
-| | Subtotal | `ItemNetTotalPrice` |
-
-Then **Save**. If the builder flags empty constants, set their values in the **Resource Manager** (same fix as before).
-
-### C. Simulate
-1. **Context Mapping:** `QuoteEntitiesMapping` (it resets to SalesTransaction each run, so check it every time).
-2. **Input Mode:** switch to **Advanced** and paste this JSON (easiest way to get two lines). Leave Context Mapping on QuoteEntitiesMapping.
+### Step 4. Simulate
+1. **Context Mapping:** `QuoteEntitiesMapping` (check it every run – it resets).
+2. **Input Mode:** Advanced. Paste:
 
 ```json
 {
@@ -85,7 +56,6 @@ Then **Save**. If the builder flags empty constants, set their values in the **R
           "ListPrice": "18000",
           "DerivedPricingAttribute": "false",
           "ItemContract": "",
-          "BeaconTier__c": "0",
           "SalesTransactionItemAttribute": [ { "AttributeValue": "4" } ]
         },
         {
@@ -95,7 +65,6 @@ Then **Save**. If the builder flags empty constants, set their values in the **R
           "ListPrice": "18000",
           "DerivedPricingAttribute": "false",
           "ItemContract": "",
-          "BeaconTier__c": "0",
           "SalesTransactionItemAttribute": [ { "AttributeValue": "2" } ]
         }
       ]
@@ -104,22 +73,10 @@ Then **Save**. If the builder flags empty constants, set their values in the **R
 }
 ```
 
-   `BeaconTier__c` is in the JSON as `0` because the simulator now lists it as an input (the formula step overwrites it). Without it, Simulate fails with *Invalid tag attribute name key: BeaconTier__c*. Or, in Simplified mode, the same values as below (copy icon on the line adds line 2):
-
-| | Line 1 | Line 2 |
-|---|---|---|
-| LineItem | `line1` | `line2` |
-| LineItemQuantity | `1` | `1` |
-| Product | `01tS900000OBbT3IAL` (ADC) | `01tS900000OBbKzIAL` (Oncology) |
-| ListPrice | `18000` | `18000` |
-| DerivedPricingAttribute | `false` | `false` |
-| AttributeValue | `4` | `2` |
-
-   PriceBooks: `01sS9000008iu6kIAA` (<50 Heads)
-
-3. **Expected:** £13,000 per line, £26,000 total (Starter, Enterprise).
-
-Send Claude a screenshot of the result.
+3. **Expected without the MAX step:** ADC **£21,000**, Oncology **£18,000** (each line keeps its tier price; the module count lookup has no tier to match yet).
+4. Send Claude a screenshot:
+   - **Runs:** the MAX step was the problem – Claude gives you another way to get the highest tier.
+   - **Fails:** send the JSON Details from the Output tab.
 
 ---
 
