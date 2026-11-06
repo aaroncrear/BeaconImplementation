@@ -6,9 +6,10 @@
 - Give each Pendo field a description.
 - Create a **Beacon - Pendo Integration** permission set with the **Salesforce API Integration** license. It gives edit access to the Pendo fields, and read and edit access to the objects they're on (Account and Contact).
 - Create a **Beacon - Pendo User** permission set that gives read access to the Pendo fields.
+- Create a **Beacon - Pendo Connected App** permission set with no license.
 - Give read access to the Pendo fields in these **Beacon … - Object, Tab, FLS** permission sets: Customer Success, Marketing, Executive, Product, Sales and Tech.
 - Give edit access to the Pendo fields in the **Beacon Salesforce Admin - Object, Tab, FLS** permission set.
-- Base the new permission set descriptions on the existing **Beacon - Hubspot Integration** and **Beacon - Hubspot User** permission sets.
+- Base the new permission set descriptions on the existing **Beacon - Hubspot Integration**, **Beacon - Hubspot User** and **Beacon - Hubspot Connected App** permission sets.
 
 ## Release Notes
 
@@ -51,6 +52,12 @@ A new permission set, **Beacon - Pendo User** (`Beacon_Pendo_User`), uses the **
 
 It gives **read** access to all 15 Pendo fields and to Account and Contact. Users who don't have one of the persona permission sets below can be given this one to see Pendo data.
 
+### Beacon - Pendo Connected App permission set
+
+A new permission set, **Beacon - Pendo Connected App** (`Beacon_Pendo_Connected_App`), has no license, the same as Beacon - Hubspot Connected App. With no license, it can be assigned to users with any user license, including the Pendo integration user. Its description matches the HubSpot one: "Gives access to the Pendo Connected App".
+
+The HubSpot version gives access to the HubSpot connected app. There's no Pendo connected app in the org yet, so this permission set doesn't give access to any app for now. Once Pendo is connected, the Pendo connected app is added to it (see Post Deployment Items).
+
 ### Persona permission sets
 
 All 15 Pendo fields were added to these persona permission sets, in alphabetical order with the existing field permissions:
@@ -86,16 +93,21 @@ These permission sets already had access to Account and Contact, so their object
 7. Go to **Setup → Permission Sets → Beacon - Pendo User**. Confirm the license is **Salesforce**, and Account and Contact have Read access only.
 8. Confirm all 15 Pendo fields have Read access and not Edit access.
 
+**Beacon - Pendo Connected App**
+
+9. Go to **Setup → Permission Sets → Beacon - Pendo Connected App**. Confirm the license is **--None--** and the description is "Gives access to the Pendo Connected App".
+
 **Persona permission sets**
 
-9. Open each of the Customer Success, Executive, Marketing, Product, Sales and Tech **Object, Tab, FLS** permission sets. Under Accounts and Contacts, confirm the Pendo fields have Read access and not Edit access.
-10. Log in as a user in one of those personas. Confirm they can see the Pendo fields on an Account and a Contact, but can't edit them.
-11. Open **Beacon Salesforce Admin - Object, Tab, FLS** and confirm the Pendo fields have Read and Edit access. As a Salesforce Admin persona user, edit **Account Id Pendo** on an Account and confirm it saves.
+10. Open each of the Customer Success, Executive, Marketing, Product, Sales and Tech **Object, Tab, FLS** permission sets. Under Accounts and Contacts, confirm the Pendo fields have Read access and not Edit access.
+11. Log in as a user in one of those personas. Confirm they can see the Pendo fields on an Account and a Contact, but can't edit them.
+12. Open **Beacon Salesforce Admin - Object, Tab, FLS** and confirm the Pendo fields have Read and Edit access. As a Salesforce Admin persona user, edit **Account Id Pendo** on an Account and confirm it saves.
 
 ## Post Deployment Items
 
 - Assign **Beacon - Pendo Integration** to the Pendo integration user. The user needs the **Salesforce API Integration** permission set license first.
 - Connect Pendo to Salesforce with the integration user, and map the Pendo fields to the Salesforce fields above.
+- Once the Pendo connected app is in the org, open **Beacon - Pendo Connected App → Assigned Connected Apps**, add the Pendo connected app, and assign the permission set to the Pendo integration user. If the connected app is set to **Admin approved users are pre-authorized**, only users with this permission set can use it.
 - Fill in **Account Id Pendo** on customer Accounts with their Pendo Account Ids, so Pendo data lands on the right Accounts.
 - If users outside the persona permission sets need to see Pendo data, assign them **Beacon - Pendo User**. In Production, it can also be added to the persona **Integrations** permission set groups, where integration permission sets are managed.
 - Add the Pendo fields to Account and Contact page layouts or Lightning pages if users should see them there. This build doesn't change any layouts.
@@ -123,10 +135,11 @@ Github Branch: [Pendo-Integration](https://github.com/aaroncrear/BeaconImplement
 | 15 | CustomField | Contact | Pendo_NPS_Year_To_Date__c | Pendo NPS Year To Date | Created | Number. The Contact's Pendo NPS this calendar year. |
 | 16 | PermissionSet | N/A | Beacon_Pendo_Integration | Beacon - Pendo Integration | Created | Salesforce API Integration license. Read and edit on Account and Contact, and on all 15 Pendo fields. |
 | 17 | PermissionSet | N/A | Beacon_Pendo_User | Beacon - Pendo User | Created | Salesforce license. Read on Account and Contact, and on all 15 Pendo fields. |
-| 18 | PermissionSet | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
-| 19 | PermissionSet | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
-| 20 | PermissionSet | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
-| 21 | PermissionSet | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
-| 22 | PermissionSet | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
-| 23 | PermissionSet | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
-| 24 | PermissionSet | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added read and edit access to the 15 Pendo fields. |
+| 18 | PermissionSet | N/A | Beacon_Pendo_Connected_App | Beacon - Pendo Connected App | Created | No license. Gives access to the Pendo connected app once it's added after deployment. |
+| 19 | PermissionSet | N/A | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
+| 20 | PermissionSet | N/A | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
+| 21 | PermissionSet | N/A | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
+| 22 | PermissionSet | N/A | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
+| 23 | PermissionSet | N/A | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
+| 24 | PermissionSet | N/A | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Added read access to the 15 Pendo fields. |
+| 25 | PermissionSet | N/A | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Added read and edit access to the 15 Pendo fields. |
