@@ -6,32 +6,31 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – do these in order
 
-_Last updated: V2 deployed; next, activate and point both settings at it._
+_Last updated: Beacon Pricing Procedure V2 live in HTCDEV; next, test the other price books._
 
-**Beacon Pricing Procedure V2** = your current V1 (all 30 standard steps, unchanged) + the six proven Beacon steps as **steps 16–21**, after list price and volume discounts and **before manual discounts** (so reps can still discount on top):
+### Step 1. Per Module price book with the discount
+New quote on **Top 1-50 Pharma**, in Browse Catalogs:
 
-| Step | Name | What it does |
-|---|---|---|
-| 16 | BeaconSetLineTier | Tier 1-6 from the line's Number of Users |
-| 17 | BeaconCountModules | `SUM(LineItemQuantity)` → module count |
-| 18 | BeaconHighestTier | `MAX(BeaconTier__c)` → highest tier |
-| 19 | BeaconTierPrice | Line price from Beacon Tier Price |
-| 20 | BeaconMultiModuleDiscount | 10/20/30% off (Per Module books) |
-| 21 | BeaconModuleCountPrice | Quote total ÷ modules per line (Module Count books) |
+| Module | Number of Users |
+|---|---|
+| Oncology | 8 |
+| CVRM | 20 |
+| ADC | 3 |
 
-V1 stays as it is. V2 deploys as **Draft**.
+**Expected:** each line at its own tier price, less **20%** (3 modules) → **£324,000** total (£405,000 before discount). Tell Claude the quote name – Claude checks every line.
 
-### Step 1. Deploy with Workbench ✅ Done
-V2 is in HTCDEV as an inactive version alongside V1.
+### Step 2. Module Count book with more users
+New quote on **Contract Orgs (>200 Heads)**:
 
-### Step 2. Activate V2 and point both settings at it
-1. **Setup → Pricing Procedures → Beacon Pricing Procedure** → open **V2** → **Activate**. (If it asks, deactivate V1.)
-2. **Revenue Settings** → pricing procedure → **Beacon Pricing Procedure**.
-3. **Salesforce Pricing Setup** → default pricing procedure → **Beacon Pricing Procedure**.
-4. **Sync Pricing Data.**
+| Module | Number of Users |
+|---|---|
+| ADC | 3 |
+| Cell Therapy | 8 |
 
-### Step 3. Reprice Product Config 1
-Change Oncology to 3 users and back to 2 (or any edit that reprices). **Expected:** ADC £13,000 + Oncology £13,000 = **£26,000**. Tell Claude – Claude checks the quote.
+**Expected:** **£100,000** total (Starter, Up to 10 users) → £50,000 per line.
+
+### Step 3. Tidy up
+Deactivate **Scratch Test V3** (it's no longer used).
 
 ---
 
@@ -47,6 +46,8 @@ Change Oncology to 3 users and back to 2 (or any edit that reprices). **Expected
 ---
 
 ## Proven so far
+
+- **Beacon Pricing Procedure V2 is live in HTCDEV** (active, default in Revenue Settings and Salesforce Pricing Setup). Product Config 1 → £13,000 + £13,000 = **£26,000**.
 
 - **Real quote works end to end** (Product Config 1, <50 Heads): ADC 4 users (Tier 2) + Oncology 2 users (Tier 1) → Module Count 2, Max Tier 2 → **£13,000 + £13,000 = £26,000**. `MAX(BeaconTier__c)` works on real quotes – its error was Simulate-only.
 - The procedure used by quotes is set in **two** places: **Revenue Settings** (pricing procedure) and **Salesforce Pricing Setup** (default pricing procedure). Both must point to the Beacon procedure.
