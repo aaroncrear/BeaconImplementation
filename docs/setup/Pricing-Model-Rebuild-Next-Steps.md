@@ -48,7 +48,39 @@ Then **Save**. If the builder flags empty constants, set their values in the **R
 
 ### C. Simulate
 1. **Context Mapping:** `QuoteEntitiesMapping` (it resets to SalesTransaction each run, so check it every time).
-2. Inputs – use the copy icon on the line to add line 2:
+2. **Input Mode:** switch to **Advanced** and paste this JSON (easiest way to get two lines). Leave Context Mapping on QuoteEntitiesMapping.
+
+```json
+{
+  "SalesTransaction": [
+    {
+      "PriceBooks": "01sS9000008iu6kIAA",
+      "SalesTransactionItem": [
+        {
+          "LineItem": "line1",
+          "LineItemQuantity": "1",
+          "Product": "01tS900000OBbT3IAL",
+          "ListPrice": "18000",
+          "DerivedPricingAttribute": "false",
+          "ItemContract": "",
+          "SalesTransactionItemAttribute": [ { "AttributeValue": "4" } ]
+        },
+        {
+          "LineItem": "line2",
+          "LineItemQuantity": "1",
+          "Product": "01tS900000OBbKzIAL",
+          "ListPrice": "18000",
+          "DerivedPricingAttribute": "false",
+          "ItemContract": "",
+          "SalesTransactionItemAttribute": [ { "AttributeValue": "2" } ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+   Leave **BeaconTier__c** out – the formula step sets it. Or, in Simplified mode, the same values as below (copy icon on the line adds line 2):
 
 | | Line 1 | Line 2 |
 |---|---|---|
