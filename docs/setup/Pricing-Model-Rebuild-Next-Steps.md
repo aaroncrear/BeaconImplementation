@@ -6,6 +6,21 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now
 
+### Fill in the matrix constants (blocking Save)
+The builder warns *Adjustment Type Field / Adjustment Value Field – Enter a value for the constant resource field* on the Module Count step (and probably the Discount step too). Same fix as for Tier Price:
+
+1. Open the **Resource Manager** panel.
+2. Set these constants' **Value**:
+
+| Constant | Value |
+|---|---|
+| `Constant_AdjustmentType_Beacon_Module_Count_…` | `Adjustment_Type__c` |
+| `Constant_AdjustmentValue_Beacon_Module_Count_…` | `Adjustment_Value__c` |
+| `Constant_AdjustmentType_Beacon_Multi_Module_…` | `Adjustment_Type__c` |
+| `Constant_AdjustmentValue_Beacon_Multi_Module_…` | `Adjustment_Value__c` |
+
+3. **Save**, then carry on below.
+
 ### Isolate the MAX step
 Simulate fails with *Invalid tag attribute name key: BeaconTier__c* even with BeaconTier__c set to 0. The only step that reads BeaconTier__c across lines is the **MAX** Aggregate, so test without it:
 
