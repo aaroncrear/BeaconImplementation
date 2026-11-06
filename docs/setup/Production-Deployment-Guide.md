@@ -96,9 +96,9 @@ For all three: **Usage Type** Pricing (Default Pricing) · **Source** Single Obj
 
 | Decision table (name) | Object | Conditions (field – operator) | Outputs |
 |---|---|---|---|
-| **Beacon Tier Price** | Beacon Tier Price | Price Book – Equals · Product – Equals · Tier – Equals | Adjustment Type, Price (Adjustment Value) |
-| **Beacon Module Count Price** | Beacon Module Count Price | Price Book – Equals · Min Modules – Equals · Max Modules – Equals · Min Tier – Greater Or Equal · Max Tier – Less Or Equal | Adjustment Type, Price Per Line (Adjustment Value), Quote Total |
-| **Beacon Multi-Module Discount** | Beacon Multi-Module Discount | Price Book – Equals · Min Modules – Equals · Max Modules – Equals | Adjustment Type, Discount % (Adjustment Value) |
+| **Beacon Tier Price** | Beacon Tier Price | Price Book – Equals · Product – Equals · Tier – Equals | Adjustment Type, Adjustment Value (`Adjustment_Value__c`) |
+| **Beacon Module Count Price** | Beacon Module Count Price | Price Book – Equals · Min Modules – Equals · Max Modules – Equals · Min Tier – Greater Or Equal · Max Tier – Less Or Equal | Adjustment Type, Adjustment Value (`Adjustment_Value__c`), Quote Total |
+| **Beacon Multi-Module Discount** | Beacon Multi-Module Discount | Price Book – Equals · Min Modules – Equals · Max Modules – Equals | Adjustment Type, Adjustment Value (`Adjustment_Value__c`) |
 
 Use exactly these names (the pricing procedure refers to their API names `Beacon_Tier_Price`, `Beacon_Module_Count_Price`, `Beacon_Multi_Module_Discount`). Tell Claude when all three are active.
 

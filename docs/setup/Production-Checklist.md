@@ -34,9 +34,9 @@ Tick each box as you go. 🤖 = tell Claude, who checks or completes that step b
 - [ ] 🤖 Claude checks attributes, tags and all 8 mappings
 
 ## 4. Decision tables (Setup → Decision Tables → New)
-- [ ] **Beacon Tier Price** – conditions Price Book =, Product =, Tier = · outputs Adjustment Type, Price → Save, Activate, Refresh
-- [ ] **Beacon Module Count Price** – conditions Price Book =, Min Modules =, Max Modules =, Min Tier ≥, Max Tier ≤ · outputs Adjustment Type, Price Per Line, Quote Total → Save, Activate, Refresh
-- [ ] **Beacon Multi-Module Discount** – conditions Price Book =, Min Modules =, Max Modules = · outputs Adjustment Type, Discount % → Save, Activate, Refresh
+- [ ] **Beacon Tier Price** – conditions Price Book =, Product =, Tier = · outputs Adjustment Type, Adjustment Value → Save, Activate, Refresh
+- [ ] **Beacon Module Count Price** – conditions Price Book =, Min Modules =, Max Modules =, Min Tier ≥, Max Tier ≤ · outputs Adjustment Type, Adjustment Value, Quote Total → Save, Activate, Refresh
+- [ ] **Beacon Multi-Module Discount** – conditions Price Book =, Min Modules =, Max Modules = · outputs Adjustment Type, Adjustment Value → Save, Activate, Refresh
 - [ ] 🤖 Claude registers the 3 tables in the Pricing Recipe and sends you `Beacon_Pricing_Procedure_PROD.zip`
 
 ## 5. Pricing procedure and pricing settings
