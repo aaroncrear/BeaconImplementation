@@ -364,7 +364,7 @@
         </scheduledPaths>
         <triggerType>RecordAfterSave</triggerType>
     </start>
-    <status>Active</status>
+    <status>Obsolete</status>
     <subflows>
         <description>Used to send email notification</description>
         <name>Fault_Path_Subflow</name>

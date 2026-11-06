@@ -6,31 +6,35 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – do these in order
 
-_Last updated: Beacon Pricing Procedure V2 live in HTCDEV; next, test the other price books._
+_Last updated: switching Number of Users from the configurator to a line editor column._
 
-### Step 1. Per Module price book with the discount
-New quote on **Top 1-50 Pharma**, in Browse Catalogs:
+**The change:** reps keep using the catalog to **add** modules, then type **Number of Users** in a column in the line editor – no gear / configure. Pricing reads the quote line field `Number_of_Users__c` instead of the product attribute. Everything else (tier, discount, module count) stays as proven.
 
-| Module | Number of Users |
-|---|---|
-| Oncology | 8 |
-| CVRM | 20 |
-| ADC | 3 |
+### Step 1. Add a context field for Number of Users
+Same screens as the Beacon tags before. **SalesTransactionContextAuto:**
+1. **Structure / attributes step** → node **SalesTransactionItem** → **Add Attributes**: Name `BeaconUsers`, Type **INPUT OUTPUT**, Data Type **NUMBER**. (Salesforce will add `__c`.)
+2. **Context Tags** tab → give it the tag `BeaconUsers` (shows as `BeaconUsers__c`).
+3. **Map Data → QuoteEntitiesMapping → Edit SObject Mapping** → SalesTransactionItem: `BeaconUsers__c` → **Number_of_Users__c**. **Save and Publish.**
+4. **OrderEntitiesMapping** → SalesTransactionItem: `BeaconUsers__c` → OrderItem **Number_of_Users__c**. **Save and Publish.**
+5. Tell Claude – Claude checks the tag and mappings.
 
-**Expected:** each line at its own tier price, less **20%** (3 modules) → **£324,000** total (£405,000 before discount). Tell Claude the quote name – Claude checks every line.
+### Step 2. Deploy Beacon Pricing Procedure V3
+Only change from V2: the tier step reads `BeaconUsers__c` (the field) instead of the attribute. A blank Number of Users prices as Tier 1.
+1. Download **Beacon_Pricing_Procedure_V3.zip** (sent in chat).
+2. Workbench → **migration → Deploy** → leave **Single Package unticked** → **Deploy**.
+3. **Pricing Procedures → Beacon Pricing Procedure → V3 → Activate** (deactivate V2 if asked). **Sync Pricing Data.**
 
-### Step 2. Module Count book with more users
-New quote on **Contract Orgs (>200 Heads)**:
+### Step 3. Turn off the attribute
+1. **Setup → Flows → Quote Pricing Complete: Sync Number of Users** → **Deactivate**. (It copied the attribute into the field; it would now overwrite what reps type.)
+2. **Product Classification "Beacon Module"** → remove the **Number of Users** attribute (or untick **Required**), so the catalog stops asking for it.
 
-| Module | Number of Users |
-|---|---|
-| ADC | 3 |
-| Cell Therapy | 8 |
+### Step 4. Add the column to the line editor
+Open a Draft quote's line editor (the grid of quote lines) and look for a **column settings / choose columns** option. Add **Number of Users**. Screenshot what you see if there's no option – Claude will find where Revenue Cloud sets the default columns.
 
-**Expected:** **£100,000** total (Starter, Up to 10 users) → £50,000 per line.
+### Step 5. Test
+On **Product Config 1**, change ADC's Number of Users in the line editor column (4 → 6). **Expected:** ADC Tier 3, max tier 3 → for <50 Heads still the Enterprise band → £13,000 + £13,000. Then set ADC to 3 → both Tier 1 → "Up to 3 users" → **£11,500 + £11,500**.
 
-### Step 3. Tidy up
-Deactivate **Scratch Test V3** (it's no longer used).
+> **Required:** a column can't be hard-required at the moment a line is added (the catalog adds lines before users are entered). The existing rule **Lines Valid Before Leaving Draft** blocks the quote from leaving Draft while any line has no Number of Users – reps see no errors while they work.
 
 ---
 
