@@ -1,7 +1,11 @@
 """Builds the Production Beacon Pricing Procedure (one Draft version, V1) from the final HTCDEV design (repo V4)
 and swaps every decision table ID for the Production ID.
 
-Usage: python3 build_beacon_pricing_procedure.py <Tier Price ID> <Module Count Price ID> <Multi-Module Discount ID> <out dir>
+Usage: python3 build_beacon_pricing_procedure.py <Tier Price ID> <Module Count Price ID> <Multi-Module Discount ID> <out dir> [source version]
+
+source version defaults to V2 (reads Number of Users from the attribute; the format that deploys). V4 adds the
+field-based Number of Users steps but fails to deploy with "Property 'dataType' not valid", so those two changes
+are made in the builder after deploying (see docs/setup/Production-Deployment-Guide.md, step 5).
 """
 import re, sys, os, zipfile
 
@@ -18,11 +22,12 @@ PROD_IDS = {
     "Index_Rate_Decision_Table": "0lDQ300000003cEMAQ",
 }
 tier_id, mc_id, disc_id, out_dir = sys.argv[1:5]
+src_ver = sys.argv[5] if len(sys.argv) > 5 else "V2"
 PROD_IDS.update({"Beacon_Tier_Price": tier_id, "Beacon_Module_Count_Price": mc_id, "Beacon_Multi_Module_Discount": disc_id})
 
 s = open(REPO).read()
 head = s[: s.index("    <versions>")]
-v = [x for x in re.findall(r"    <versions>.*?\n    </versions>", s, re.S) if "<fullName>Beacon_Pricing_Procedure_V4</fullName>" in x][0]
+v = [x for x in re.findall(r"    <versions>.*?\n    </versions>", s, re.S) if f"<fullName>Beacon_Pricing_Procedure_{src_ver}</fullName>" in x][0]
 
 def fix_step(m):
     st = m.group(0)
@@ -34,7 +39,7 @@ def fix_step(m):
     return st
 
 v = re.sub(r"        <steps>.*?\n        </steps>", fix_step, v, flags=re.S)
-v = v.replace("Beacon_Pricing_Procedure_V4", "Beacon_Pricing_Procedure_V1").replace("<label>Beacon Pricing Procedure V4</label>", "<label>Beacon Pricing Procedure V1</label>")
+v = v.replace(f"Beacon_Pricing_Procedure_{src_ver}", "Beacon_Pricing_Procedure_V1").replace(f"<label>Beacon Pricing Procedure {src_ver}</label>", "<label>Beacon Pricing Procedure V1</label>")
 v = re.sub(r"<rank>\d+</rank>", "<rank>1</rank>", v)
 v = re.sub(r"<versionNumber>\d+</versionNumber>", "<versionNumber>1</versionNumber>", v)
 v = re.sub(r"<status>\w+</status>", "<status>Draft</status>", v, count=1)

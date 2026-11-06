@@ -109,12 +109,16 @@ Use exactly these names (the pricing procedure refers to their API names `Beacon
 ## 5. Pricing procedure (Workbench)
 
 1. **workbench.developerforce.com** → Environment **Production** → log in.
-2. **migration → Deploy** → `Beacon_Pricing_Procedure_PROD.zip` (from Claude) → **Single Package unticked** → Deploy.
-3. **Setup → Pricing Procedures → Beacon Pricing Procedure → V1 → Activate.**
-4. **Revenue Settings** → pricing procedure → **Beacon Pricing Procedure**.
-5. **Salesforce Pricing Setup** → default pricing procedure → **Beacon Pricing Procedure**.
-6. **Salesforce Pricing Setup** → **Turn On Price Waterfall Persistence** (leave the API waterfall and Price Tracking History off).
-7. **Sync Pricing Data** and wait for it to finish.
+2. **migration → Deploy** → `Beacon_Pricing_Procedure_PROD.zip` (from Claude) → **Single Package unticked**, **Rollback On Error ticked**, Test Level **RunLocalTests** (Production refuses NoTestRun) → Deploy.
+3. **Builder edits (before activating)** – open **Beacon Pricing Procedure V1** in the builder:
+   - Add a **Formula Based Pricing** step directly **above BeaconSetLineTier**: Formula `IF(BeaconUsers__c >= 1, BeaconUsers__c, VALUE(AttributeValue))`, Output Variable `BeaconUsers__c`, tick **Exclude Price Waterfall**.
+   - Change **BeaconSetLineTier**'s formula to `IF(BeaconUsers__c >= 51, 6, IF(BeaconUsers__c >= 21, 5, IF(BeaconUsers__c >= 11, 4, IF(BeaconUsers__c >= 6, 3, IF(BeaconUsers__c >= 4, 2, 1)))))`.
+   - **Save.** (The zip deploys the attribute-based version because the field-based one fails to deploy with *Property 'dataType' not valid*; these two edits are the difference, same as HTCDEV V3.)
+4. **Setup → Pricing Procedures → Beacon Pricing Procedure → V1 → Activate.**
+5. **Revenue Settings** → pricing procedure → **Beacon Pricing Procedure**.
+6. **Salesforce Pricing Setup** → default pricing procedure → **Beacon Pricing Procedure**.
+7. **Salesforce Pricing Setup** → **Turn On Price Waterfall Persistence** (leave the API waterfall and Price Tracking History off).
+8. **Sync Pricing Data** and wait for it to finish.
 
 If the deploy fails, send Claude the *problem* line. Fallback: Claude gives builder steps (same 7 Beacon steps you built in HTCDEV Scratch Test).
 

@@ -40,7 +40,8 @@ Tick each box as you go. 🤖 = tell Claude, who checks or completes that step b
 - [ ] 🤖 Claude registers the 3 tables in the Pricing Recipe and sends you `Beacon_Pricing_Procedure_PROD.zip`
 
 ## 5. Pricing procedure and pricing settings
-- [ ] Workbench (Production) → migration → Deploy the zip (**Single Package unticked**)
+- [ ] Workbench (Production) → migration → Deploy the zip (**Single Package unticked**, **Rollback On Error ticked**, Test Level **RunLocalTests**)
+- [ ] Builder edits on V1: add the Number of Users formula step above BeaconSetLineTier; change BeaconSetLineTier's formula to the field version → Save
 - [ ] Pricing Procedures → **Beacon Pricing Procedure V1** → **Activate**
 - [ ] **Revenue Settings** → pricing procedure = **Beacon Pricing Procedure**
 - [ ] **Salesforce Pricing Setup** → default pricing procedure = **Beacon Pricing Procedure**
