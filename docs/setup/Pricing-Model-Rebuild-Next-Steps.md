@@ -6,51 +6,34 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – do these in order
 
-_Last updated: module count pricing proven; testing MAX._
+_Last updated: MAX works on standard fields; next, a real-quote test._
 
-### Step 1. Test MAX on a standard field
-This tells us whether MAX itself fails, or only MAX on our custom `BeaconTier__c`.
+MAX works (`MAX(LineItemQuantity)` gave £11,500 as expected). It only fails on our custom `BeaconTier__c` **in Simulate**. Simulate has already failed on custom tags once where the real engine may not, so the next test is a **real quote**. Everything else is proven.
 
-1. Add an **Aggregate Price** step right after the SUM one:
-   - **Formula:** `MAX(LineItemQuantity)`
-   - **Output Variable:** `BeaconMaxUsers__c`
-2. **Save.**
-3. **Simulate** (Advanced, Context Mapping **QuoteEntitiesMapping**) with the JSON below. It's the same as before, without `BeaconMaxUsers__c`.
+### Step 1. Put the real MAX back
+In Scratch Test V3, change the second Aggregate step's formula from `MAX(LineItemQuantity)` back to **`MAX(BeaconTier__c)`** (output stays `BeaconMaxUsers__c`). **Save.**
 
-```json
-{
-  "SalesTransaction": [
-    {
-      "PriceBooks": "01sS9000008iu6kIAA",
-      "SalesTransactionItem": [
-        {
-          "LineItem": "line1",
-          "LineItemQuantity": "1",
-          "Product": "01tS900000OBbT3IAL",
-          "ListPrice": "18000",
-          "DerivedPricingAttribute": "false",
-          "ItemContract": "",
-          "SalesTransactionItemAttribute": [ { "AttributeValue": "4" } ]
-        },
-        {
-          "LineItem": "line2",
-          "LineItemQuantity": "1",
-          "Product": "01tS900000OBbKzIAL",
-          "ListPrice": "18000",
-          "DerivedPricingAttribute": "false",
-          "ItemContract": "",
-          "SalesTransactionItemAttribute": [ { "AttributeValue": "2" } ]
-        }
-      ]
-    }
-  ]
-}
-```
+Check the steps are in this order:
+1. Pricing Setting
+2. Formula Based Pricing → `BeaconTier__c` (tick **Exclude Price Waterfall**)
+3. Aggregate Price `SUM(LineItemQuantity)` → `BeaconModuleCount__c`
+4. Aggregate Price `MAX(BeaconTier__c)` → `BeaconMaxUsers__c`
+5. Price Adjustment Matrix – Beacon Tier Price
+6. Price Adjustment Matrix – Beacon Multi-Module Discount
+7. Price Adjustment Matrix – Beacon Module Count Price
 
-4. **Expected:** **£11,500 per line**. MAX of quantity = 1, so it uses Tier 1 = "Up to 3 users" band: £23,000 ÷ 2. (The number is wrong for this quote on purpose – it just shows MAX ran.)
-5. Send Claude the result:
-   - **£11,500:** MAX works; the problem is aggregating our custom tag. Claude will give you the workaround.
-   - **Error:** MAX isn't usable here; Claude will give you a different approach.
+### Step 2. Make Scratch Test the live procedure (HTCDEV only)
+1. **Activate** Scratch Test V3.
+2. **Setup → Salesforce Pricing Setup** → set the **default pricing procedure** to **Scratch Test**.
+3. **Sync Pricing Data** and wait for it to finish.
+
+### Step 3. Price a real quote
+1. Open quote **Product Config 1** (<50 Heads, ADC at 4 users) in Browse Catalogs.
+2. Add **Oncology Module** with **Number of Users = 2**. Save / reprice.
+3. **Expected:** ADC **£13,000**, Oncology **£13,000**, total **£26,000** (Starter, Enterprise).
+4. Tell Claude when it's saved – Claude will check the line prices, Pricing Tier, Pricing Module Count and Pricing Max User Tier in HTCDEV.
+
+If pricing errors, screenshot the message. Either way, leave the default on Scratch Test until Claude says to switch it back (HTCDEV quotes priced with the standard procedure until now anyway).
 
 ---
 
@@ -68,7 +51,7 @@ This tells us whether MAX itself fails, or only MAX on our custom `BeaconTier__c
 ## Proven so far
 
 - **Module count pricing works:** SUM(LineItemQuantity) → `BeaconModuleCount__c` = 2, and the Module Count matrix with max tier 2 overrode both lines to **£13,000** (<50 Heads, Starter, Enterprise). Discount step correctly did nothing on a Module Count book.
-- `MAX(BeaconTier__c)` fails at run time with *Invalid tag attribute name key: BeaconTier__c* (being investigated).
+- `MAX(LineItemQuantity)` works in Aggregate Price; `MAX(BeaconTier__c)` fails **in Simulate** with *Invalid tag attribute name key: BeaconTier__c* – being tested on a real quote.
 
 - Price Adjustment Matrix can read the Beacon tables once each table is **registered to it in the Pricing Recipe** (done in HTCDEV for all three tables).
 - Tables need **Adjustment Type** and **Adjustment Value** outputs (added).
