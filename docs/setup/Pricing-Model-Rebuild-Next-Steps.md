@@ -6,23 +6,28 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – Number of Users column in the Transaction Line Editor
 
-_Last updated: V4 built (catalog prompt + column) – deploy it in Step 2._
+_Last updated: V4 deploy failed – make the change in the builder (Step 2)._
 
 Reps add modules with Browse Catalogs, then set **Number of Users** in a column in the Transaction Line Editor. Pricing reads the quote line field instead of the product attribute. Tier, discount and module count pricing don't change.
 
 ### Step 1. Add a context field for Number of Users ✅ Done
 `BeaconUsers__c` mapped to `Number_of_Users__c` in QuoteEntitiesMapping and OrderEntitiesMapping (checked by Claude).
 
-### Step 2. Deploy Beacon Pricing Procedure V4
-V4 = V2 plus:
-- **Step 16 (new):** if the line's **Number of Users** field is empty, copy in the value entered in the catalog configurator.
-- **Step 17:** the tier comes from the field (`BeaconUsers__c`). A line with no users anywhere prices as Tier 1.
+### Step 2. Make V3 in the builder (instead of the Workbench deploy)
+The V4 Workbench deploy fails with *Property 'dataType' not valid* at a line that doesn't contain one, so make the two small changes in the builder instead.
 
-So reps enter users in the catalog (gear, still required) when adding a module; after that, the **Transaction Line Editor column** is the master – change users there, not by reopening the gear.
+1. **Pricing Procedures → Beacon Pricing Procedure → V2** → **Save As → Save as New Version**. Name **Beacon Pricing Procedure V3**, version **3**.
+2. Open V3. Find step **BeaconSetLineTier** (Formula Based Pricing, after the volume discount steps).
+3. **Add a Formula Based Pricing step just above it:**
+   - **Formula:** `IF(BeaconUsers__c >= 1, BeaconUsers__c, VALUE(AttributeValue))`
+   - **Output Variable:** `BeaconUsers__c`
+   - Tick **Exclude Price Waterfall**.
+4. **Change BeaconSetLineTier's formula to:**
+   `IF(BeaconUsers__c >= 51, 6, IF(BeaconUsers__c >= 21, 5, IF(BeaconUsers__c >= 11, 4, IF(BeaconUsers__c >= 6, 3, IF(BeaconUsers__c >= 4, 2, 1)))))`
+   (Output stays `BeaconTier__c`.)
+5. **Save → Activate** (deactivate V2 if asked). **Sync Pricing Data.**
 
-1. Download **Beacon_Pricing_Procedure_V4.zip** (sent in chat). Ignore the earlier V3 zip.
-2. Workbench → **migration → Deploy** → leave **Single Package unticked** → **Deploy**.
-3. **Pricing Procedures → Beacon Pricing Procedure → V4 → Activate** (deactivate V2 if asked). **Sync Pricing Data.**
+What it does: if a line's Number of Users field is empty, the catalog (gear) value is copied in; the tier then comes from the field. No users anywhere → Tier 1. After a line is added, change users in the **Transaction Line Editor column**.
 
 ### Step 3. Turn off the sync flow
 **Setup → Flows → Quote Pricing Complete: Sync Number of Users → Deactivate.** (Pricing now fills the field itself; the flow would overwrite column edits.)
