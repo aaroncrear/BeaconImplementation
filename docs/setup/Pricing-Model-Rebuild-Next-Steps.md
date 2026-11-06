@@ -4,7 +4,26 @@ This page is kept up to date. Work from **Now** down.
 
 ---
 
-## Now – do these in order
+## Current state (checked in HTCDEV)
+
+_Last updated: ready to test all price books with the current setup._
+
+- **Live:** Beacon Pricing Procedure **V2** (active, default in Revenue Settings and Salesforce Pricing Setup). No deploys or changes needed to test.
+- **Number of Users** is still read from the product attribute (set in Browse Catalogs), and the sync flow copies it to the line field. Always enter a value – V2 has no safeguard for a blank.
+- **On hold:** the Number of Users column change (V3 and Steps 1–5 below). Don't start it mid-testing – it changes where pricing reads users from.
+
+**What to expect per price book**
+
+| Price books | Each line | Quote total |
+|---|---|---|
+| Top 1-50 Pharma, >200 Heads (Per Module) | Its own tier price (from its users) | Sum of lines less 10% (2 modules), 20% (3), 30% (4+) |
+| <50 Heads, 51-200 Heads, PE-VC, Contract Orgs (Module Count) | Equal share of the total | Module level (1, 2, 3-4, 5, 6+) × user band from the **highest** users on any line |
+
+Send Claude the quote names – Claude checks every line against the price tables. A total can be a penny over when it doesn't divide evenly (e.g. 3 lines).
+
+---
+
+## On hold – Number of Users column (don't start yet)
 
 _Last updated: switching Number of Users from the configurator to a line editor column._
 
