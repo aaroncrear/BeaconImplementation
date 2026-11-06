@@ -63,6 +63,7 @@ Then **Save**. If the builder flags empty constants, set their values in the **R
           "ListPrice": "18000",
           "DerivedPricingAttribute": "false",
           "ItemContract": "",
+          "BeaconTier__c": "0",
           "SalesTransactionItemAttribute": [ { "AttributeValue": "4" } ]
         },
         {
@@ -72,6 +73,7 @@ Then **Save**. If the builder flags empty constants, set their values in the **R
           "ListPrice": "18000",
           "DerivedPricingAttribute": "false",
           "ItemContract": "",
+          "BeaconTier__c": "0",
           "SalesTransactionItemAttribute": [ { "AttributeValue": "2" } ]
         }
       ]
@@ -80,7 +82,7 @@ Then **Save**. If the builder flags empty constants, set their values in the **R
 }
 ```
 
-   Leave **BeaconTier__c** out – the formula step sets it. Or, in Simplified mode, the same values as below (copy icon on the line adds line 2):
+   `BeaconTier__c` is in the JSON as `0` because the simulator now lists it as an input (the formula step overwrites it). Without it, Simulate fails with *Invalid tag attribute name key: BeaconTier__c*. Or, in Simplified mode, the same values as below (copy icon on the line adds line 2):
 
 | | Line 1 | Line 2 |
 |---|---|---|
