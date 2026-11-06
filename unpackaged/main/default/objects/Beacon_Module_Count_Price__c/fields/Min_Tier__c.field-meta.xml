@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Min_Tier__c</fullName>
-    <description>Lowest user tier (1-6) in this band. The pricing procedure compares it with the highest tier on any quote line (Quote Pricing Max Users). Tiers: 1 = 1-3 users, 2 = 4-5, 3 = 6-10, 4 = 11-20, 5 = 21-50, 6 = 51+.</description>
+    <description>Lowest user tier (1-6) in this band. The pricing procedure compares it with the highest tier on any quote line (Quote field Pricing Max User Tier). Tiers: 1 = 1-3 users, 2 = 4-5, 3 = 6-10, 4 = 11-20, 5 = 21-50, 6 = 51+.</description>
     <externalId>false</externalId>
     <label>Min Tier</label>
     <precision>2</precision>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Adjustment_Value__c</fullName>
-    <description>Same as List Price. The pricing procedure's Price Adjustment Matrix step reads the price from this field. Set by the Pricing_Model_Rebuild_Set_Adjustment_Fields script.</description>
+    <description>Annual price for the module at this tier on this price book. The Beacon Pricing Procedure sets the quote line price to this value (Adjustment Type = Override).</description>
     <externalId>false</externalId>
-    <inlineHelpText>Same as List Price. Used by the pricing procedure.</inlineHelpText>
-    <label>Adjustment Value</label>
+    <inlineHelpText>Annual price for this module, tier and price book.</inlineHelpText>
+    <label>Price</label>
     <precision>18</precision>
     <required>false</required>
     <scale>2</scale>

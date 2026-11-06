@@ -36,11 +36,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>
-                <field>Pricing_Users__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>User_Tier__c</field>
+                <field>Pricing_Tier__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>

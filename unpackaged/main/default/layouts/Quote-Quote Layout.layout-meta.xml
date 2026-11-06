@@ -63,7 +63,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>
-                <field>Module_Count__c</field>
+                <field>Pricing_Module_Count__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>

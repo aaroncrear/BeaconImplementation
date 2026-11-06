@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Adjustment_Value__c</fullName>
-    <description>Same as Discount Percent, as a plain number (10 = 10%). Read by the pricing procedure.</description>
+    <description>Percent taken off every line for this module count (10 = 10%). Read by the Beacon Pricing Procedure (Adjustment Type = Percentage).</description>
     <externalId>false</externalId>
-    <label>Adjustment Value</label>
+    <label>Discount %</label>
     <precision>5</precision>
     <required>false</required>
     <scale>2</scale>

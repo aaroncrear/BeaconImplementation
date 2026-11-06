@@ -371,11 +371,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Beacon_Module_Count_Price__c.Max_Users__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Beacon_Module_Count_Price__c.Min_Tier__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -2025,11 +2020,6 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>true</editable>
-        <field>Pricebook2.Pricing_Method__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
         <editable>false</editable>
         <field>Quote.Lines_With_Users__c</field>
         <readable>true</readable>
@@ -2050,11 +2040,6 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
-        <field>Quote.Module_Count__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
         <editable>true</editable>
         <field>Quote.Pricing_Max_Users__c</field>
         <readable>true</readable>
@@ -2072,16 +2057,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>QuoteLineItem.Pricing_Tier__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>QuoteLineItem.Pricing_Users__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>QuoteLineItem.User_Tier__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
