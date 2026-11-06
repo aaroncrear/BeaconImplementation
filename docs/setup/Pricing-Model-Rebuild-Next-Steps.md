@@ -6,7 +6,7 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – do these in order
 
-_Last updated: matrix constants and MAX test._
+_Last updated: BeaconMaxUsers__c set by hand in the Step 4 JSON._
 
 ### Step 1. Fill in the four empty constants
 In Scratch Test V3, open the **Resource Manager** and search **Constant_Adjustment**. Set the **Value** of the four without one:
@@ -48,6 +48,7 @@ Delete the `MAX(BeaconTier__c)` Aggregate step (it's the likely cause of *Invali
   "SalesTransaction": [
     {
       "PriceBooks": "01sS9000008iu6kIAA",
+      "BeaconMaxUsers__c": "2",
       "SalesTransactionItem": [
         {
           "LineItem": "line1",
@@ -73,8 +74,9 @@ Delete the `MAX(BeaconTier__c)` Aggregate step (it's the likely cause of *Invali
 }
 ```
 
-3. **Expected without the MAX step:** ADC **£21,000**, Oncology **£18,000** (each line keeps its tier price; the module count lookup has no tier to match yet).
-4. Send Claude a screenshot:
+3. `BeaconMaxUsers__c` is set by hand to **2** (the highest tier: ADC at 4 users), standing in for the deleted MAX step. If the simulator still asks for it, click **Fix Input** and enter `2`.
+4. **Expected:** **£13,000 per line**, £26,000 total (<50 Heads, 2 modules = Starter, Tier 2 = Enterprise). This proves the module count step works; then only the highest-tier calculation is left.
+5. Send Claude a screenshot:
    - **Runs:** the MAX step was the problem – Claude gives you another way to get the highest tier.
    - **Fails:** send the JSON Details from the Output tab.
 
