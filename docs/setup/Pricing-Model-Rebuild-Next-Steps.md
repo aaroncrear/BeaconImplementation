@@ -4,30 +4,11 @@ This page is kept up to date. Work from **Now** down.
 
 ---
 
-## Current state (checked in HTCDEV)
+## Now – Number of Users column in the Transaction Line Editor
 
-_Last updated: ready to test all price books with the current setup._
+_Last updated: column change is the current task (do it before price book testing)._
 
-- **Live:** Beacon Pricing Procedure **V2** (active, default in Revenue Settings and Salesforce Pricing Setup). No deploys or changes needed to test.
-- **Number of Users** is still read from the product attribute (set in Browse Catalogs), and the sync flow copies it to the line field. Always enter a value – V2 has no safeguard for a blank.
-- **On hold:** the Number of Users column change (V3 and Steps 1–5 below). Don't start it mid-testing – it changes where pricing reads users from.
-
-**What to expect per price book**
-
-| Price books | Each line | Quote total |
-|---|---|---|
-| Top 1-50 Pharma, >200 Heads (Per Module) | Its own tier price (from its users) | Sum of lines less 10% (2 modules), 20% (3), 30% (4+) |
-| <50 Heads, 51-200 Heads, PE-VC, Contract Orgs (Module Count) | Equal share of the total | Module level (1, 2, 3-4, 5, 6+) × user band from the **highest** users on any line |
-
-Send Claude the quote names – Claude checks every line against the price tables. A total can be a penny over when it doesn't divide evenly (e.g. 3 lines).
-
----
-
-## On hold – Number of Users column (don't start yet)
-
-_Last updated: switching Number of Users from the configurator to a line editor column._
-
-**The change:** reps keep using the catalog to **add** modules, then type **Number of Users** in a column in the line editor – no gear / configure. Pricing reads the quote line field `Number_of_Users__c` instead of the product attribute. Everything else (tier, discount, module count) stays as proven.
+Reps add modules with Browse Catalogs, then set **Number of Users** in a column in the Transaction Line Editor. Pricing reads the quote line field instead of the product attribute. Tier, discount and module count pricing don't change.
 
 ### Step 1. Add a context field for Number of Users
 Same screens as the Beacon tags before. **SalesTransactionContextAuto:**
@@ -47,13 +28,26 @@ Only change from V2: the tier step reads `BeaconUsers__c` (the field) instead of
 1. **Setup → Flows → Quote Pricing Complete: Sync Number of Users** → **Deactivate**. (It copied the attribute into the field; it would now overwrite what reps type.)
 2. **Product Classification "Beacon Module"** → remove the **Number of Users** attribute (or untick **Required**), so the catalog stops asking for it.
 
-### Step 4. Add the column to the line editor
-Open a Draft quote's line editor (the grid of quote lines) and look for a **column settings / choose columns** option. Add **Number of Users**. Screenshot what you see if there's no option – Claude will find where Revenue Cloud sets the default columns.
+### Step 4. Add the column to the Transaction Line Editor
+Open a **Draft** quote → in the Transaction Line Editor grid, use the column settings (usually a gear or **Columns** option at the top right of the grid) → add **Number of Users**. If there's no such option, screenshot the grid's header for Claude. The column is editable once Step 1 maps the field.
 
 ### Step 5. Test
 On **Product Config 1**, change ADC's Number of Users in the line editor column (4 → 6). **Expected:** ADC Tier 3, max tier 3 → for <50 Heads still the Enterprise band → £13,000 + £13,000. Then set ADC to 3 → both Tier 1 → "Up to 3 users" → **£11,500 + £11,500**.
 
 > **Required:** a column can't be hard-required at the moment a line is added (the catalog adds lines before users are entered). The existing rule **Lines Valid Before Leaving Draft** blocks the quote from leaving Draft while any line has no Number of Users – reps see no errors while they work.
+
+---
+
+---
+
+## Then – test all price books
+
+| Price books | Each line | Quote total |
+|---|---|---|
+| Top 1-50 Pharma, >200 Heads (Per Module) | Its own tier price (from its users) | Sum of lines less 10% (2 modules), 20% (3), 30% (4+) |
+| <50 Heads, 51-200 Heads, PE-VC, Contract Orgs (Module Count) | Equal share of the total | Module level (1, 2, 3-4, 5, 6+) × user band from the **highest** users on any line |
+
+Send Claude the quote names – Claude checks every line. A total can be a penny over when it doesn't divide evenly (e.g. 3 lines).
 
 ---
 
