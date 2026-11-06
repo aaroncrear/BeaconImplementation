@@ -6,7 +6,7 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – do these in order
 
-_Last updated: Beacon Pricing Procedure V2 ready to deploy._
+_Last updated: rebuilt V2 zip (Single Package unticked)._
 
 **Beacon Pricing Procedure V2** = your current V1 (all 30 standard steps, unchanged) + the six proven Beacon steps as **steps 16–21**, after list price and volume discounts and **before manual discounts** (so reps can still discount on top):
 
@@ -23,7 +23,7 @@ V1 stays as it is. V2 deploys as **Draft**.
 
 ### Step 1. Deploy with Workbench
 1. Download **Beacon_Pricing_Procedure_V2.zip** (sent in chat).
-2. Workbench → **migration → Deploy** → choose the zip → tick **Single Package** → **Next → Deploy**.
+2. Workbench → **migration → Deploy** → choose the zip → leave **Single Package UNticked** → **Next → Deploy**. (Use the rebuilt zip – its files sit in an `unpackaged` folder, like Workbench's own retrieve zips.)
 3. If it fails, screenshot the error for Claude.
 
 ### Step 2. Activate V2 and point both settings at it
