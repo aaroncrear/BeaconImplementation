@@ -6,28 +6,33 @@ This page is kept up to date. Work from **Now** down.
 
 ## Now – Number of Users column in the Transaction Line Editor
 
-_Last updated: Step 1 done – deploy V3 next._
+_Last updated: V4 built (catalog prompt + column) – deploy it in Step 2._
 
 Reps add modules with Browse Catalogs, then set **Number of Users** in a column in the Transaction Line Editor. Pricing reads the quote line field instead of the product attribute. Tier, discount and module count pricing don't change.
 
 ### Step 1. Add a context field for Number of Users ✅ Done
 `BeaconUsers__c` mapped to `Number_of_Users__c` in QuoteEntitiesMapping and OrderEntitiesMapping (checked by Claude).
 
-### Step 2. Deploy Beacon Pricing Procedure V3
-Only change from V2: the tier step reads `BeaconUsers__c` (the field) instead of the attribute. A blank Number of Users prices as Tier 1.
-1. Download **Beacon_Pricing_Procedure_V3.zip** (sent in chat).
-2. Workbench → **migration → Deploy** → leave **Single Package unticked** → **Deploy**.
-3. **Pricing Procedures → Beacon Pricing Procedure → V3 → Activate** (deactivate V2 if asked). **Sync Pricing Data.**
+### Step 2. Deploy Beacon Pricing Procedure V4
+V4 = V2 plus:
+- **Step 16 (new):** if the line's **Number of Users** field is empty, copy in the value entered in the catalog configurator.
+- **Step 17:** the tier comes from the field (`BeaconUsers__c`). A line with no users anywhere prices as Tier 1.
 
-### Step 3. Turn off the attribute
-1. **Setup → Flows → Quote Pricing Complete: Sync Number of Users** → **Deactivate**. (It copied the attribute into the field; it would now overwrite what reps type.)
-2. **Product Classification "Beacon Module"** → remove the **Number of Users** attribute (or untick **Required**), so the catalog stops asking for it.
+So reps enter users in the catalog (gear, still required) when adding a module; after that, the **Transaction Line Editor column** is the master – change users there, not by reopening the gear.
+
+1. Download **Beacon_Pricing_Procedure_V4.zip** (sent in chat). Ignore the earlier V3 zip.
+2. Workbench → **migration → Deploy** → leave **Single Package unticked** → **Deploy**.
+3. **Pricing Procedures → Beacon Pricing Procedure → V4 → Activate** (deactivate V2 if asked). **Sync Pricing Data.**
+
+### Step 3. Turn off the sync flow
+**Setup → Flows → Quote Pricing Complete: Sync Number of Users → Deactivate.** (Pricing now fills the field itself; the flow would overwrite column edits.)
+**Keep** the Number of Users attribute on the **Beacon Module** classification (still required in the catalog).
 
 ### Step 4. Add the column to the Transaction Line Editor
 Open a **Draft** quote → in the Transaction Line Editor grid, use the column settings (usually a gear or **Columns** option at the top right of the grid) → add **Number of Users**. If there's no such option, screenshot the grid's header for Claude. The column is editable once Step 1 maps the field.
 
 ### Step 5. Test
-On **Product Config 1**, change ADC's Number of Users in the line editor column (4 → 6). **Expected:** ADC Tier 3, max tier 3 → for <50 Heads still the Enterprise band → £13,000 + £13,000. Then set ADC to 3 → both Tier 1 → "Up to 3 users" → **£11,500 + £11,500**.
+On **Product Config 1**, change ADC's Number of Users in the line editor column (4 → 6). Also add a new module through the catalog with users set in the gear → after pricing, its column should show that number. **Expected for ADC 6:** ADC Tier 3, max tier 3 → for <50 Heads still the Enterprise band → £13,000 + £13,000. Then set ADC to 3 → both Tier 1 → "Up to 3 users" → **£11,500 + £11,500**.
 
 > **Required:** a column can't be hard-required at the moment a line is added (the catalog adds lines before users are entered). The existing rule **Lines Valid Before Leaving Draft** blocks the quote from leaving Draft while any line has no Number of Users – reps see no errors while they work.
 
