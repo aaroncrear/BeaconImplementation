@@ -17,6 +17,29 @@
         </assignmentItems>
     </assignments>
     <decisions>
+        <description>Checks whether the quote line has a Quote Action (renewal and amendment lines do). Kept out of the start formula, which can't reference QuoteActionId.</description>
+        <name>Has_Quote_Action</name>
+        <label>Has Quote Action?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No Quote Action</defaultConnectorLabel>
+        <rules>
+            <name>Quote_Action_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.QuoteActionId</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Quote_Action</targetReference>
+            </connector>
+            <label>Quote Action Found</label>
+        </rules>
+    </decisions>
+    <decisions>
         <description>Checks whether the quote line has a Source Asset, so the Asset is only looked up for renewal and amendment lines.</description>
         <name>Has_Source_Asset</name>
         <label>Has Source Asset?</label>
@@ -62,7 +85,7 @@
             <label>Has Users</label>
         </rules>
     </decisions>
-    <description>When a quote line is created for an existing Asset (for example by Create Renewal Quote in Order - Assets Created - Create Renewal, or an amendment), copies Number of Users from that Asset, so the renewal is priced at the customer&apos;s current users. The Asset is found through the line&apos;s Quote Action (Source Asset). Only runs when the line has a Quote Action, Number of Users is blank, and Run Flows is checked on the On/Off Switch custom setting.</description>
+    <description>When a quote line is created for an existing Asset (for example by Create Renewal Quote in Order - Assets Created - Create Renewal, or an amendment), copies Number of Users from that Asset, so the renewal is priced at the customer&apos;s current users. The Asset is found through the line&apos;s Quote Action (Source Asset). Only runs when Number of Users is blank and Run Flows is checked on the On/Off Switch custom setting; lines without a Quote Action stop at the first decision.</description>
     <environments>Default</environments>
     <interviewLabel>Quote Line Item - On Create - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Quote Line Item - On Create - Before Save</label>
@@ -137,11 +160,10 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Get_Quote_Action</targetReference>
+            <targetReference>Has_Quote_Action</targetReference>
         </connector>
         <filterFormula>AND(
     {!$Setup.On_Off_Switch__c.Run_Flows__c},
-    NOT(ISBLANK({!$Record.QuoteActionId})),
     ISBLANK({!$Record.Number_of_Users__c})
 )</filterFormula>
         <object>QuoteLineItem</object>
