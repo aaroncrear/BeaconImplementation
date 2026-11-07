@@ -142,6 +142,20 @@ After cleanup, every price book has exactly 17 active entries (one per module, o
 
 The pricing procedure, decision tables and context mapping are Revenue Cloud setup. They're built in Setup in each org, as listed in Post Deployment Items, because they depend on the price objects and fields in this release. Once built in HTCDEV, retrieve them with Gearset into a follow-up branch so UAT and Prod can be deployed the same way.
 
+### Quote status: Approved is the final status
+
+The customer is condensing quote statuses. Once a quote is approved internally it isn't worked any further, so **Approved** replaces **Accepted** as the status that drives the automation:
+
+- **Quote - On Update - After Save** moves the Opportunity to **Contract** when a syncing quote's Status changes to **Approved** (was Accepted).
+- **Closed Won Revenue Automation** builds the Contract and Order from the Opportunity's most recently modified **Approved** quote (step renamed **Get Approved Quote**). If there isn't one, the error reads "no Approved Quote was found".
+- The Quote Status values **In Review, Rejected, Presented, Denied and Accepted** are deactivated, leaving **Draft, Needs Review and Approved**. They're deactivated in Setup, not deployed (see Post Deployment Items), so existing quotes keep their value.
+
+### Production fixes found in go-live testing
+
+- **Order and Quote field access.** Production gives no profile access to standard Order fields such as Opportunity and Quote, so the order action failed with "Can't create an order from this type of quote". The new permission set **Beacon - Revenue Cloud Order and Quote Fields** grants them and is part of the **Beacon - Revenue Cloud User** group.
+- **Quotes without an opportunity** must stay off in Revenue Settings. Quotes created while it was on can't be turned into orders.
+- **Renewal surveys.** When a renewal Opportunity is created, **Opportunity - On Create After Save** now looks up the open Sales Demo and Sales Prospecting surveys before deleting them. A filtered Delete step fails when nothing matches, which stopped the Onboarding Call 1 and Customer Call surveys from being created.
+
 ## Acceptance Criteria
 
 **Setup checks**
@@ -184,7 +198,7 @@ The pricing procedure, decision tables and context mapping are Revenue Cloud set
 
 **Order, Asset, subscriptions and renewal**
 
-22. Accept and close won the Contract Orgs quote from step 13 (ADC 3 users, Cell Therapy 12 users). Wait for the Closed Won automation to finish.
+22. Approve and close won the Contract Orgs quote from step 13 (ADC 3 users, Cell Therapy 12 users). Wait for the Closed Won automation to finish.
 23. Open the Order. Confirm each Order Product shows Number of Users 3 and 12.
 24. Open the ADC and Cell Therapy Assets. Confirm Number of Users is 3 and 12, and that ADC has 3 Beacon Subscriptions and Cell Therapy has 12.
 25. Open the renewal Quote created by the automation. Confirm each line shows the Asset's Number of Users (3 and 12) and the renewal is priced from them.
@@ -193,6 +207,14 @@ The pricing procedure, decision tables and context mapping are Revenue Cloud set
 **Access**
 
 21. Log in as a Beacon Sales user. Confirm you can edit Number of Users and can view, but not edit, the price objects.
+
+**Quote status and Closed Won**
+
+27. Open a quote's Status picklist. Confirm only Draft, Needs Review and Approved can be chosen.
+28. On a Subscription New Opportunity with a Primary Module, set its syncing quote to **Approved**. Confirm the Opportunity moves to **Contract** and a ResOps Request Case is created.
+29. Close the Opportunity as Won. Confirm the Contract and an activated Order are created from the Approved quote, Assets and Beacon Subscriptions are created, and a renewal Opportunity is linked.
+30. Open the renewal Opportunity. Confirm its Onboarding Call 1 and Customer Call surveys exist and no fault email was sent.
+31. On an Opportunity whose only quote is in Draft, close it as Won. Confirm Closed Won Automation Error says no Approved Quote was found.
 
 ## Post Deployment Items
 
@@ -234,6 +256,9 @@ Run these in each org (UAT, then Prod) after Gearset deploys this branch. In HTC
    - deletes bundle components and groups, seat band and multi-year schedules, and unused entries with no selling model
    - deletes bundles, or deactivates any bundle still used on a quote, opportunity, order or asset (Prod has no quote or opportunity lines today).
 6. **HTCDEV test data:** Core Bundle is deactivated, not deleted, because test orders, assets, opportunities and quotes use it. To remove it completely, those test records must be deleted first. Only do this with Rev Ops' go-ahead.
+
+7. **Deactivate quote statuses** (each org, in Setup). **Object Manager → Quote → Fields & Relationships → Status**. Deactivate **In Review, Rejected, Presented, Denied** and **Accepted**. Keep **Draft** (default), **Needs Review** and **Approved**. Before deactivating, check no open Opportunity has a quote waiting in one of those statuses (none in Prod on 7 Nov 2026).
+8. **Revenue Settings:** keep the setting for quotes without an opportunity **off** (Prod had it on).
 
 ## Component Manifest
 
@@ -302,3 +327,10 @@ Github Branch: [Pricing-Model-Rebuild](https://github.com/aaroncrear/BeaconImple
 | 59 | Flow | Quote | Quote_Pricing_Complete_Sync_Number_of_Users | Quote - Pricing Complete - Sync Number of Users | Created | When a Draft quote finishes pricing, copies each line's Number of Users attribute into the quote line field, updating only changed lines. |
 | 60 | CustomField | Quote | Lines_Wrong_Quantity__c | Lines Wrong Quantity | Created | Roll-up COUNT of quote lines whose Quantity isn't 1. |
 | 61 | CustomField | Quote | Lines_With_Users__c | Lines With Users | Created | Roll-up COUNT of quote lines with Number of Users of 1 or more. |
+| 62 | Flow | Quote | Quote_On_Update_After_Save | Quote - On Update - After Save | Updated | Moves the Opportunity to Contract when a syncing quote changes to Approved (was Accepted). |
+| 63 | Flow | Opportunity | Closed_Won_Revenue_Automation | Closed Won Revenue Automation | Updated | Builds the Contract and Order from the most recent Approved quote (was Accepted); step renamed Get Approved Quote. |
+| 64 | Flow | Opportunity | Opportunity_Closed_Won_After_Save | Opportunity - Closed Won - After Save | Updated | Description now refers to the Approved quote. |
+| 65 | Flow | Opportunity | Opportunity_On_Create_After_Save | Opportunity - On Create or Record Type Change - After Save | Updated | Looks up open Sales Demo/Prospecting surveys before deleting them, so the renewal surveys are still created when there are none. |
+| 66 | PermissionSet | Order, Quote | Beacon_Revenue_Cloud_Order_Quote_Fields | Beacon - Revenue Cloud Order and Quote Fields | Created | Standard Order and Quote field access (e.g. Order Opportunity and Quote) needed by the order and contract actions. |
+| 67 | PermissionSetGroup | — | Beacon_Revenue_Cloud_User | Beacon - Revenue Cloud User | Updated | Includes Beacon - Revenue Cloud Order and Quote Fields. |
+| 68 | Picklist value (Setup) | Quote | Status | Status | Updated | In Review, Rejected, Presented, Denied and Accepted deactivated in Setup (Post Deployment Item 7). |

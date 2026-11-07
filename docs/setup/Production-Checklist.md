@@ -60,6 +60,10 @@ Tick each box as you go. 🤖 = tell Claude, who checks or completes that step b
 ## 7b. Revenue Settings
 - [ ] Turn on **Advanced Order Creation From Quote** (needed for Closed Won → Order)
 
+## 7c. Quote statuses
+- [ ] **Object Manager → Quote → Status**: deactivate **In Review, Rejected, Presented, Denied, Accepted** (keep Draft, Needs Review, Approved)
+- [ ] Revenue Settings: quotes without an opportunity stays **off**
+
 ## 8. Users and permissions
 - [ ] Assign the Revenue Cloud permission set licenses to each user (list in the guide, step 8)
 - [ ] Assign **Beacon - Revenue Cloud User** to everyone who quotes (it includes **Beacon - Revenue Cloud Order and Quote Fields** – without it Closed Won fails with "Can't create an order from this type of quote")
@@ -79,5 +83,6 @@ Tick each box as you go. 🤖 = tell Claude, who checks or completes that step b
 - [ ] Price waterfall opens on a repriced quote
 - [ ] Quantity ≠ 1 in Browse Catalogs shows the warning
 - [ ] Quote can't leave Draft with a line missing Number of Users
+- [ ] Quote set to **Approved** → Opportunity moves to Contract + ResOps Case
 - [ ] Closed Won → Order → Assets carry Number of Users → Beacon Subscriptions + renewal opportunity created
 - [ ] 🤖 Claude signs off the test results

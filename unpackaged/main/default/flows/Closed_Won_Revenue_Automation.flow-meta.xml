@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
-        <description>Native Revenue Cloud Create Contract action (the same action used by the Create Contract From Quote screen flow). Creates the Contract from the Accepted Quote and saves the quote&apos;s net unit prices as contract prices.</description>
+        <description>Native Revenue Cloud Create Contract action (the same action used by the Create Contract From Quote screen flow). Creates the Contract from the Approved Quote and saves the quote&apos;s net unit prices as contract prices.</description>
         <name>Create_Contract</name>
         <label>Create Contract</label>
         <locationX>0</locationX>
@@ -18,7 +18,7 @@
         <inputParameters>
             <name>sourceId</name>
             <value>
-                <elementReference>Get_Accepted_Quote.Id</elementReference>
+                <elementReference>Get_Approved_Quote.Id</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -49,7 +49,7 @@
         <inputParameters>
             <name>quoteId</name>
             <value>
-                <elementReference>Get_Accepted_Quote.Id</elementReference>
+                <elementReference>Get_Approved_Quote.Id</elementReference>
             </value>
         </inputParameters>
         <nameSegment>createOrdersFromQuote</nameSegment>
@@ -60,7 +60,7 @@
     <apiVersion>68.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
-        <description>Uses the Contract that is already linked to the Accepted Quote (for example from an earlier run that failed after the Contract was created), so a second Contract isn&apos;t created.</description>
+        <description>Uses the Contract that is already linked to the Approved Quote (for example from an earlier run that failed after the Contract was created), so a second Contract isn&apos;t created.</description>
         <name>Assign_Existing_Contract</name>
         <label>Assign Existing Contract</label>
         <locationX>0</locationX>
@@ -69,7 +69,7 @@
             <assignToReference>contractId</assignToReference>
             <operator>Assign</operator>
             <value>
-                <elementReference>Get_Accepted_Quote.ContractId</elementReference>
+                <elementReference>Get_Approved_Quote.ContractId</elementReference>
             </value>
         </assignmentItems>
         <connector>
@@ -111,7 +111,7 @@
         </connector>
     </assignments>
     <assignments>
-        <description>Sets the error message when the Opportunity has no Accepted Quote.</description>
+        <description>Sets the error message when the Opportunity has no Approved Quote.</description>
         <name>Set_No_Quote_Error</name>
         <label>Set No Quote Error</label>
         <locationX>0</locationX>
@@ -120,7 +120,7 @@
             <assignToReference>errorMessage</assignToReference>
             <operator>Assign</operator>
             <value>
-                <stringValue>Closed Won automation: no Accepted Quote was found on this Opportunity, so the Contract and Order were not created.</stringValue>
+                <stringValue>Closed Won automation: no Approved Quote was found on this Opportunity, so the Contract and Order were not created.</stringValue>
             </value>
         </assignmentItems>
         <connector>
@@ -189,7 +189,7 @@
         </rules>
     </decisions>
     <decisions>
-        <description>Checks whether the Accepted Quote already has a Contract. If it does, that Contract is reused.</description>
+        <description>Checks whether the Approved Quote already has a Contract. If it does, that Contract is reused.</description>
         <name>Contract_Exists</name>
         <label>Contract Exists?</label>
         <locationX>0</locationX>
@@ -202,7 +202,7 @@
             <name>Has_Contract</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Get_Accepted_Quote.ContractId</leftValueReference>
+                <leftValueReference>Get_Approved_Quote.ContractId</leftValueReference>
                 <operator>IsNull</operator>
                 <rightValue>
                     <booleanValue>false</booleanValue>
@@ -215,7 +215,7 @@
         </rules>
     </decisions>
     <decisions>
-        <description>Checks whether an Order already exists for the Accepted Quote. If it does, it is activated instead of creating another one.</description>
+        <description>Checks whether an Order already exists for the Approved Quote. If it does, it is activated instead of creating another one.</description>
         <name>Order_Exists</name>
         <label>Order Exists?</label>
         <locationX>0</locationX>
@@ -241,7 +241,7 @@
         </rules>
     </decisions>
     <decisions>
-        <description>Stops when no Accepted Quote was found.</description>
+        <description>Stops when no Approved Quote was found.</description>
         <name>Quote_Found</name>
         <label>Quote Found?</label>
         <locationX>0</locationX>
@@ -254,7 +254,7 @@
             <name>Found</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Get_Accepted_Quote.Id</leftValueReference>
+                <leftValueReference>Get_Approved_Quote.Id</leftValueReference>
                 <operator>IsNull</operator>
                 <rightValue>
                     <booleanValue>false</booleanValue>
@@ -291,12 +291,12 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Get_Accepted_Quote</targetReference>
+                <targetReference>Get_Approved_Quote</targetReference>
             </connector>
             <label>Run</label>
         </rules>
     </decisions>
-    <description>Called by Opportunity - Closed Won - After Save with the Opportunity Id. Finds the Opportunity&apos;s Accepted Quote and stops if there isn&apos;t one. Creates the Contract with the native Create Contract action (net unit prices saved as contract prices), sets its Contract Term from the quote lines if blank (Create Contract leaves it blank, so the Contract would have no End Date) and activates it. Creates the Order with the native Create Orders From Quote action and activates it, which fires Order - Create Assets. Then checks Closed Won Automation Complete, clears Closed Won Automation Error, links the Contract to the Opportunity and copies the Contract&apos;s Start Date and End Date to License Start Date and License End Date. Re-uses a Contract or Order that already exists for the Quote, and does nothing if the automation has already completed, so re-running it doesn&apos;t create duplicates. Any error is written to Closed Won Automation Error and sent through the Fault Path Subflow. The renewal Opportunity and Quote are created later by Order - Assets Created - Create Renewal, once the Assets exist.</description>
+    <description>Called by Opportunity - Closed Won - After Save with the Opportunity Id. Finds the Opportunity&apos;s Approved Quote and stops if there isn&apos;t one. Creates the Contract with the native Create Contract action (net unit prices saved as contract prices), sets its Contract Term from the quote lines if blank (Create Contract leaves it blank, so the Contract would have no End Date) and activates it. Creates the Order with the native Create Orders From Quote action and activates it, which fires Order - Create Assets. Then checks Closed Won Automation Complete, clears Closed Won Automation Error, links the Contract to the Opportunity and copies the Contract&apos;s Start Date and End Date to License Start Date and License End Date. Re-uses a Contract or Order that already exists for the Quote, and does nothing if the automation has already completed, so re-running it doesn&apos;t create duplicates. Any error is written to Closed Won Automation Error and sent through the Fault Path Subflow. The renewal Opportunity and Quote are created later by Order - Assets Created - Create Renewal, once the Assets exist.</description>
     <environments>Default</environments>
     <formulas>
         <description>Contract Term in months, from the Contract Start Date to the day after the latest quote line End Date (e.g. 2 Nov 2026 to 1 Nov 2027 = 12).</description>
@@ -383,7 +383,7 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
-        <description>Gets the Accepted Quote&apos;s line with the latest End Date, which marks the end of the subscription term.</description>
+        <description>Gets the Approved Quote&apos;s line with the latest End Date, which marks the end of the subscription term.</description>
         <name>Get_Latest_Quote_Line</name>
         <label>Get Latest Quote Line</label>
         <locationX>0</locationX>
@@ -400,7 +400,7 @@
             <field>QuoteId</field>
             <operator>EqualTo</operator>
             <value>
-                <elementReference>Get_Accepted_Quote.Id</elementReference>
+                <elementReference>Get_Approved_Quote.Id</elementReference>
             </value>
         </filters>
         <filters>
@@ -419,9 +419,9 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
-        <description>Gets the most recently modified Accepted Quote on the Opportunity.</description>
-        <name>Get_Accepted_Quote</name>
-        <label>Get Accepted Quote</label>
+        <description>Gets the most recently modified Approved Quote on the Opportunity.</description>
+        <name>Get_Approved_Quote</name>
+        <label>Get Approved Quote</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
@@ -443,7 +443,7 @@
             <field>Status</field>
             <operator>EqualTo</operator>
             <value>
-                <stringValue>Accepted</stringValue>
+                <stringValue>Approved</stringValue>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
@@ -455,7 +455,7 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
-        <description>Looks for an Order already created from the Accepted Quote.</description>
+        <description>Looks for an Order already created from the Approved Quote.</description>
         <name>Get_Existing_Order</name>
         <label>Get Existing Order</label>
         <locationX>0</locationX>
@@ -472,7 +472,7 @@
             <field>QuoteId</field>
             <operator>EqualTo</operator>
             <value>
-                <elementReference>Get_Accepted_Quote.Id</elementReference>
+                <elementReference>Get_Approved_Quote.Id</elementReference>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
@@ -525,7 +525,7 @@
             <field>QuoteId</field>
             <operator>EqualTo</operator>
             <value>
-                <elementReference>Get_Accepted_Quote.Id</elementReference>
+                <elementReference>Get_Approved_Quote.Id</elementReference>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
@@ -599,7 +599,7 @@
         <object>Contract</object>
     </recordUpdates>
     <recordUpdates>
-        <description>Activates every Order created from the Accepted Quote (Status = Activated) that isn&apos;t already active. Activation fires Order - Create Assets, which creates the Assets on the Account asynchronously.</description>
+        <description>Activates every Order created from the Approved Quote (Status = Activated) that isn&apos;t already active. Activation fires Order - Create Assets, which creates the Assets on the Account asynchronously.</description>
         <name>Activate_Orders</name>
         <label>Activate Orders</label>
         <locationX>0</locationX>
@@ -615,7 +615,7 @@
             <field>QuoteId</field>
             <operator>EqualTo</operator>
             <value>
-                <elementReference>Get_Accepted_Quote.Id</elementReference>
+                <elementReference>Get_Approved_Quote.Id</elementReference>
             </value>
         </filters>
         <filters>
