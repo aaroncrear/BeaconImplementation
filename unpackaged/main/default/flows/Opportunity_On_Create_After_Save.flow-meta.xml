@@ -247,7 +247,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Delete_Sales_Surveys</targetReference>
+                <targetReference>Get_Sales_Surveys</targetReference>
             </connector>
             <label>Changed to Renewal</label>
         </rules>
@@ -342,14 +342,55 @@
         </faultConnector>
         <inputReference>colBeaconFeedback</inputReference>
     </recordCreates>
+    <decisions>
+        <description>Checks whether Get Sales Surveys found any surveys to delete. A Delete Records step with filters fails when nothing matches, so it only runs when there is something to delete.</description>
+        <name>Sales_Surveys_Found</name>
+        <label>Sales Surveys Found?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Get_Onboarding_Call_1_Record_Type</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>None Found</defaultConnectorLabel>
+        <rules>
+            <name>Surveys_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Sales_Surveys</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Delete_Sales_Surveys</targetReference>
+            </connector>
+            <label>Surveys Found</label>
+        </rules>
+    </decisions>
     <recordDeletes>
-        <description>Removes the Sales Demo and Sales Prospecting surveys created while the Opportunity was Subscription New, unless they have been completed (Survey Completed = Yes), so the renewal surveys can replace them.</description>
+        <description>Removes the Sales Demo and Sales Prospecting surveys found by Get Sales Surveys (not completed), so the renewal surveys can replace them.</description>
         <name>Delete_Sales_Surveys</name>
         <label>Delete Sales Surveys</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
             <targetReference>Get_Onboarding_Call_1_Record_Type</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Fault_Path_Subflow</targetReference>
+        </faultConnector>
+        <inputReference>Get_Sales_Surveys</inputReference>
+    </recordDeletes>
+    <recordLookups>
+        <description>Finds the Sales Demo and Sales Prospecting surveys on this Opportunity that haven&apos;t been completed (Survey Completed isn&apos;t Yes).</description>
+        <name>Get_Sales_Surveys</name>
+        <label>Get Sales Surveys</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Sales_Surveys_Found</targetReference>
         </connector>
         <faultConnector>
             <targetReference>Fault_Path_Subflow</targetReference>
@@ -383,8 +424,11 @@
                 <stringValue>Sales Prospecting</stringValue>
             </value>
         </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
         <object>Beacon_Feedback__c</object>
-    </recordDeletes>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <recordLookups>
         <description>Retrieves the Beacon Feedback Sales Demo record type by its developer name (Sales_Demo), so its Id isn&apos;t hardcoded.</description>
         <name>Get_Sales_Demo_Record_Type</name>
