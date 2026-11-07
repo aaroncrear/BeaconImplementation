@@ -22,7 +22,7 @@ Production had no quote lines, so nothing existing was affected.
 
 ## 1. Deploy the metadata (Gearset)
 
-Deploy from branch **`Pricing-Model-Rebuild`** to **Beacon Production** using the manifest **`manifest/Production-Pricing-and-Renewals-package.xml`** (92 components). Use **Run specified tests / no tests** as your Production policy allows (no Apex in this package).
+Deploy from branch **`Pricing-Model-Rebuild`** to **Beacon Production** using the manifest **`manifest/Production-Pricing-and-Renewals-package.xml`** (93 components). Use **Run specified tests / no tests** as your Production policy allows (no Apex in this package).
 
 | Type | Components |
 |---|---|
@@ -152,7 +152,7 @@ If the classification scope isn't offered, add the 17 modules to the same rule a
 ## 8. Users and permissions
 
 - **Permission set licenses first.** A group can only be assigned to users who hold the licenses of its permission sets. For **Beacon - Revenue Cloud User**: Revenue Cloud User, Product Catalog Management Viewer, Product Discovery User, Salesforce Pricing Run Time, Product Configuration User, Business Rules Engine Runtime, Context Service Runtime, Decimal Quantity Runtime User, Fulfillment User PSL, DocGen Designer, OmniStudio. Admins additionally need: Product Catalog Management Administrator, Salesforce Pricing Design Time, Business Rules Engine Designer, Context Service Admin, Decimal Quantity DesignTime User.
-- Assign **Beacon - Revenue Cloud User** to everyone who quotes; assign **Beacon - Revenue Cloud Admin** *and* the User group to Revenue Cloud admins.
+- Assign **Beacon - Revenue Cloud User** to everyone who quotes; assign **Beacon - Revenue Cloud Admin** *and* the User group to Revenue Cloud admins. The User group includes **Beacon - Revenue Cloud Order and Quote Fields** (standard Order/Quote field access, e.g. Order → Opportunity and Order → Quote). In Production no profile grants these, and without them Closed Won fails at Create Orders with "Can't create an order from this type of quote".
 
 - Confirm reps have their persona `Beacon_*_Object_Tab_FLS` permission set (new fields are included).
 - Assign **Edit Closed Opportunities** / **Edit Closed Won Quotes** only to the people allowed to change closed records.

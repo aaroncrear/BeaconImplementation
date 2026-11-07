@@ -3,6 +3,7 @@
     <description>Revenue Cloud permission sets for people who quote: catalog, configurator, pricing, quotes, orders, contracts, and asset amend, renew and cancel. Users also need the matching permission set licenses.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Beacon - Revenue Cloud User</label>
+    <permissionSets>Beacon_Revenue_Cloud_Order_Quote_Fields</permissionSets>
     <permissionSets>force__BRERuntime</permissionSets>
     <permissionSets>force__ContextServiceRuntimePsl</permissionSets>
     <permissionSets>force__CorePricingRunTimeUser</permissionSets>

@@ -98,6 +98,7 @@
         <members>Beacon_Marketing_Object_Tab_FLS</members>
         <members>Beacon_Product_Object_Tab_FLS</members>
         <members>Beacon_ResOps_Object_Tab_FLS</members>
+        <members>Beacon_Revenue_Cloud_Order_Quote_Fields</members>
         <members>Beacon_Sales_Object_Tab_FLS</members>
         <members>Beacon_Salesforce_Admin_Object_Tab_FLS</members>
         <members>Beacon_Tech_Object_Tab_FLS</members>
