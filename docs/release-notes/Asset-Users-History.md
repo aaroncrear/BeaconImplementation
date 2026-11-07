@@ -42,6 +42,13 @@ It's still the current value that renewal quote lines copy, that creates the Bea
 
 `scripts/apex/Asset_Users_History_Backfill.apex` fills the new fields for existing Asset Actions and State Periods from their Order Products, using the same rules. Set `PREVIEW = true` to check the counts first.
 
+### Unresolved questions (on hold)
+
+Asset → Number of Users is one record per module, overwritten by every renewal or amendment Order (the history is kept on the Asset Actions and State Periods). Two side effects are waiting on a decision from Beacon:
+
+1. **Timing.** The Asset's Number of Users (and any extra Beacon Subscriptions) change when the renewal **Order is activated**, not when the new term **starts**. A renewal closed a month before its start date shows next year's users a month early. Option: a daily scheduled flow that sets Asset → Number of Users from the Asset State Period covering today.
+2. **Fewer users.** When users go down, the Asset shows the lower number but the Beacon Subscriptions flow only adds missing seats, so the surplus subscriptions stay until removed by hand. Option: end the surplus subscriptions (e.g. set Date Access Removed on the newest unassigned seats) when users go down.
+
 ## Acceptance Criteria
 
 1. **New business.** Close Won a Subscription New Opportunity whose Approved quote has ADC at 5 users and Oncology at 12 users. When the Order's Assets are created, open the ADC Asset → Asset Actions. Confirm the Initial Sale action shows Number of Users 5 and Change in Users 5. Open its Asset State Period and confirm Number of Users 5. Repeat for Oncology (12 / 12).
