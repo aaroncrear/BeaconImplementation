@@ -276,6 +276,21 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>AssetAction.Change_in_Users__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssetAction.Number_of_Users__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssetStatePeriod.Number_of_Users__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Beacon_Module_Count_Price__c.Adjustment_Type__c</field>
         <readable>true</readable>
     </fieldPermissions>

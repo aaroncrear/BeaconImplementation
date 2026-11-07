@@ -64,7 +64,127 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Loop_Match_Order_Items</targetReference>
+            <targetReference>Loop_State_Periods</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Adds the Asset Id to the list used to get the Assets and their Asset State Periods.</description>
+        <name>Add_Asset_Id</name>
+        <label>Add Asset Id</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varAssetIds</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Loop_Collect_Asset_Ids.AssetId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Collect_Asset_Ids</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Clears the previous Number of Users before looking it up for this Asset.</description>
+        <name>Reset_Previous_Users</name>
+        <label>Reset Previous Users</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varPreviousUsers</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <numberValue>0.0</numberValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Find_Asset</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Keeps the Asset&apos;s Number of Users before this Order (blank for a new Asset), used for Change in Users.</description>
+        <name>Set_Previous_Users</name>
+        <label>Set Previous Users</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varPreviousUsers</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Find_Asset.Number_of_Users__c</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Find_Asset</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Sets Number of Users and Change in Users on the Asset Action and adds it to the list to update.</description>
+        <name>Add_Action_Users</name>
+        <label>Add Action Users</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varAssetAction.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Asset_Actions.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varAssetAction.Number_of_Users__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formNewUsers</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varAssetAction.Change_in_Users__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formUsersChange</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varAssetActionsToUpdate</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>varAssetAction</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Is_Cancellation</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Sets Number of Users on the Asset State Period and adds it to the list to update.</description>
+        <name>Add_Period_Users</name>
+        <label>Add Period Users</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varStatePeriod.Id</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_State_Periods.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varStatePeriod.Number_of_Users__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formNewUsers</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varStatePeriodsToUpdate</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>varStatePeriod</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_State_Periods</targetReference>
         </connector>
     </assignments>
     <decisions>
@@ -170,7 +290,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Add_Asset_Users</targetReference>
+                <targetReference>Reset_Previous_Users</targetReference>
             </connector>
             <label>Matches</label>
         </rules>
@@ -201,8 +321,107 @@
             <label>Has Assets</label>
         </rules>
     </decisions>
-    <description>Runs when Revenue Cloud publishes the final Create Asset Order Event for an Order, meaning its Assets have been created after Order activation. First sets Number of Users on each of the Order&apos;s Assets from its Order Product (Order Product, then Asset Action Source, then Asset Action, then Asset), which creates the Beacon Subscriptions. Then checks Assets Created on the Order, which starts Order - Assets Created - Create Renewal. The renewal work isn&apos;t done here because platform event-triggered flows can&apos;t call subflows or flow actions. Only listens to the event; it doesn&apos;t change it, so other subscribers still receive it. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
+    <decisions>
+        <description>Checks whether this Asset is the one the current Asset Action belongs to.</description>
+        <name>Asset_Matches_Action</name>
+        <label>Asset Matches Action?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Loop_Find_Asset</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Asset_Matches</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Loop_Find_Asset.Id</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Loop_Asset_Actions.AssetId</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Previous_Users</targetReference>
+            </connector>
+            <label>Matches</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Cancellations record 0 users on the Asset Action and its periods but leave the Asset&apos;s Number of Users (and its Beacon Subscriptions) unchanged.</description>
+        <name>Is_Cancellation</name>
+        <label>Cancellation?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Add_Asset_Users</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Not a Cancellation</defaultConnectorLabel>
+        <rules>
+            <name>Cancel</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Loop_Asset_Actions.Type</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Cancel</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Loop_State_Periods</targetReference>
+            </connector>
+            <label>Cancellation</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks whether this Asset State Period belongs to the Asset and starts on or after the action&apos;s start date. A renewal or amendment starts a new period on that date, so it and any later periods get the new Number of Users; earlier periods keep theirs.</description>
+        <name>Period_Matches_Action</name>
+        <label>Period Starts On or After Action?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Loop_State_Periods</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No</defaultConnectorLabel>
+        <rules>
+            <name>Period_Matches</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Loop_State_Periods.AssetId</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Loop_Asset_Actions.AssetId</elementReference>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Loop_State_Periods.StartDate</leftValueReference>
+                <operator>GreaterThanOrEqualTo</operator>
+                <rightValue>
+                    <elementReference>Loop_Match_Sources.StartDate</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Add_Period_Users</targetReference>
+            </connector>
+            <label>Matches</label>
+        </rules>
+    </decisions>
+    <description>Runs when Revenue Cloud publishes the final Create Asset Order Event for an Order, meaning its Assets have been created after Order activation. First sets Number of Users on each of the Order&apos;s Assets from its Order Product (Order Product, then Asset Action Source, then Asset Action, then Asset), which creates the Beacon Subscriptions. It also records the users history: Number of Users and Change in Users on each Asset Action, and Number of Users on the Asset State Periods from the action&apos;s start date onward (0 users for a cancellation, which leaves the Asset unchanged). Then checks Assets Created on the Order, which starts Order - Assets Created - Create Renewal. The renewal work isn&apos;t done here because platform event-triggered flows can&apos;t call subflows or flow actions. Only listens to the event; it doesn&apos;t change it, so other subscribers still receive it. Only runs when Run Flows is checked on the On/Off Switch custom setting.</description>
     <environments>Default</environments>
+    <formulas>
+        <description>Number of Users after this action: the Order Product&apos;s Number of Users, or 0 for a cancellation.</description>
+        <name>formNewUsers</name>
+        <dataType>Number</dataType>
+        <expression>IF(TEXT({!Loop_Asset_Actions.Type}) = &quot;Cancel&quot;, 0, {!Loop_Match_Order_Items.Number_of_Users__c})</expression>
+        <scale>0</scale>
+    </formulas>
+    <formulas>
+        <description>Change in Users for this action: the new Number of Users minus the Asset&apos;s Number of Users before this Order (0 when the Asset is new).</description>
+        <name>formUsersChange</name>
+        <dataType>Number</dataType>
+        <expression>{!formNewUsers} - BLANKVALUE({!varPreviousUsers}, 0)</expression>
+        <scale>0</scale>
+    </formulas>
     <interviewLabel>Create Asset Order Event - Mark Order Assets Created {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Create Asset Order Event - Mark Order Assets Created</label>
     <loops>
@@ -247,7 +466,7 @@
             <targetReference>Loop_Match_Sources</targetReference>
         </nextValueConnector>
         <noMoreValuesConnector>
-            <targetReference>Assets_To_Update_Found</targetReference>
+            <targetReference>Update_Asset_Action_Users</targetReference>
         </noMoreValuesConnector>
     </loops>
     <loops>
@@ -278,6 +497,51 @@
         </nextValueConnector>
         <noMoreValuesConnector>
             <targetReference>Loop_Match_Sources</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>Collects the Asset Ids from the Asset Actions.</description>
+        <name>Loop_Collect_Asset_Ids</name>
+        <label>Loop Collect Asset Ids</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Asset_Actions</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Add_Asset_Id</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Get_Assets</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>Finds the current Asset Action&apos;s Asset to read its Number of Users before this Order.</description>
+        <name>Loop_Find_Asset</name>
+        <label>Loop Find Asset</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Assets</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Asset_Matches_Action</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Add_Action_Users</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>Finds the Asset State Periods to set Number of Users on.</description>
+        <name>Loop_State_Periods</name>
+        <label>Loop State Periods</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_State_Periods</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Period_Matches_Action</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Loop_Match_Order_Items</targetReference>
         </noMoreValuesConnector>
     </loops>
     <processMetadataValues>
@@ -353,6 +617,7 @@
         <queriedFields>Id</queriedFields>
         <queriedFields>AssetActionId</queriedFields>
         <queriedFields>ReferenceEntityItemId</queriedFields>
+        <queriedFields>StartDate</queriedFields>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
@@ -363,7 +628,7 @@
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Loop_Asset_Actions</targetReference>
+            <targetReference>Loop_Collect_Asset_Ids</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -377,8 +642,80 @@
         <object>AssetAction</object>
         <queriedFields>Id</queriedFields>
         <queriedFields>AssetId</queriedFields>
+        <queriedFields>Type</queriedFields>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
+    <recordLookups>
+        <description>Gets the Order&apos;s Assets with their Number of Users before this Order, used for Change in Users.</description>
+        <name>Get_Assets</name>
+        <label>Get Assets</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_State_Periods</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>In</operator>
+            <value>
+                <elementReference>varAssetIds</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>Asset</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Number_of_Users__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the Asset State Periods of the Order&apos;s Assets.</description>
+        <name>Get_State_Periods</name>
+        <label>Get Asset State Periods</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Loop_Asset_Actions</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AssetId</field>
+            <operator>In</operator>
+            <value>
+                <elementReference>varAssetIds</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>AssetStatePeriod</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>AssetId</queriedFields>
+        <queriedFields>StartDate</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Saves Number of Users and Change in Users on the Asset Actions.</description>
+        <name>Update_Asset_Action_Users</name>
+        <label>Update Asset Action Users</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Update_State_Period_Users</targetReference>
+        </connector>
+        <inputReference>varAssetActionsToUpdate</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <description>Saves Number of Users on the Asset State Periods.</description>
+        <name>Update_State_Period_Users</name>
+        <label>Update State Period Users</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Assets_To_Update_Found</targetReference>
+        </connector>
+        <inputReference>varStatePeriodsToUpdate</inputReference>
+    </recordUpdates>
     <recordUpdates>
         <description>Saves Number of Users on the Assets. When it changes, Asset - On Create or Update - After Save creates the missing Beacon Subscriptions. This runs before Assets Created is checked, so the renewal quote is created from Assets that already have Number of Users.</description>
         <name>Update_Asset_Users</name>
@@ -462,5 +799,58 @@
         <isCollection>true</isCollection>
         <isInput>false</isInput>
         <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Asset Action record used to build each users update.</description>
+        <name>varAssetAction</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>AssetAction</objectType>
+    </variables>
+    <variables>
+        <description>Asset Actions to update with Number of Users and Change in Users.</description>
+        <name>varAssetActionsToUpdate</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>AssetAction</objectType>
+    </variables>
+    <variables>
+        <description>Ids of the Order&apos;s Assets.</description>
+        <name>varAssetIds</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>The current Asset&apos;s Number of Users before this Order.</description>
+        <name>varPreviousUsers</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+    </variables>
+    <variables>
+        <description>Asset State Period record used to build each users update.</description>
+        <name>varStatePeriod</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>AssetStatePeriod</objectType>
+    </variables>
+    <variables>
+        <description>Asset State Periods to update with Number of Users.</description>
+        <name>varStatePeriodsToUpdate</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>AssetStatePeriod</objectType>
     </variables>
 </Flow>
