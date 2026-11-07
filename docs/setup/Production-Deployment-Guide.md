@@ -145,6 +145,10 @@ If the classification scope isn't offered, add the 17 modules to the same rule a
 
 ---
 
+## 7b. Revenue Settings – order creation
+
+**Setup → Revenue Settings** → turn on **Advanced Order Creation From Quote** (top of the page). Without it, the Closed Won automation's Create Orders step fails with *"Can't create an order from this type of quote."* Leave **Set Up Flow for Creating Orders from Quotes**, **Managing Assets** and **Creating Contracts from Quotes** as they are (they match HTCDEV).
+
 ## 8. Users and permissions
 
 - **Permission set licenses first.** A group can only be assigned to users who hold the licenses of its permission sets. For **Beacon - Revenue Cloud User**: Revenue Cloud User, Product Catalog Management Viewer, Product Discovery User, Salesforce Pricing Run Time, Product Configuration User, Business Rules Engine Runtime, Context Service Runtime, Decimal Quantity Runtime User, Fulfillment User PSL, DocGen Designer, OmniStudio. Admins additionally need: Product Catalog Management Administrator, Salesforce Pricing Design Time, Business Rules Engine Designer, Context Service Admin, Decimal Quantity DesignTime User.

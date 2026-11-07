@@ -57,6 +57,9 @@ Tick each box as you go. 🤖 = tell Claude, who checks or completes that step b
 - [ ] Sub-Type Mapping: `PC_ProductBasedOn` → `ProductBasedOn`
 - [ ] Create rule **Beacon Module Quantity Must Be 1** – condition and action target both Product Classification **Beacon Module** (not a single product), Quantity ≠ 1 → message, effective to 2099 → Validate → Activate
 
+## 7b. Revenue Settings
+- [ ] Turn on **Advanced Order Creation From Quote** (needed for Closed Won → Order)
+
 ## 8. Users and permissions
 - [ ] Assign the Revenue Cloud permission set licenses to each user (list in the guide, step 8)
 - [ ] Assign **Beacon - Revenue Cloud User** to everyone who quotes
