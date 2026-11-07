@@ -16,7 +16,7 @@ The existing rule that requires fields when an Opportunity enters Demo Booked sh
 
 ### New field
 
-**Date Demo Scheduled** (`Date_Demo_Scheduled__c`, Date) holds the date the demo will take place. It sits below **Date Demo Booked** (the day the demo was booked) on the Opportunity layouts, and has the same access as Date Demo Booked in every permission set.
+**Date Demo Scheduled** (`Date_Demo_Scheduled__c`, Date) holds the date the demo will take place. It sits below **Date Demo Booked** (the day the demo was booked) on the Opportunity Layout (not the Subscription Renewal layout, since renewals have no demo stages), and has the same access as Date Demo Booked in every permission set.
 
 ### New validation rules
 
@@ -44,7 +44,7 @@ Each rule fires only when the Stage **changes from** the listed stage **to a lat
 
 Use a Subscription New Opportunity unless stated.
 
-1. Open an Opportunity. Confirm **Date Demo Scheduled** shows below Date Demo Booked and can be edited by a Sales user.
+1. Open a Subscription New Opportunity. Confirm **Date Demo Scheduled** shows below Date Demo Booked and can be edited by a Sales user. Open a Subscription Renewal Opportunity and confirm the field isn't on its layout.
 2. **Entering Demo Booked (existing rule).** With Type blank, move from Request for Information to Demo Booked. Confirm the existing error. (Renewal and Consulting Opportunities don't have a Demo Booked stage, so the rule can only fire on Subscription New.)
 3. **Leaving Demo Booked.** At Demo Booked with Date Demo Scheduled blank, move to Demo Completed. Confirm the error lists Date Demo Scheduled, Primary Module, Primary Campaign Source, Lead Source and Lead Type. Fill Date Demo Scheduled and save the move. Confirm it succeeds.
 4. Repeat step 3 clearing Primary Module, then Primary Campaign Source, Lead Source and Lead Type in turn. Confirm each blocks the move.
@@ -77,23 +77,22 @@ Package manifest: `manifest/Opportunity-Stage-Required-Fields-package.xml`
 | 4 | ValidationRule | Opportunity | Required_Fields_Leaving_Demo_Completed | Required_Fields_Leaving_Demo_Completed | Created | Moving on from Demo Completed requires Date Demo Booked. |
 | 5 | ValidationRule | Opportunity | Required_Fields_Leaving_Proposal | Required_Fields_Leaving_Proposal | Created | Moving on from Proposal requires Invoice Terms. |
 | 6 | Layout | Opportunity | Opportunity-Opportunity Layout | Opportunity Layout | Updated | Date Demo Scheduled added below Date Demo Booked. |
-| 7 | Layout | Opportunity | Opportunity-Beacon Subscription Renewal Opportunity Layout | Beacon Subscription Renewal Opportunity Layout | Updated | Date Demo Scheduled added below Date Demo Booked. |
-| 8 | PermissionSet | — | Beacon_Consulting | Beacon Consulting | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
-| 9 | PermissionSet | — | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
-| 10 | PermissionSet | — | Beacon_Customer_Success | Beacon Customer Success | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
-| 11 | PermissionSet | — | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
-| 12 | PermissionSet | — | Beacon_Executive | Beacon Executive | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
-| 13 | PermissionSet | — | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
-| 14 | PermissionSet | — | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
-| 15 | PermissionSet | — | Beacon_Marketing | Beacon Marketing | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
-| 16 | PermissionSet | — | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
-| 17 | PermissionSet | — | Beacon_Product | Beacon Product | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
-| 18 | PermissionSet | — | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
-| 19 | PermissionSet | — | Beacon_ResOps | Beacon ResOps | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
-| 20 | PermissionSet | — | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
-| 21 | PermissionSet | — | Beacon_Sales | Beacon Sales | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
-| 22 | PermissionSet | — | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
-| 23 | PermissionSet | — | Beacon_Salesforce_Admin | Beacon Salesforce Admin | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
-| 24 | PermissionSet | — | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
-| 25 | PermissionSet | — | Beacon_Tech | Beacon Tech | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
-| 26 | PermissionSet | — | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
+| 7 | PermissionSet | — | Beacon_Consulting | Beacon Consulting | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
+| 8 | PermissionSet | — | Beacon_Consulting_Object_Tab_FLS | Beacon Consulting - Object, Tab, FLS | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
+| 9 | PermissionSet | — | Beacon_Customer_Success | Beacon Customer Success | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
+| 10 | PermissionSet | — | Beacon_Customer_Success_Object_Tab_FLS | Beacon Customer Success - Object, Tab, FLS | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
+| 11 | PermissionSet | — | Beacon_Executive | Beacon Executive | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
+| 12 | PermissionSet | — | Beacon_Executive_Object_Tab_FLS | Beacon Executive - Object, Tab, FLS | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
+| 13 | PermissionSet | — | Beacon_Finance_Object_Tab_FLS | Beacon Finance - Object, Tab, FLS | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
+| 14 | PermissionSet | — | Beacon_Marketing | Beacon Marketing | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
+| 15 | PermissionSet | — | Beacon_Marketing_Object_Tab_FLS | Beacon Marketing - Object, Tab, FLS | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
+| 16 | PermissionSet | — | Beacon_Product | Beacon Product | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
+| 17 | PermissionSet | — | Beacon_Product_Object_Tab_FLS | Beacon Product - Object, Tab, FLS | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
+| 18 | PermissionSet | — | Beacon_ResOps | Beacon ResOps | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
+| 19 | PermissionSet | — | Beacon_ResOps_Object_Tab_FLS | Beacon ResOps - Object, Tab, FLS | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
+| 20 | PermissionSet | — | Beacon_Sales | Beacon Sales | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
+| 21 | PermissionSet | — | Beacon_Sales_Object_Tab_FLS | Beacon Sales - Object, Tab, FLS | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
+| 22 | PermissionSet | — | Beacon_Salesforce_Admin | Beacon Salesforce Admin | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
+| 23 | PermissionSet | — | Beacon_Salesforce_Admin_Object_Tab_FLS | Beacon Salesforce Admin - Object, Tab, FLS | Updated | Read and edit access to Date Demo Scheduled (same as Date Demo Booked). |
+| 24 | PermissionSet | — | Beacon_Tech | Beacon Tech | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |
+| 25 | PermissionSet | — | Beacon_Tech_Object_Tab_FLS | Beacon Tech - Object, Tab, FLS | Updated | Read access to Date Demo Scheduled (same as Date Demo Booked). |

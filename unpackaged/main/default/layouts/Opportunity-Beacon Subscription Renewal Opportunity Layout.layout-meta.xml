@@ -134,10 +134,6 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>Date_Demo_Scheduled__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
                 <field>Date_Demo_Completed__c</field>
             </layoutItems>
             <layoutItems>
