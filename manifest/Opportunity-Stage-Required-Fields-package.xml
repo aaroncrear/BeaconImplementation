@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Opportunity.Date_Demo_Scheduled__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Opportunity-Beacon Subscription Renewal Opportunity Layout</members>
+        <members>Opportunity-Opportunity Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>Beacon_Consulting</members>
+        <members>Beacon_Consulting_Object_Tab_FLS</members>
+        <members>Beacon_Customer_Success</members>
+        <members>Beacon_Customer_Success_Object_Tab_FLS</members>
+        <members>Beacon_Executive</members>
+        <members>Beacon_Executive_Object_Tab_FLS</members>
+        <members>Beacon_Finance_Object_Tab_FLS</members>
+        <members>Beacon_Marketing</members>
+        <members>Beacon_Marketing_Object_Tab_FLS</members>
+        <members>Beacon_Product</members>
+        <members>Beacon_Product_Object_Tab_FLS</members>
+        <members>Beacon_ResOps</members>
+        <members>Beacon_ResOps_Object_Tab_FLS</members>
+        <members>Beacon_Sales</members>
+        <members>Beacon_Sales_Object_Tab_FLS</members>
+        <members>Beacon_Salesforce_Admin</members>
+        <members>Beacon_Salesforce_Admin_Object_Tab_FLS</members>
+        <members>Beacon_Tech</members>
+        <members>Beacon_Tech_Object_Tab_FLS</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>Opportunity.Required_Fields_Demo_Booked</members>
+        <members>Opportunity.Required_Fields_Leaving_Demo_Booked</members>
+        <members>Opportunity.Required_Fields_Leaving_Demo_Completed</members>
+        <members>Opportunity.Required_Fields_Leaving_Proposal</members>
+        <name>ValidationRule</name>
+    </types>
+    <version>67.0</version>
+</Package>

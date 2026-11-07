@@ -766,6 +766,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Opportunity.Date_Demo_Scheduled__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Opportunity.Date_Demo_Completed__c</field>
         <readable>true</readable>
     </fieldPermissions>

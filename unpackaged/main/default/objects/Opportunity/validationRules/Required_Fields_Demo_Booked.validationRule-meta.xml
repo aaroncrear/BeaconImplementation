@@ -2,8 +2,9 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Required_Fields_Demo_Booked</fullName>
     <active>true</active>
-    <description>Requires Primary Campaign Source, Type, Primary Module, Lead Source and Lead Type to be populated when the Opportunity Stage is Demo Booked. Honors the On/Off Switch (Run Validation Rules).</description>
+    <description>Requires Primary Campaign Source, Type, Primary Module, Lead Source and Lead Type to be populated when a Subscription New Opportunity&apos;s Stage is Demo Booked. Honors the On/Off Switch (Run Validation Rules).</description>
     <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp; (
+    RecordType.DeveloperName = &quot;Subscription_New&quot; &amp;&amp;
     ISPICKVAL(StageName, &quot;Demo Booked&quot;) &amp;&amp;
     (
         ISBLANK(CampaignId) ||

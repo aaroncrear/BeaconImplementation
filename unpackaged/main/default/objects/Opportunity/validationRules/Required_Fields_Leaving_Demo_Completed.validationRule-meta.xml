@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Required_Fields_Leaving_Demo_Completed</fullName>
+    <active>true</active>
+    <description>When a Subscription Opportunity moves on from Demo Completed to a later stage (Proposal, Contract or Closed Won), requires Date Demo Booked. Moving back a stage or to Closed Lost isn't blocked. Honors the On/Off Switch (Run Validation Rules).</description>
+    <errorConditionFormula>$Setup.On_Off_Switch__c.Run_Validation_Rules__c &amp;&amp;
+BEGINS(RecordType.DeveloperName, &quot;Subscription_&quot;) &amp;&amp;
+ISCHANGED(StageName) &amp;&amp;
+ISPICKVAL(PRIORVALUE(StageName), &quot;Demo Completed&quot;) &amp;&amp;
+(
+    ISPICKVAL(StageName, &quot;Proposal&quot;) ||
+    ISPICKVAL(StageName, &quot;Contract&quot;) ||
+    ISPICKVAL(StageName, &quot;Closed Won&quot;)
+) &amp;&amp;
+ISBLANK(Date_Demo_Booked__c)</errorConditionFormula>
+    <errorMessage>Before moving on from Demo Completed, please complete Date Demo Booked.</errorMessage>
+</ValidationRule>

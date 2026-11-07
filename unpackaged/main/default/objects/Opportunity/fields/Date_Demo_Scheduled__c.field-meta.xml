@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Date_Demo_Scheduled__c</fullName>
+    <description>Date the demo is scheduled to take place. Required before a Subscription New Opportunity can move on from Demo Booked (validation rule Required_Fields_Leaving_Demo_Booked).</description>
+    <inlineHelpText>The date the demo will take place (not the day it was booked - that is Date Demo Booked).</inlineHelpText>
+    <label>Date Demo Scheduled</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>
